@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments Management - CUEA MindConnect Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #17a2b8;
+            --light-bg: #ecf0f1;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 20px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: var(--secondary-color);
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stats-card.pending { border-left-color: var(--warning-color); }
+        .stats-card.scheduled { border-left-color: var(--success-color); }
+        .stats-card.completed { border-left-color: var(--info-color); }
+        .stats-card.urgent { border-left-color: var(--danger-color); }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .appointments-table {
+            width: 100%;
+            margin: 0;
+        }
+
+        .appointments-table th {
+            background: #f8f9fa;
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .appointments-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+
+        .appointments-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-assigned { background: #d4edda; color: #155724; }
+        .status-scheduled { background: #d1ecf1; color: #0c5460; }
+        .status-completed { background: #e2e3e5; color: #383d41; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .priority-badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .priority-normal { background: #e3f2fd; color: #1976d2; }
+        .priority-medium { background: #fff3e0; color: #f57c00; }
+        .priority-high { background: #ffebee; color: #d32f2f; }
+        .priority-urgent { background: #ffebee; color: #d32f2f; }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .user-details .name {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.2rem;
+        }
+
+        .user-details .email {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .time-display {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .requested-time {
+            font-weight: 600;
+            color: var(--warning-color);
+        }
+
+        .scheduled-time {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .time-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+
+        .modal-lg {
+            max-width: 800px;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .alert {
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-menu {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
+        }
+
+        .no-appointments {
+            background: white;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Admin Panel</h4>
+                        <small class="text-muted">CUEA MindConnect</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin-dashboard">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/users">
+                                <i class="fas fa-users"></i> User Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/counselors">
+                                <i class="fas fa-user-md"></i> Counselor Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/appointments">
+                                <i class="fas fa-calendar-check"></i> Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/content">
+                                <i class="fas fa-file-alt"></i> Content Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/analytics">
+                                <i class="fas fa-chart-bar"></i> Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/settings">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="/logout">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h2 mb-0">
+                                <i class="fas fa-calendar-check me-2"></i>
+                                Appointments Management
+                            </h1>
+                            <p class="mb-0 mt-2 opacity-75">Manage all counseling appointments and schedules - Prevent double booking</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-light" onclick="refreshData()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="exportData('csv')">
+                                        <i class="fas fa-file-csv"></i> Export as CSV
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportData('excel')">
+                                        <i class="fas fa-file-excel"></i> Export as Excel
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                <div id="flashMessages"></div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-cards">
+                    <div class="stats-card pending">
+                        <div class="stats-number" id="pendingCount">0</div>
+                        <div class="stats-label">
+                            <i class="fas fa-clock"></i> Pending Assignments
+                        </div>
+                    </div>
+                    <div class="stats-card scheduled">
+                        <div class="stats-number" id="scheduledCount">0</div>
+                        <div class="stats-label">
+                            <i class="fas fa-calendar-check"></i> Scheduled Sessions
+                        </div>
+                    </div>
+                    <div class="stats-card completed">
+                        <div class="stats-number" id="completedCount">0</div>
+                        <div class="stats-label">
+                            <i class="fas fa-check-circle"></i> Completed
+                        </div>
+                    </div>
+                    <div class="stats-card urgent">
+                        <div class="stats-number" id="urgentCount">0</div>
+                        <div class="stats-label">
+                            <i class="fas fa-exclamation-triangle"></i> High Priority
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="filters-section">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label"><i class="fas fa-filter"></i> Status Filter</label>
+                            <select class="form-select" id="statusFilter" onchange="applyFilters()">
+                                <option value="">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="assigned">Assigned</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><i class="fas fa-user-md"></i> Counselor Filter</label>
+                            <select class="form-select" id="counselorFilter" onchange="applyFilters()">
+                                <option value="">All Counselors</option>
+                                <option value="unassigned">Unassigned</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><i class="fas fa-calendar"></i> Date Range</label>
+                            <select class="form-select" id="dateFilter" onchange="applyFilters()">
+                                <option value="">All Dates</option>
+                                <option value="today">Today</option>
+                                <option value="tomorrow">Tomorrow</option>
+                                <option value="this-week">This Week</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><i class="fas fa-search"></i> Search</label>
+                            <input type="text" class="form-control" id="searchInput" 
+                                   placeholder="Search students..." onkeyup="applyFilters()">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearFilters()">
+                                <i class="fas fa-times"></i> Clear Filters
+                            </button>
+                            <span class="ms-3 text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                Showing <span id="filteredCount">0</span> of <span id="totalAppointments">0</span> appointments
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointments Table -->
+                <div class="table-container" id="appointmentsContainer">
+                    <div class="table-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            All Appointments (<span id="totalCount">0</span>)
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="showBulkAssignModal()" 
+                                    id="bulkAssignBtn" disabled>
+                                <i class="fas fa-user-plus"></i> Bulk Assign (<span id="selectedCount">0</span>)
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="bulkCancel()"
+                                    id="bulkCancelBtn" disabled>
+                                <i class="fas fa-times"></i> Bulk Cancel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive" style="max-height: 650px; overflow-y: auto;">
+                        <table class="table appointments-table">
+                            <thead>
+                                <tr>
+                                    <th width="3%">
+                                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="form-check-input">
+                                    </th>
+                                    <th width="22%">Student</th>
+                                    <th width="18%">Counselor</th>
+                                    <th width="18%">Date & Time</th>
+                                    <th width="8%">Status</th>
+                                    <th width="7%">Priority</th>
+                                    <th width="8%">Mode</th>
+                                    <th width="16%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentsTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="empty-state">
+                                            <div class="spinner"></div>
+                                            <p>Loading appointments...</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- No Appointments State -->
+                <div class="no-appointments" id="noAppointmentsState" style="display: none;">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h4>No Appointments Found</h4>
+                    <p>There are currently no appointments in the system matching your filters.</p>
+                    <button class="btn btn-primary" onclick="clearFilters()">
+                        <i class="fas fa-filter"></i> Clear Filters
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Assign Counselor Modal -->
+    <div class="modal fade" id="assignCounselorModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus"></i> Assign Counselor
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="assignCounselorForm">
+                    <div class="modal-body">
+                        <!-- Student Info Display -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-user"></i> Student Request Details</h6>
+                            </div>
+                            <div class="card-body" id="studentRequestDetails">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Assignment Form -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Select Counselor *</label>
+                                <select class="form-select" name="counselor_id" required>
+                                    <option value="">Choose a counselor...</option>
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i> Only available counselors shown (no conflicts)
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Session Mode</label>
+                                <select class="form-select" name="mode" onchange="toggleModeFields()">
+                                    <option value="in-person">In-Person</option>
+                                    <option value="video-call">Video Call</option>
+                                    <option value="phone-call">Phone Call</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Scheduled Date & Time *</label>
+                                <input type="datetime-local" class="form-control" name="scheduled_date" required
+                                       onchange="checkAvailability()">
+                                <div class="form-text">
+                                    <i class="fas fa-clock"></i> System will check for conflicts
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Duration (minutes)</label>
+                                <select class="form-select" name="duration" onchange="checkAvailability()">
+                                    <option value="30">30 minutes</option>
+                                    <option value="45">45 minutes</option>
+                                    <option value="60" selected>60 minutes</option>
+                                    <option value="90">90 minutes</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6" id="roomNumberField">
+                                <label class="form-label">Room Number *</label>
+                                <input type="text" class="form-control" name="room_number" 
+                                       placeholder="e.g., Room 201, Office 3A" required>
+                            </div>
+                            <div class="col-md-6" id="videoLinkField" style="display: none;">
+                                <label class="form-label">Video/Call Link *</label>
+                                <input type="url" class="form-control" name="video_link" 
+                                       placeholder="https://meet.google.com/...">
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="form-label">Assignment Notes</label>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                      placeholder="Add notes about the assignment (optional)..."></textarea>
+                        </div>
+
+                        <!-- Availability Check Alert -->
+                        <div id="availabilityAlert" class="alert alert-info mt-3" style="display: none;">
+                            <i class="fas fa-info-circle"></i> <span id="availabilityMessage"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="assignSubmitBtn">
+                            <i class="fas fa-user-plus"></i> Assign Counselor
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Assignment Modal -->
+    <div class="modal fade" id="editAssignmentModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit"></i> Edit Assignment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editAssignmentForm">
+                    <div class="modal-body">
+                        <!-- Current Assignment Display -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Current Assignment</h6>
+                            </div>
+                            <div class="card-body" id="currentAssignmentDetails">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Edit Form -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Reassign Counselor</label>
+                                <select class="form-select" name="counselor_id" required>
+                                    <option value="">Choose a counselor...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Session Mode</label>
+                                <select class="form-select" name="mode" onchange="toggleEditModeFields()">
+                                    <option value="in-person">In-Person</option>
+                                    <option value="video-call">Video Call</option>
+                                    <option value="phone-call">Phone Call</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Scheduled Date & Time</label>
+                                <input type="datetime-local" class="form-control" name="scheduled_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Duration (minutes)</label>
+                                <select class="form-select" name="duration">
+                                    <option value="30">30 minutes</option>
+                                    <option value="45">45 minutes</option>
+                                    <option value="60">60 minutes</option>
+                                    <option value="90">90 minutes</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6" id="editRoomNumberField">
+                                <label class="form-label">Room Number</label>
+                                <input type="text" class="form-control" name="room_number" 
+                                       placeholder="e.g., Room 201, Office 3A">
+                            </div>
+                            <div class="col-md-6" id="editVideoLinkField" style="display: none;">
+                                <label class="form-label">Video/Call Link</label>
+                                <input type="url" class="form-control" name="video_link" 
+                                       placeholder="https://meet.google.com/...">
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="form-label">Update Notes</label>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                      placeholder="Add notes about the changes (optional)..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Update Assignment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Appointment Modal -->
+    <div class="modal fade" id="viewAppointmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-eye"></i> Appointment Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="appointmentDetailsBody">
+                    <!-- Content loaded dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="printAppointmentDetails()">
+                        <i class="fas fa-print"></i> Print Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reschedule Modal -->
+    <div class="modal fade" id="rescheduleModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-alt"></i> Reschedule Appointment
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="rescheduleForm">
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            This will change the appointment date/time and notify the student and counselor.
+                        </div>
+
+                        <div id="rescheduleCurrentInfo" class="card mb-3">
+                            <!-- Current appointment info -->
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">New Date</label>
+                                <input type="date" class="form-control" name="new_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">New Time</label>
+                                <input type="time" class="form-control" name="new_time" required>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="form-label">Reason for Reschedule</label>
+                            <textarea class="form-control" name="reason" rows="3" 
+                                      placeholder="Explain why the appointment is being rescheduled..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calendar-alt"></i> Reschedule
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Appointment Modal -->
+    <div class="modal fade" id="cancelAppointmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-times-circle"></i> Cancel Appointment
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="cancelAppointmentForm">
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            <strong>Warning:</strong> This action cannot be undone. The student and counselor will be notified.
+                        </div>
+
+                        <div id="cancelAppointmentInfo" class="card mb-3">
+                            <!-- Appointment info to cancel -->
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Reason for Cancellation *</label>
+                            <select class="form-select" name="cancellation_reason" required>
+                                <option value="">Select a reason...</option>
+                                <option value="student_request">Student Request</option>
+                                <option value="counselor_unavailable">Counselor Unavailable</option>
+                                <option value="scheduling_conflict">Scheduling Conflict</option>
+                                <option value="technical_issues">Technical Issues</option>
+                                <option value="emergency">Emergency</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Additional Notes</label>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                      placeholder="Provide additional details about the cancellation..."></textarea>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="notify_parties" checked>
+                            <label class="form-check-label">
+                                Notify student and counselor via email
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-arrow-left"></i> Keep Appointment
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i> Confirm Cancellation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Assign Modal -->
+    <div class="modal fade" id="bulkAssignModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-users"></i> Bulk Assign Counselor
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="bulkAssignForm">
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            You are about to assign a counselor to <strong id="bulkSelectionCount">0</strong> selected appointments.
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-list"></i> Selected Appointments</h6>
+                            </div>
+                            <div class="card-body" id="bulkSelectedAppointments">
+                                <!-- Selected appointments list -->
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Select Counselor *</label>
+                                <select class="form-select" name="counselor_id" required>
+                                    <option value="">Choose a counselor...</option>
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-exclamation-triangle"></i> Only select if counselor is available for ALL selected times
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Default Mode</label>
+                                <select class="form-select" name="mode">
+                                    <option value="in-person">In-Person</option>
+                                    <option value="video-call">Video Call</option>
+                                    <option value="phone-call">Phone Call</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="form-label">Bulk Assignment Notes</label>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                      placeholder="Add notes that will apply to all assigned appointments..."></textarea>
+                        </div>
+
+                        <div class="alert alert-warning mt-3">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            <strong>Important:</strong> This will assign the selected counselor to all selected appointments. 
+                            Make sure to check for scheduling conflicts manually.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-user-plus"></i> Assign to All Selected
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="bg-white p-4 rounded text-center">
+            <div class="spinner"></div>
+            <p class="mb-0">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Global variables
+let appointments = [];
+let filteredAppointments = [];
+let counselors = [];
+let currentAppointmentId = null;
+let selectedAppointments = [];
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('🔧 Initializing Complete Appointments Management...');
+    loadAppointments();
+    loadCounselors();
+    setupEventHandlers();
+});
+
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.appointment-checkbox');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    updateSelectedAppointments();
+}
+
+function clearSelections() {
+    const checkboxes = document.querySelectorAll('.appointment-checkbox');
+    checkboxes.forEach(cb => cb.checked = false);
+    document.getElementById('selectAll').checked = false;
+    updateSelectedAppointments();
+}
+
+function toggleModeFields() {
+    const mode = document.querySelector('#assignCounselorForm select[name="mode"]').value;
+    const roomField = document.getElementById('roomNumberField');
+    const videoField = document.getElementById('videoLinkField');
+    
+    if (mode === 'in-person') {
+        roomField.style.display = 'block';
+        videoField.style.display = 'none';
+        roomField.querySelector('input').required = true;
+        videoField.querySelector('input').required = false;
+    } else {
+        roomField.style.display = 'none';
+        videoField.style.display = 'block';
+        roomField.querySelector('input').required = false;
+        videoField.querySelector('input').required = true;
+    }
+}
+
+function toggleEditModeFields() {
+    const mode = document.querySelector('#editAssignmentForm select[name="mode"]').value;
+    const roomField = document.getElementById('editRoomNumberField');
+    const videoField = document.getElementById('editVideoLinkField');
+    
+    if (mode === 'in-person') {
+        roomField.style.display = 'block';
+        videoField.style.display = 'none';
+    } else {
+        roomField.style.display = 'none';
+        videoField.style.display = 'block';
+    }
+}
+
+// ===============================
+// FILTER FUNCTIONS
+// ===============================
+
+function applyFilters() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const counselorFilter = document.getElementById('counselorFilter').value;
+    const dateFilter = document.getElementById('dateFilter').value;
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    filteredAppointments = appointments.filter(appointment => {
+        // Status filter
+        if (statusFilter && appointment.status !== statusFilter) return false;
+        
+        // Counselor filter
+        if (counselorFilter) {
+            if (counselorFilter === 'unassigned' && appointment.counselor) return false;
+            if (counselorFilter !== 'unassigned' && 
+                (!appointment.counselor || appointment.counselor.id != counselorFilter)) return false;
+        }
+        
+        // Date filter
+        if (dateFilter && !matchesDateFilter(appointment, dateFilter)) return false;
+        
+        // Search filter
+        if (searchTerm && !matchesSearchTerm(appointment, searchTerm)) return false;
+        
+        return true;
+    });
+    
+    renderAppointmentsTable();
+}
+
+function matchesDateFilter(appointment, filter) {
+    const appointmentDate = new Date(appointment.scheduled_date || appointment.requested_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    switch (filter) {
+        case 'today':
+            return appointmentDate.toDateString() === today.toDateString();
+        case 'tomorrow':
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            return appointmentDate.toDateString() === tomorrow.toDateString();
+        case 'this-week':
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            return appointmentDate >= weekStart && appointmentDate <= weekEnd;
+        case 'overdue':
+            return appointmentDate < today && !['completed', 'cancelled'].includes(appointment.status);
+        default:
+            return true;
+    }
+}
+
+function matchesSearchTerm(appointment, searchTerm) {
+    const studentName = `${appointment.student.first_name} ${appointment.student.last_name}`.toLowerCase();
+    const studentEmail = appointment.student.email.toLowerCase();
+    const studentId = (appointment.student.student_id || '').toLowerCase();
+    
+    return studentName.includes(searchTerm) || 
+           studentEmail.includes(searchTerm) ||
+           studentId.includes(searchTerm);
+}
+
+function clearFilters() {
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('counselorFilter').value = '';
+    document.getElementById('dateFilter').value = '';
+    document.getElementById('searchInput').value = '';
+    filteredAppointments = [...appointments];
+    renderAppointmentsTable();
+}
+
+// ===============================
+// UTILITY FUNCTIONS
+// ===============================
+
+function getInitials(firstName, lastName) {
+    return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`;
+}
+
+function getRowClass(appointment) {
+    if (appointment.priority === 'urgent') return 'table-danger';
+    if (appointment.status === 'overdue') return 'table-warning';
+    return '';
+}
+
+function formatDateTime(dateString) {
+    if (!dateString) return 'TBD';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function formatStatus(status) {
+    const statusMap = {
+        'pending': 'Pending',
+        'assigned': 'Assigned',
+        'scheduled': 'Scheduled',
+        'completed': 'Completed',
+        'cancelled': 'Cancelled'
+    };
+    return statusMap[status] || status;
+}
+
+function formatPriority(priority) {
+    return (priority || 'normal').charAt(0).toUpperCase() + (priority || 'normal').slice(1);
+}
+
+function formatMode(mode) {
+    const modeMap = {
+        'in-person': 'In-Person',
+        'video-call': 'Video Call',
+        'phone-call': 'Phone Call'
+    };
+    return modeMap[mode] || mode || 'Not Set';
+}
+
+function generateStudentRequestHTML(appointment) {
+    return `
+        <div class="row">
+            <div class="col-md-6">
+                <strong>Student:</strong> ${appointment.student.first_name} ${appointment.student.last_name}<br>
+                <strong>Email:</strong> ${appointment.student.email}<br>
+                ${appointment.student.student_id ? `<strong>Student ID:</strong> ${appointment.student.student_id}<br>` : ''}
+                ${appointment.student.course ? `<strong>Course:</strong> ${appointment.student.course}<br>` : ''}
+            </div>
+            <div class="col-md-6">
+                <strong>Requested Date:</strong> ${formatDateTime(appointment.requested_date)}<br>
+                <strong>Topic:</strong> ${appointment.topic || 'General counseling'}<br>
+                <strong>Priority:</strong> <span class="priority-badge priority-${appointment.priority || 'normal'}">${formatPriority(appointment.priority)}</span><br>
+                <strong>Duration:</strong> ${appointment.duration || 60} minutes
+            </div>
+        </div>
+        ${appointment.notes ? `
+            <div class="mt-2">
+                <strong>Student Notes:</strong><br>
+                <div class="alert alert-light">${appointment.notes}</div>
+            </div>
+        ` : ''}
+    `;
+}
+
+function generateCurrentAssignmentHTML(appointment) {
+    return `
+        <div class="row">
+            <div class="col-md-6">
+                <strong>Current Counselor:</strong> ${appointment.counselor ? appointment.counselor.first_name + ' ' + appointment.counselor.last_name : 'Not assigned'}<br>
+                <strong>Scheduled Date:</strong> ${formatDateTime(appointment.scheduled_date || appointment.requested_date)}<br>
+                <strong>Mode:</strong> ${formatMode(appointment.mode)}<br>
+            </div>
+            <div class="col-md-6">
+                <strong>Status:</strong> <span class="status-badge status-${appointment.status}">${formatStatus(appointment.status)}</span><br>
+                <strong>Duration:</strong> ${appointment.duration || 60} minutes<br>
+                ${appointment.room_number ? `<strong>Room:</strong> ${appointment.room_number}<br>` : ''}
+                ${appointment.video_link ? `<strong>Link:</strong> <a href="${appointment.video_link}" target="_blank">Join Session</a><br>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function generateDetailsHTML(appointment) {
+    return `
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-user"></i> Student Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Name:</strong> ${appointment.student.first_name} ${appointment.student.last_name}</p>
+                        <p><strong>Email:</strong> ${appointment.student.email}</p>
+                        <p><strong>Student ID:</strong> ${appointment.student.student_id || 'N/A'}</p>
+                        <p><strong>Course:</strong> ${appointment.student.course || 'N/A'}</p>
+                        <p><strong>Phone:</strong> ${appointment.student.phone || 'N/A'}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-calendar"></i> Appointment Details</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Status:</strong> <span class="status-badge status-${appointment.status}">${formatStatus(appointment.status)}</span></p>
+                        <p><strong>Priority:</strong> <span class="priority-badge priority-${appointment.priority || 'normal'}">${formatPriority(appointment.priority)}</span></p>
+                        <p><strong>Requested:</strong> ${formatDateTime(appointment.requested_date)}</p>
+                        <p><strong>Scheduled:</strong> ${appointment.scheduled_date ? formatDateTime(appointment.scheduled_date) : 'TBD'}</p>
+                        <p><strong>Duration:</strong> ${appointment.duration || 60} minutes</p>
+                        <p><strong>Mode:</strong> ${formatMode(appointment.mode)}</p>
+                        ${appointment.room_number ? `<p><strong>Room:</strong> ${appointment.room_number}</p>` : ''}
+                        ${appointment.video_link ? `<p><strong>Link:</strong> <a href="${appointment.video_link}" target="_blank">Join Session</a></p>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        ${appointment.counselor ? `
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-user-md"></i> Assigned Counselor</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> ${appointment.counselor.first_name} ${appointment.counselor.last_name}</p>
+                    <p><strong>Email:</strong> ${appointment.counselor.email}</p>
+                    <p><strong>Specialization:</strong> ${appointment.counselor.specialization || 'General Counseling'}</p>
+                    <p><strong>Phone:</strong> ${appointment.counselor.phone || 'N/A'}</p>
+                </div>
+            </div>
+        ` : ''}
+        
+        ${appointment.notes || appointment.admin_notes || appointment.counselor_notes ? `
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-sticky-note"></i> Notes</h6>
+                </div>
+                <div class="card-body">
+                    ${appointment.notes ? `<p><strong>Student Notes:</strong><br>${appointment.notes}</p>` : ''}
+                    ${appointment.admin_notes ? `<p><strong>Admin Notes:</strong><br>${appointment.admin_notes}</p>` : ''}
+                    ${appointment.counselor_notes ? `<p><strong>Counselor Notes:</strong><br>${appointment.counselor_notes}</p>` : ''}
+                </div>
+            </div>
+        ` : ''}
+    `;
+}
+
+function updateStatistics(stats) {
+    if (stats) {
+        document.getElementById('pendingCount').textContent = stats.pending || 0;
+        document.getElementById('scheduledCount').textContent = stats.scheduled || 0;
+        document.getElementById('completedCount').textContent = stats.completed || 0;
+        document.getElementById('urgentCount').textContent = stats.urgent || 0;
+    }
+}
+
+function updateCounts() {
+    document.getElementById('totalCount').textContent = filteredAppointments.length;
+    document.getElementById('filteredCount').textContent = filteredAppointments.length;
+    document.getElementById('totalAppointments').textContent = appointments.length;
+}
+
+function refreshData() {
+    clearSelections();
+    loadAppointments();
+    loadCounselors();
+    showAlert('Data refreshed successfully!', 'info');
+}
+
+function showLoading(show) {
+    document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+}
+
+function showAlert(message, type = 'info') {
+    const alertHTML = `
+        <div class="alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show" role="alert">
+            <i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    const container = document.getElementById('flashMessages');
+    container.insertAdjacentHTML('beforeend', alertHTML);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        const alerts = container.querySelectorAll('.alert');
+        if (alerts.length > 0) {
+            alerts[0].remove();
+        }
+    }, 5000);
+}
+
+function showErrorState() {
+    document.getElementById('appointmentsTableBody').innerHTML = `
+        <tr>
+            <td colspan="8" class="text-center py-4">
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle text-warning fa-2x mb-3"></i>
+                    <h5 class="text-danger">Failed to load appointments</h5>
+                    <p>There was an error loading the appointments data.</p>
+                    <button class="btn btn-outline-primary btn-sm" onclick="loadAppointments()">
+                        <i class="fas fa-retry"></i> Try Again
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+function exportData(format) {
+    try {
+        console.log(`📤 Exporting data in ${format} format`);
+        
+        // Get current filter parameters
+        const statusFilter = document.getElementById('statusFilter').value;
+        const counselorFilter = document.getElementById('counselorFilter').value;
+        const dateFilter = document.getElementById('dateFilter').value;
+        const searchTerm = document.getElementById('searchInput').value;
+        
+        // Build URL with parameters
+        let url = `/api/admin/appointments/export?format=${format}`;
+        const params = new URLSearchParams();
+        
+        if (statusFilter) params.append('status', statusFilter);
+        if (counselorFilter) params.append('counselor_id', counselorFilter);
+        if (dateFilter) params.append('date_filter', dateFilter);
+        if (searchTerm) params.append('search', searchTerm);
+        
+        if (params.toString()) {
+            url += '&' + params.toString();
+        }
+        
+        console.log('📋 Export URL:', url);
+        
+        // Create hidden download link
+        const link = document.createElement('a');
+        link.href = url;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showAlert(`📋 ${format.toUpperCase()} export started. Download will begin shortly.`, 'success');
+        
+    } catch (error) {
+        console.error('Export error:', error);
+        showAlert('Export failed. Please try again.', 'error');
+    }
+}
+
+function printAppointmentDetails() {
+    window.print();
+}
+
+console.log('✅ Complete Admin Appointments Management System loaded successfully');
+console.log('📋 Features available:');
+console.log('  ✅ View all appointments with complete details');
+console.log('  ✅ Assign counselors with availability checking');
+console.log('  ✅ Edit assignments and prevent double booking');
+console.log('  ✅ Reschedule appointments with conflict detection');
+console.log('  ✅ Cancel appointments with reason tracking');
+console.log('  ✅ Bulk operations (assign/cancel multiple)');
+console.log('  ✅ Advanced filtering and search');
+console.log('  ✅ Export to CSV/Excel');
+console.log('  ✅ Real-time notifications and alerts');
+console.log('  ✅ Mobile responsive design');
+
+function setupEventHandlers() {
+    // Form submission handlers
+    document.getElementById('assignCounselorForm').addEventListener('submit', handleAssignCounselor);
+    document.getElementById('editAssignmentForm').addEventListener('submit', handleEditAssignment);
+    document.getElementById('rescheduleForm').addEventListener('submit', handleReschedule);
+    document.getElementById('cancelAppointmentForm').addEventListener('submit', handleCancelAppointment);
+    document.getElementById('bulkAssignForm').addEventListener('submit', handleBulkAssign);
+}
+
+// ===============================
+// LOAD DATA FUNCTIONS
+// ===============================
+
+async function loadAppointments() {
+    try {
+        showLoading(true);
+        console.log('📡 Loading appointments...');
+        
+        const response = await fetch('/api/admin/appointments');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('📊 Appointments data:', data);
+        
+        if (data.success) {
+            appointments = data.appointments || [];
+            filteredAppointments = [...appointments];
+            renderAppointmentsTable();
+            updateStatistics(data.stats);
+            updateCounts();
+            console.log(`✅ Loaded ${appointments.length} appointments`);
+        } else {
+            throw new Error(data.message || 'Unknown error');
+        }
+    } catch (error) {
+        console.error('❌ Error loading appointments:', error);
+        showAlert(`Failed to load appointments: ${error.message}`, 'error');
+        showErrorState();
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function loadCounselors() {
+    try {
+        console.log('📡 Loading counselors...');
+        const response = await fetch('/api/admin/counselors');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('📊 Counselors data:', data);
+        
+        if (data.success) {
+            counselors = data.counselors || [];
+            populateCounselorDropdowns();
+            console.log(`✅ Loaded ${counselors.length} counselors`);
+        } else {
+            throw new Error(data.message || 'Failed to load counselors');
+        }
+    } catch (error) {
+        console.error('❌ Error loading counselors:', error);
+        showAlert(`Failed to load counselors: ${error.message}`, 'error');
+    }
+}
+
+// ===============================
+// RENDER FUNCTIONS
+// ===============================
+
+function renderAppointmentsTable() {
+    const tbody = document.getElementById('appointmentsTableBody');
+    const container = document.getElementById('appointmentsContainer');
+    const noAppointmentsState = document.getElementById('noAppointmentsState');
+    
+    if (!filteredAppointments.length) {
+        container.style.display = 'none';
+        noAppointmentsState.style.display = 'block';
+        return;
+    }
+
+    container.style.display = 'block';
+    noAppointmentsState.style.display = 'none';
+
+    tbody.innerHTML = filteredAppointments.map(appointment => `
+        <tr data-appointment-id="${appointment.id}" class="${getRowClass(appointment)}">
+            <td>
+                <input type="checkbox" class="form-check-input appointment-checkbox" 
+                       value="${appointment.id}" onchange="updateSelectedAppointments()">
+            </td>
+            <td>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        ${getInitials(appointment.student.first_name, appointment.student.last_name)}
+                    </div>
+                    <div class="user-details">
+                        <div class="name">${appointment.student.first_name} ${appointment.student.last_name}</div>
+                        <div class="email">${appointment.student.email}</div>
+                        ${appointment.student.student_id ? `<div class="email">${appointment.student.student_id}</div>` : ''}
+                    </div>
+                </div>
+            </td>
+            <td>
+                ${renderCounselorInfo(appointment.counselor)}
+            </td>
+            <td>
+                <div class="time-display">
+                    ${renderTimeInfo(appointment)}
+                </div>
+            </td>
+            <td>
+                <span class="status-badge status-${appointment.status}">
+                    ${formatStatus(appointment.status)}
+                </span>
+            </td>
+            <td>
+                <span class="priority-badge priority-${appointment.priority || 'normal'}">
+                    ${formatPriority(appointment.priority)}
+                </span>
+            </td>
+            <td>
+                <span class="badge bg-secondary">
+                    ${formatMode(appointment.mode)}
+                </span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    ${renderActionButtons(appointment)}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    
+    updateCounts();
+}
+
+function renderActionButtons(appointment) {
+    let buttons = `
+        <button type="button" class="btn btn-outline-primary btn-sm" 
+                onclick="viewAppointment(${appointment.id})" title="View Details">
+            <i class="fas fa-eye"></i>
+        </button>
+    `;
+
+    if (appointment.status === 'pending') {
+        buttons += `
+            <button type="button" class="btn btn-outline-success btn-sm" 
+                    onclick="assignCounselor(${appointment.id})" title="Assign Counselor">
+                <i class="fas fa-user-plus"></i>
+            </button>
+        `;
+    } else if (appointment.status === 'assigned' || appointment.status === 'scheduled') {
+        buttons += `
+            <button type="button" class="btn btn-outline-warning btn-sm" 
+                    onclick="editAssignment(${appointment.id})" title="Edit Assignment">
+                <i class="fas fa-edit"></i>
+            </button>
+        `;
+    }
+
+    if (['pending', 'assigned', 'scheduled'].includes(appointment.status)) {
+        buttons += `
+            <div class="dropdown d-inline">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                        type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="rescheduleAppointment(${appointment.id})">
+                        <i class="fas fa-calendar-alt"></i> Reschedule
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" onclick="cancelAppointment(${appointment.id})">
+                        <i class="fas fa-times"></i> Cancel
+                    </a></li>
+                </ul>
+            </div>
+        `;
+    }
+    
+    return buttons;
+}
+
+function renderCounselorInfo(counselor) {
+    if (!counselor) {
+        return `
+            <span class="text-muted">
+                <i class="fas fa-user-clock"></i> Not Assigned
+            </span>
+        `;
+    }
+    
+    return `
+        <div class="user-info">
+            <div class="user-avatar" style="background: var(--success-color);">
+                ${getInitials(counselor.first_name, counselor.last_name)}
+            </div>
+            <div class="user-details">
+                <div class="name">${counselor.first_name} ${counselor.last_name}</div>
+                <div class="email">${counselor.specialization || 'General Counseling'}</div>
+            </div>
+        </div>
+    `;
+}
+
+function renderTimeInfo(appointment) {
+    let html = '';
+    
+    // Show requested time
+    if (appointment.requested_date) {
+        html += `
+            <div class="requested-time">
+                <div class="time-label">Requested:</div>
+                <div>${formatDateTime(appointment.requested_date)}</div>
+            </div>
+        `;
+    }
+    
+    // Show scheduled time if different or if no requested time
+    if (appointment.scheduled_date) {
+        const isScheduled = appointment.scheduled_date !== appointment.requested_date;
+        html += `
+            <div class="scheduled-time">
+                <div class="time-label">${isScheduled ? 'Scheduled:' : 'Time:'}</div>
+                <div>${formatDateTime(appointment.scheduled_date)}</div>
+            </div>
+        `;
+    } else if (!appointment.requested_date) {
+        html += `<div class="text-muted">TBD</div>`;
+    }
+    
+    // Show duration
+    html += `<div class="text-muted small"><i class="fas fa-clock"></i> ${appointment.duration || 60} min</div>`;
+    
+    return html;
+}
+
+// ===============================
+// ACTION FUNCTIONS
+// ===============================
+
+async function assignCounselor(appointmentId) {
+    console.log(`👨‍⚕️ Assigning counselor to appointment ${appointmentId}`);
+    
+    const appointment = appointments.find(a => a.id === appointmentId);
+    if (!appointment) return;
+    
+    currentAppointmentId = appointmentId;
+    
+    // Populate student request details
+    document.getElementById('studentRequestDetails').innerHTML = generateStudentRequestHTML(appointment);
+    
+    // Set default scheduled date to requested date
+    const form = document.getElementById('assignCounselorForm');
+    if (appointment.requested_date) {
+        const date = new Date(appointment.requested_date);
+        form.scheduled_date.value = date.toISOString().slice(0, 16);
+    }
+    
+    // Load available counselors for this time slot
+    await loadAvailableCounselors(appointment.requested_date, appointment.duration || 60);
+    
+    new bootstrap.Modal(document.getElementById('assignCounselorModal')).show();
+}
+
+async function editAssignment(appointmentId) {
+    console.log(`✏️ Editing assignment for appointment ${appointmentId}`);
+    
+    const appointment = appointments.find(a => a.id === appointmentId);
+    if (!appointment) return;
+    
+    currentAppointmentId = appointmentId;
+    
+    // Populate current assignment details
+    document.getElementById('currentAssignmentDetails').innerHTML = generateCurrentAssignmentHTML(appointment);
+    
+    // Pre-fill form with current values
+    const form = document.getElementById('editAssignmentForm');
+    if (appointment.counselor) {
+        form.counselor_id.value = appointment.counselor.id;
+    }
+    if (appointment.scheduled_date) {
+        const date = new Date(appointment.scheduled_date);
+        form.scheduled_date.value = date.toISOString().slice(0, 16);
+    }
+    form.mode.value = appointment.mode || 'in-person';
+    form.duration.value = appointment.duration || 60;
+    form.room_number.value = appointment.room_number || '';
+    form.video_link.value = appointment.video_link || '';
+    
+    // Toggle mode fields
+    toggleEditModeFields();
+    
+    // Load available counselors
+    await loadAvailableCounselorsForEdit(appointment.scheduled_date || appointment.requested_date, appointment.duration || 60, appointmentId);
+    
+    new bootstrap.Modal(document.getElementById('editAssignmentModal')).show();
+}
+
+async function rescheduleAppointment(appointmentId) {
+    console.log(`📅 Rescheduling appointment ${appointmentId}`);
+    
+    const appointment = appointments.find(a => a.id === appointmentId);
+    if (!appointment) return;
+    
+    currentAppointmentId = appointmentId;
+    
+    // Show current appointment info
+    document.getElementById('rescheduleCurrentInfo').innerHTML = `
+        <div class="card-header bg-light">
+            <h6 class="mb-0">Current Appointment</h6>
+        </div>
+        <div class="card-body">
+            <p><strong>Student:</strong> ${appointment.student.first_name} ${appointment.student.last_name}</p>
+            <p><strong>Current Date & Time:</strong> ${formatDateTime(appointment.scheduled_date || appointment.requested_date)}</p>
+            <p><strong>Counselor:</strong> ${appointment.counselor ? appointment.counselor.first_name + ' ' + appointment.counselor.last_name : 'Not assigned'}</p>
+        </div>
+    `;
+    
+    new bootstrap.Modal(document.getElementById('rescheduleModal')).show();
+}
+
+async function cancelAppointment(appointmentId) {
+    console.log(`❌ Canceling appointment ${appointmentId}`);
+    
+    const appointment = appointments.find(a => a.id === appointmentId);
+    if (!appointment) return;
+    
+    currentAppointmentId = appointmentId;
+    
+    // Show appointment info to cancel
+    document.getElementById('cancelAppointmentInfo').innerHTML = `
+        <div class="card-header bg-light">
+            <h6 class="mb-0">Appointment to Cancel</h6>
+        </div>
+        <div class="card-body">
+            <p><strong>Student:</strong> ${appointment.student.first_name} ${appointment.student.last_name}</p>
+            <p><strong>Date & Time:</strong> ${formatDateTime(appointment.scheduled_date || appointment.requested_date)}</p>
+            <p><strong>Counselor:</strong> ${appointment.counselor ? appointment.counselor.first_name + ' ' + appointment.counselor.last_name : 'Not assigned'}</p>
+            <p><strong>Status:</strong> ${formatStatus(appointment.status)}</p>
+        </div>
+    `;
+    
+    new bootstrap.Modal(document.getElementById('cancelAppointmentModal')).show();
+}
+
+async function viewAppointment(appointmentId) {
+    console.log(`👀 Viewing appointment ${appointmentId}`);
+    
+    try {
+        showLoading(true);
+        const response = await fetch(`/api/admin/appointments/${appointmentId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const appointment = data.appointment;
+            document.getElementById('appointmentDetailsBody').innerHTML = generateDetailsHTML(appointment);
+            new bootstrap.Modal(document.getElementById('viewAppointmentModal')).show();
+        } else {
+            showAlert(`Failed to load appointment: ${data.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error loading appointment:', error);
+        showAlert('Failed to load appointment details', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ===============================
+// FORM HANDLERS - FIXED
+// ===============================
+
+async function handleAssignCounselor(event) {
+    event.preventDefault();
+    
+    if (!currentAppointmentId) {
+        showAlert('No appointment selected', 'error');
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        const formData = new FormData(event.target);
+        const assignmentData = Object.fromEntries(formData.entries());
+        
+        console.log('📤 Assignment data:', assignmentData);
+        
+        const response = await fetch(`/api/admin/appointments/${currentAppointmentId}/assign-with-details`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(assignmentData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert('✅ Counselor assigned successfully! Student and counselor have been notified.', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('assignCounselorModal')).hide();
+            event.target.reset();
+            loadAppointments(); // Refresh table
+        } else {
+            showAlert(`Assignment failed: ${data.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error assigning counselor:', error);
+        showAlert('Failed to assign counselor. Please try again.', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function handleEditAssignment(event) {
+    event.preventDefault();
+    
+    if (!currentAppointmentId) {
+        showAlert('No appointment selected', 'error');
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        const formData = new FormData(event.target);
+        const updateData = Object.fromEntries(formData.entries());
+        
+        console.log('📤 Update data:', updateData);
+        
+        const response = await fetch(`/api/admin/appointments/${currentAppointmentId}/update`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert('✅ Assignment updated successfully!', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editAssignmentModal')).hide();
+            loadAppointments(); // Refresh table
+        } else {
+            showAlert(`Update failed: ${data.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating assignment:', error);
+        showAlert('Failed to update assignment. Please try again.', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function handleReschedule(event) {
+    event.preventDefault();
+    
+    if (!currentAppointmentId) {
+        showAlert('No appointment selected', 'error');
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        const formData = new FormData(event.target);
+        const rescheduleData = Object.fromEntries(formData.entries());
+        
+        console.log('📤 Reschedule data:', rescheduleData);
+        
+        const response = await fetch(`/api/admin/appointments/${currentAppointmentId}/reschedule`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(rescheduleData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert('✅ Appointment rescheduled successfully! Parties have been notified.', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('rescheduleModal')).hide();
+            event.target.reset();
+            loadAppointments(); // Refresh table
+        } else {
+            showAlert(`Reschedule failed: ${data.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error rescheduling appointment:', error);
+        showAlert('Failed to reschedule appointment. Please try again.', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function handleCancelAppointment(event) {
+    event.preventDefault();
+    
+    if (!currentAppointmentId) {
+        showAlert('No appointment selected', 'error');
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        const formData = new FormData(event.target);
+        const cancelData = Object.fromEntries(formData.entries());
+        
+        console.log('📤 Cancel data:', cancelData);
+        
+        const response = await fetch(`/api/admin/appointments/${currentAppointmentId}/cancel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cancelData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert('✅ Appointment cancelled successfully. Notifications sent.', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('cancelAppointmentModal')).hide();
+            event.target.reset();
+            loadAppointments(); // Refresh table
+        } else {
+            showAlert(`Cancellation failed: ${data.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error cancelling appointment:', error);
+        showAlert('Failed to cancel appointment. Please try again.', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function handleBulkAssign(event) {
+    event.preventDefault();
+    
+    if (selectedAppointments.length === 0) {
+        showAlert('No appointments selected', 'error');
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        const formData = new FormData(event.target);
+        const bulkData = Object.fromEntries(formData.entries());
+        bulkData.appointment_ids = selectedAppointments;
+        
+        console.log('📤 Bulk assign data:', bulkData);
+        
+        const response = await fetch('/api/admin/appointments/bulk-assign', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bulkData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert(`✅ ${data.message}`, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('bulkAssignModal')).hide();
+            event.target.reset();
+            clearSelections();
+            loadAppointments(); // Refresh table
+        } else {
+            showAlert(`Bulk assignment failed: ${data.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error in bulk assignment:', error);
+        showAlert('Failed to bulk assign. Please try again.', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ===============================
+// BULK OPERATIONS
+// ===============================
+
+function showBulkAssignModal() {
+    if (selectedAppointments.length === 0) {
+        showAlert('Please select at least one appointment', 'warning');
+        return;
+    }
+
+    // Update count
+    document.getElementById('bulkSelectionCount').textContent = selectedAppointments.length;
+    
+    // Show selected appointments
+    const selectedHtml = selectedAppointments.map(id => {
+        const appointment = appointments.find(a => a.id === id);
+        if (!appointment) return '';
+        
+        return `
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <div>
+                    <strong>${appointment.student.first_name} ${appointment.student.last_name}</strong><br>
+                    <small class="text-muted">${formatDateTime(appointment.requested_date)}</small>
+                </div>
+                <span class="status-badge status-${appointment.status}">${formatStatus(appointment.status)}</span>
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('bulkSelectedAppointments').innerHTML = selectedHtml;
+    
+    new bootstrap.Modal(document.getElementById('bulkAssignModal')).show();
+}
+
+async function bulkCancel() {
+    if (selectedAppointments.length === 0) {
+        showAlert('Please select at least one appointment to cancel', 'warning');
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to cancel ${selectedAppointments.length} selected appointments? This action cannot be undone.`)) {
+        return;
+    }
+
+    try {
+        showLoading(true);
+        
+        const response = await fetch('/api/admin/appointments/bulk-action', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                appointment_ids: selectedAppointments,
+                action: 'cancel',
+                reason: 'Bulk cancellation by admin'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert(`✅ ${data.message}`, 'success');
+            clearSelections();
+            loadAppointments();
+        } else {
+            showAlert(`Bulk cancellation failed: ${data.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error in bulk cancel:', error);
+        showAlert('Failed to cancel appointments. Please try again.', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ===============================
+// HELPER FUNCTIONS
+// ===============================
+
+async function loadAvailableCounselors(appointmentDate, duration) {
+    try {
+        const response = await fetch('/api/admin/counselors/available-for-appointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                appointment_date: appointmentDate,
+                duration: duration
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = document.querySelector('#assignCounselorForm select[name="counselor_id"]');
+            select.innerHTML = '<option value="">Choose a counselor...</option>';
+            
+            if (data.available_counselors.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No counselors available at this time';
+                option.disabled = true;
+                select.appendChild(option);
+                
+                showAlert('⚠️ No counselors available for the selected time. Please choose a different time or assign manually.', 'warning');
+            } else {
+                data.available_counselors.forEach(counselor => {
+                    const option = document.createElement('option');
+                    option.value = counselor.id;
+                    option.textContent = `${counselor.name} - ${counselor.specialization} (${counselor.workload} current appointments)`;
+                    select.appendChild(option);
+                });
+            }
+        } else {
+            console.error('Failed to load available counselors:', data.message);
+            showAlert('Failed to check counselor availability', 'warning');
+        }
+    } catch (error) {
+        console.error('Error loading available counselors:', error);
+        showAlert('Error checking counselor availability', 'warning');
+    }
+}
+
+async function loadAvailableCounselorsForEdit(appointmentDate, duration, excludeAppointmentId) {
+    try {
+        const response = await fetch('/api/admin/counselors/available-for-appointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                appointment_date: appointmentDate,
+                duration: duration,
+                exclude_appointment_id: excludeAppointmentId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = document.querySelector('#editAssignmentForm select[name="counselor_id"]');
+            select.innerHTML = '<option value="">Choose a counselor...</option>';
+            
+            data.available_counselors.forEach(counselor => {
+                const option = document.createElement('option');
+                option.value = counselor.id;
+                option.textContent = `${counselor.name} - ${counselor.specialization}`;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading available counselors for edit:', error);
+    }
+}
+
+async function checkAvailability() {
+    const form = document.getElementById('assignCounselorForm');
+    const selectedDate = form.scheduled_date.value;
+    const duration = form.duration.value;
+    
+    if (!selectedDate) return;
+    
+    try {
+        const response = await fetch('/api/admin/counselors/available-for-appointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                appointment_date: selectedDate,
+                duration: parseInt(duration)
+            })
+        });
+        
+        const data = await response.json();
+        const alertDiv = document.getElementById('availabilityAlert');
+        const messageSpan = document.getElementById('availabilityMessage');
+        
+        if (data.success) {
+            if (data.available_counselors.length === 0) {
+                alertDiv.className = 'alert alert-warning mt-3';
+                messageSpan.textContent = 'No counselors available at this time. Consider choosing a different time.';
+                alertDiv.style.display = 'block';
+            } else {
+                alertDiv.className = 'alert alert-success mt-3';
+                messageSpan.textContent = `${data.available_counselors.length} counselor(s) available at this time.`;
+                alertDiv.style.display = 'block';
+            }
+        } else {
+            alertDiv.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error checking availability:', error);
+    }
+}
+
+function populateCounselorDropdowns() {
+    const selectors = [
+        '#counselorFilter',
+        '#bulkAssignForm select[name="counselor_id"]'
+    ];
+
+    selectors.forEach(selector => {
+        const select = document.querySelector(selector);
+        if (select) {
+            // Keep first option, clear the rest
+            const firstOption = select.children[0];
+            select.innerHTML = '';
+            select.appendChild(firstOption);
+            
+            // Add unassigned option for filter
+            if (selector === '#counselorFilter') {
+                const unassignedOption = document.createElement('option');
+                unassignedOption.value = 'unassigned';
+                unassignedOption.textContent = 'Unassigned';
+                select.appendChild(unassignedOption);
+            }
+            
+            // Add counselors
+            counselors.forEach(counselor => {
+                const option = document.createElement('option');
+                option.value = counselor.id;
+                option.textContent = `${counselor.name} - ${counselor.specialization}`;
+                select.appendChild(option);
+            });
+        }
+    });
+}
+
+function updateSelectedAppointments() {
+    const checkboxes = document.querySelectorAll('.appointment-checkbox:checked');
+    selectedAppointments = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    
+    document.getElementById('selectedCount').textContent = selectedAppointments.length;
+    
+    // Enable/disable bulk action buttons
+    const bulkAssignBtn = document.getElementById('bulkAssignBtn');
+    const bulkCancelBtn = document.getElementById('bulkCancelBtn');
+    
+    if (selectedAppointments.length > 0) {
+        bulkAssignBtn.disabled = false;
+        bulkCancelBtn.disabled = false;
+    } else {
+        bulkAssignBtn.disabled = true;
+        bulkCancelBtn.disabled = true;
+    }
+}
+
+</script>
+    
+
+
+</body>
+</html> 

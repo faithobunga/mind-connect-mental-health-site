@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counselor Management - CUEA MindConnect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+     <style>
+        /* Base Admin Styles - Same as Dashboard */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #17a2b8;
+            --light-bg: #ecf0f1;
+            --card-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 20px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: var(--secondary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+        }
+
+        /* Statistics Cards */
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            border: none;
+            transition: transform 0.3s ease;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 5px 0;
+            line-height: 1;
+        }
+
+        .stats-label {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        /* Cards and Tables */
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #e3e6f0;
+            border-radius: 15px 15px 0 0;
+            padding: 20px 25px;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        /* Avatar Circles */
+        .avatar-circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        /* Performance Stats for Counselors */
+        .performance-stats {
+            min-width: 120px;
+        }
+
+        .performance-stats .progress {
+            height: 4px;
+            margin-top: 5px;
+            background-color: #e9ecef;
+            border-radius: 2px;
+        }
+
+        .performance-stats .progress-bar {
+            border-radius: 2px;
+        }
+
+        /* Button Groups */
+        .btn-group .btn {
+            margin: 0 1px;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 0.375rem;
+        }
+
+        /* Modals */
+        .modal-dialog-lg {
+            max-width: 800px;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #e3e6f0;
+            padding: 20px 25px 15px;
+        }
+
+        .modal-body {
+            padding: 20px 25px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #e3e6f0;
+            padding: 15px 25px 20px;
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            border: 1px solid #d1d3e2;
+            border-radius: 8px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        /* Input Groups */
+        .input-group-text {
+            background: #f8f9fc;
+            border: 1px solid #d1d3e2;
+            color: #5a5c69;
+        }
+
+        /* Badges */
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.5em 0.75em;
+            border-radius: 6px;
+        }
+
+        /* Alerts */
+        .alert {
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .alert-dismissible .btn-close {
+            padding: 1rem 1.25rem;
+        }
+
+        /* Table Styles */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-top: none;
+            border-bottom: 2px solid #e3e6f0;
+            font-weight: 600;
+            color: var(--primary-color);
+            padding: 15px;
+        }
+
+        .table td {
+            padding: 15px;
+            vertical-align: middle;
+            border-top: 1px solid #e3e6f0;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fc;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .stats-card {
+                height: 120px;
+                padding: 15px;
+            }
+            
+            .stats-number {
+                font-size: 1.5rem;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .card-body {
+                padding: 15px;
+            }
+            
+            .modal-body {
+                padding: 15px;
+            }
+            
+            .btn-group .btn {
+                margin-bottom: 5px;
+            }
+        }
+
+        /* Counselor Specific Styles */
+        .specialization-badge {
+            background: linear-gradient(45deg, var(--info-color), #20c997);
+            color: white;
+            border-radius: 12px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .license-info {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #6c757d;
+            background: #f8f9fa;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .counselor-stats-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .counselor-stats-summary h6 {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .counselor-stats-summary .stats-number {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* Status indicators for counselors */
+        .status-active {
+            color: var(--success-color);
+        }
+
+        .status-inactive {
+            color: var(--danger-color);
+        }
+
+        /* Enhanced button styles */
+        .btn-outline-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .btn-outline-warning:hover {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+        }
+
+        .btn-outline-success:hover {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .btn-outline-danger:hover {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        /* Tooltip styles */
+        .tooltip-inner {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.875rem;
+        }
+
+        /* Loading states */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Admin Panel</h4>
+                        <small class="text-muted">CUEA MindConnect</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_users') }}">
+                                <i class="fas fa-users"></i>
+                                User Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('admin_counselors') }}">
+                                <i class="fas fa-user-md"></i>
+                                Counselor Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_appointments') }}">
+                                <i class="fas fa-calendar-check"></i>
+                                Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_content') }}">
+                                <i class="fas fa-file-alt"></i>
+                                Content Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_forum_oversight') }}">
+                                <i class="fas fa-comments"></i>
+                                Forum Oversight
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_analytics') }}">
+                                <i class="fas fa-chart-bar"></i>
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_settings') }}">
+                                <i class="fas fa-cog"></i>
+                                Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_system_health') }}">
+                                <i class="fas fa-heartbeat"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Counselor Management</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportCounselors()">
+                                <i class="fas fa-download"></i> Export Report
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCounselorModal">
+                            <i class="fas fa-user-md"></i> Add New Counselor
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stats-card">
+                            <div class="stats-icon bg-success">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="stats-number text-success">{{ counselor_stats|length }}</div>
+                            <div class="stats-label">Total Counselors</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stats-card">
+                            <div class="stats-icon bg-primary">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="stats-number text-primary">
+                                {{ counselor_stats | selectattr('counselor.is_active') | list | length }}
+                            </div>
+                            <div class="stats-label">Active Counselors</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stats-card">
+                            <div class="stats-icon bg-warning">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stats-number text-warning">
+                                {{ counselor_stats | sum(attribute='total_appointments') }}
+                            </div>
+                            <div class="stats-label">Total Appointments</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stats-card">
+                            <div class="stats-icon bg-info">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stats-number text-info">
+                                {{ counselor_stats | sum(attribute='completed_appointments') }}
+                            </div>
+                            <div class="stats-label">Completed Sessions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Search counselors...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="statusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="specializationFilter">
+                                    <option value="">All Specializations</option>
+                                    <option value="Clinical Psychology">Clinical Psychology</option>
+                                    <option value="Counseling Psychology">Counseling Psychology</option>
+                                    <option value="Educational Psychology">Educational Psychology</option>
+                                    <option value="Family Therapy">Family Therapy</option>
+                                    <option value="Addiction Counseling">Addiction Counseling</option>
+                                    <option value="Trauma Counseling">Trauma Counseling</option>
+                                    <option value="Career Counseling">Career Counseling</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                    <i class="fas fa-times"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Counselors Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">All Counselors ({{ counselor_stats|length }})</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="counselorsTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Specialization</th>
+                                        <th>License</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th>Performance</th>
+                                        <th>Joined</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stat in counselor_stats %}
+                                    {% set counselor = stat.counselor %}
+                                    <tr>
+                                        <td>{{ counselor.id }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">
+                                                    {{ counselor.first_name[0] }}{{ counselor.last_name[0] }}
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">{{ counselor.first_name }} {{ counselor.last_name }}</div>
+                                                    <small class="text-muted">{{ counselor.username }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ counselor.email }}</td>
+                                        <td>
+                                            <span class="badge bg-info">{{ counselor.specialization or 'General' }}</span>
+                                        </td>
+                                        <td>{{ counselor.license_number or 'N/A' }}</td>
+                                        <td>{{ counselor.phone or 'N/A' }}</td>
+                                        <td>
+                                            {% if counselor.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="performance-stats">
+                                                <small class="text-muted">
+                                                    {{ stat.completed_appointments }}/{{ stat.total_appointments }} sessions
+                                                </small>
+                                                <div class="progress" style="height: 4px;">
+                                                    <div class="progress-bar bg-success" 
+                                                         style="width: {{ (stat.completed_appointments / stat.total_appointments * 100) if stat.total_appointments > 0 else 0 }}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ counselor.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                        onclick="viewCounselor({{ counselor.id }})" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        onclick="editCounselor({{ counselor.id }})" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-warning"
+                                                        onclick="resetCounselorPassword({{ counselor.id }})" title="Reset Password">
+                                                    <i class="fas fa-key"></i>
+                                                </button>
+                                                {% if counselor.is_active %}
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        onclick="toggleCounselorStatus({{ counselor.id }}, false)" title="Deactivate">
+                                                    <i class="fas fa-user-slash"></i>
+                                                </button>
+                                                {% else %}
+                                                <button type="button" class="btn btn-sm btn-outline-success"
+                                                        onclick="toggleCounselorStatus({{ counselor.id }}, true)" title="Activate">
+                                                    <i class="fas fa-user-check"></i>
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Counselor Modal -->
+    <div class="modal fade" id="addCounselorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Counselor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{{ url_for('admin_add_counselor') }}">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="first_name" class="form-label">First Name *</label>
+                                    <input type="text" class="form-control" name="first_name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="last_name" class="form-label">Last Name *</label>
+                                    <input type="text" class="form-control" name="last_name" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" name="email" required>
+                                    <div class="form-text">Must be a CUEA email address (@cuea.edu)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username *</label>
+                                    <input type="text" class="form-control" name="username" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" name="phone" placeholder="+254...">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="specialization" class="form-label">Specialization</label>
+                                    <select class="form-select" name="specialization">
+                                        <option value="">Select Specialization</option>
+                                        <option value="Clinical Psychology">Clinical Psychology</option>
+                                        <option value="Counseling Psychology">Counseling Psychology</option>
+                                        <option value="Educational Psychology">Educational Psychology</option>
+                                        <option value="Family Therapy">Family Therapy</option>
+                                        <option value="Addiction Counseling">Addiction Counseling</option>
+                                        <option value="Trauma Counseling">Trauma Counseling</option>
+                                        <option value="Career Counseling">Career Counseling</option>
+                                        <option value="Child Psychology">Child Psychology</option>
+                                        <option value="Behavioral Therapy">Behavioral Therapy</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="license_number" class="form-label">License Number</label>
+                            <input type="text" class="form-control" name="license_number" placeholder="e.g., PSY001">
+                            <div class="form-text">Professional counseling license number (if applicable)</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="temp_password" class="form-label">Temporary Password *</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" name="temp_password" id="counselorTempPassword" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="generateCounselorPassword()">
+                                    <i class="fas fa-dice"></i> Generate
+                                </button>
+                            </div>
+                            <div class="form-text">Counselor will be required to change password on first login.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Counselor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Counselor Modal -->
+    <div class="modal fade" id="editCounselorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Counselor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editCounselorForm">
+                    <div class="modal-body" id="editCounselorContent">
+                        <!-- Content will be loaded via JavaScript -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Counselor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Counselor Details Modal -->
+    <div class="modal fade" id="counselorDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Counselor Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="counselorDetailsContent">
+                    <!-- Content will be loaded via JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmationMessage">
+                    <!-- Message will be set via JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Reset Result Modal -->
+    <div class="modal fade" id="passwordResetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Password Reset Successful</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        Password has been reset successfully!
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Temporary Password:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="tempPasswordDisplay" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('tempPasswordDisplay')">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="form-text">Please share this password securely with the counselor.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/script.js"></script>
+    
+    <script>
+        // Additional helper functions specific to this page
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            showToast('Password copied to clipboard', 'success');
+        }
+
+        // Enhanced confirmation function
+        function confirmAction(message, callback) {
+            const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            document.getElementById('confirmationMessage').textContent = message;
+            
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            confirmBtn.onclick = function() {
+                modal.hide();
+                callback();
+            };
+            
+            modal.show();
+        }
+
+        // Enhanced password reset display
+        function resetCounselorPassword(counselorId) {
+            confirmAction('Are you sure you want to reset this counselor\'s password?', () => {
+                fetch(`/admin/counselors/${counselorId}/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('tempPasswordDisplay').value = data.temp_password;
+                        new bootstrap.Modal(document.getElementById('passwordResetModal')).show();
+                        showToast('Password reset successfully', 'success');
+                    } else {
+                        showToast(data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Failed to reset password', 'danger');
+                });
+            });
+        }
+        // Function to view counselor details
+function viewCounselor(counselorId) {
+    fetch(`/admin/counselors/${counselorId}/details`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success === false) {
+                showToast(data.message, 'danger');
+                return;
+            }
+            
+            const modal = document.getElementById('counselorDetailsModal');
+            const content = document.getElementById('counselorDetailsContent');
+            
+            content.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Personal Information</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Name:</strong></td><td>${data.counselor.name}</td></tr>
+                            <tr><td><strong>Email:</strong></td><td>${data.counselor.email}</td></tr>
+                            <tr><td><strong>Username:</strong></td><td>${data.counselor.username}</td></tr>
+                            <tr><td><strong>Phone:</strong></td><td>${data.counselor.phone}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Professional Information</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Specialization:</strong></td><td>${data.counselor.specialization}</td></tr>
+                            <tr><td><strong>License:</strong></td><td>${data.counselor.license_number}</td></tr>
+                            <tr><td><strong>Status:</strong></td><td>
+                                <span class="badge ${data.counselor.is_active ? 'bg-success' : 'bg-danger'}">
+                                    ${data.counselor.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </td></tr>
+                            <tr><td><strong>Joined:</strong></td><td>${data.counselor.created_at}</td></tr>
+                            <tr><td><strong>Last Login:</strong></td><td>${data.counselor.last_login}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6>Performance Statistics</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Total Appointments:</strong></td><td>${data.statistics.total_appointments}</td></tr>
+                            <tr><td><strong>Completed:</strong></td><td>${data.statistics.completed_appointments}</td></tr>
+                            <tr><td><strong>Completion Rate:</strong></td><td>${data.statistics.completion_rate}%</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Recent Appointments</h6>
+                        <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Student</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.recent_appointments.map(apt => `
+                                        <tr>
+                                            <td>${apt.date}</td>
+                                            <td><span class="badge bg-${apt.status === 'Completed' ? 'success' : apt.status === 'Cancelled' ? 'danger' : 'primary'}">${apt.status}</span></td>
+                                            <td>${apt.user_name}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            new bootstrap.Modal(modal).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to load counselor details', 'danger');
+        });
+}
+
+// Function to edit counselor
+function editCounselor(counselorId) {
+    fetch(`/admin/counselors/${counselorId}/edit`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success === false) {
+                showToast(data.message, 'danger');
+                return;
+            }
+            
+            const modal = document.getElementById('editCounselorModal');
+            const content = document.getElementById('editCounselorContent');
+            
+            content.innerHTML = `
+                <input type="hidden" name="counselor_id" value="${data.id}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">First Name *</label>
+                            <input type="text" class="form-control" name="first_name" value="${data.first_name}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Last Name *</label>
+                            <input type="text" class="form-control" name="last_name" value="${data.last_name}" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" name="email" value="${data.email}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="phone" value="${data.phone}">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Specialization</label>
+                            <select class="form-select" name="specialization">
+                                <option value="">Select Specialization</option>
+                                <option value="Clinical Psychology" ${data.specialization === 'Clinical Psychology' ? 'selected' : ''}>Clinical Psychology</option>
+                                <option value="Counseling Psychology" ${data.specialization === 'Counseling Psychology' ? 'selected' : ''}>Counseling Psychology</option>
+                                <option value="Educational Psychology" ${data.specialization === 'Educational Psychology' ? 'selected' : ''}>Educational Psychology</option>
+                                <option value="Family Therapy" ${data.specialization === 'Family Therapy' ? 'selected' : ''}>Family Therapy</option>
+                                <option value="Addiction Counseling" ${data.specialization === 'Addiction Counseling' ? 'selected' : ''}>Addiction Counseling</option>
+                                <option value="Trauma Counseling" ${data.specialization === 'Trauma Counseling' ? 'selected' : ''}>Trauma Counseling</option>
+                                <option value="Career Counseling" ${data.specialization === 'Career Counseling' ? 'selected' : ''}>Career Counseling</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">License Number</label>
+                            <input type="text" class="form-control" name="license_number" value="${data.license_number}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            new bootstrap.Modal(modal).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to load counselor data', 'danger');
+        });
+}
+
+// Function to toggle counselor status
+function toggleCounselorStatus(counselorId, newStatus) {
+    const action = newStatus ? 'activate' : 'deactivate';
+    
+    confirmAction(`Are you sure you want to ${action} this counselor?`, () => {
+        fetch(`/admin/counselors/${counselorId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                location.reload();
+            } else {
+                showToast(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to update counselor status', 'danger');
+        });
+    });
+}
+
+// Function to generate counselor password
+function generateCounselorPassword() {
+    const passwordField = document.getElementById('counselorTempPassword');
+    if (passwordField) {
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        let password = "";
+        for (let i = 0; i < 12; i++) {
+            password += charset.charAt(Math.floor(Math.random() * charset.length));
+        }
+        passwordField.value = password;
+        passwordField.type = 'text'; // Show generated password
+        
+        // Hide password after 3 seconds
+        setTimeout(() => {
+            passwordField.type = 'password';
+        }, 3000);
+    }
+}
+
+// Function to export counselors
+function exportCounselors() {
+    const table = document.getElementById('counselorsTable');
+    if (!table) return;
+    
+    let csv = 'ID,Name,Email,Specialization,License,Phone,Status,Total Appointments,Completed,Joined\n';
+    
+    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    Array.from(rows).forEach(row => {
+        if (row.style.display !== 'none') {
+            const cells = row.getElementsByTagName('td');
+            const data = [
+                cells[0].textContent, // ID
+                cells[1].textContent.replace(/\n/g, ' ').trim(), // Name
+                cells[2].textContent, // Email
+                cells[3].textContent, // Specialization
+                cells[4].textContent, // License
+                cells[5].textContent, // Phone
+                cells[6].textContent.trim(), // Status
+                cells[7].textContent.split('/')[1] || '0', // Total appointments
+                cells[7].textContent.split('/')[0] || '0', // Completed
+                cells[8].textContent // Joined date
+            ];
+            csv += data.map(field => `"${field}"`).join(',') + '\n';
+        }
+    });
+    
+    // Download CSV
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'counselors_export.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    showToast('Counselors exported successfully', 'success');
+}
+
+// Function to clear filters
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('specializationFilter').value = '';
+    
+    // Reset table visibility
+    const table = document.getElementById('counselorsTable');
+    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    Array.from(rows).forEach(row => {
+        row.style.display = '';
+    });
+}
+
+// Function to show toast notifications
+function showToast(message, type = 'success') {
+    // Create toast container if it doesn't exist
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1055';
+        document.body.appendChild(container);
+    }
+    
+    const toastId = 'toast-' + Date.now();
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0`;
+    toast.id = toastId;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    // Remove toast after it's hidden
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+// Handle edit counselor form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const editForm = document.getElementById('editCounselorForm');
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(editForm);
+            const data = Object.fromEntries(formData.entries());
+            const counselorId = data.counselor_id;
+            
+            const submitBtn = editForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';
+            submitBtn.disabled = true;
+            
+            fetch(`/admin/counselors/${counselorId}/edit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('editCounselorModal')).hide();
+                    location.reload();
+                } else {
+                    showToast(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                showToast('Failed to update counselor', 'danger');
+            });
+        });
+    }
+});
+
+// Add search and filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const specializationFilter = document.getElementById('specializationFilter');
+    const table = document.getElementById('counselorsTable');
+
+    if (!table) return;
+
+    function filterTable() {
+        const searchTerm = searchInput?.value.toLowerCase() || '';
+        const statusValue = statusFilter?.value || '';
+        const specializationValue = specializationFilter?.value || '';
+        
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        Array.from(rows).forEach(row => {
+            const name = row.cells[1].textContent.toLowerCase();
+            const email = row.cells[2].textContent.toLowerCase();
+            const specialization = row.cells[3].textContent;
+            const status = row.cells[6].textContent.toLowerCase();
+            
+            const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
+            const matchesStatus = !statusValue || status.includes(statusValue);
+            const matchesSpecialization = !specializationValue || specialization.includes(specializationValue);
+            
+            row.style.display = matchesSearch && matchesStatus && matchesSpecialization ? '' : 'none';
+        });
+    }
+
+    searchInput?.addEventListener('input', filterTable);
+    statusFilter?.addEventListener('change', filterTable);
+    specializationFilter?.addEventListener('change', filterTable);
+});
+    
+    </script>
+</body>
+</html>

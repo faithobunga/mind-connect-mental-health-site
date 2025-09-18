@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookmarks - CUEA MindConnect</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Same styles as your resources page */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f23;
+            min-height: 100vh;
+            color: #e2e8f0;
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+        
+        /* Navigation - Same as resources page */
+        .navbar {
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-logo h2 {
+            margin: 0;
+        }
+        .nav-logo a {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        .nav-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: white;
+            background: rgba(102, 126, 234, 0.2);
+            text-decoration: none;
+        }
+        .nav-link.active {
+            color: white;
+            background: rgba(102, 126, 234, 0.3);
+            font-weight: 600;
+        }
+        .nav-link.logout {
+            color: #ef4444;
+        }
+        .nav-link.logout:hover {
+            color: white;
+            background: #ef4444;
+        }
+        
+        /* Mobile Navigation */
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: rgba(15, 15, 35, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding: 50px 20px;
+                transition: left 0.3s ease;
+            }
+            .nav-links.active {
+                left: 0;
+            }
+            .nav-toggle {
+                display: flex;
+            }
+        }
+        
+        /* Bookmarks Container */
+        .bookmarks-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        /* Bookmarks Header */
+        .bookmarks-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        .bookmarks-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .bookmarks-header p {
+            margin: 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        /* Actions Bar */
+        .bookmarks-actions {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .bookmark-count {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+        
+        /* Resources Grid - Same as resources page */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .resource-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        .bookmark-remove {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .resource-card:hover .bookmark-remove {
+            opacity: 1;
+        }
+        .bookmark-remove:hover {
+            background: #dc2626;
+        }
+        .resource-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .resource-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .category-article {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        .category-video {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .category-meditation {
+            background: #f0fdf4;
+            color: #059669;
+        }
+        .category-exercise {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .resource-featured {
+            background: #8b5cf6;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+        }
+        .resource-content {
+            padding: 0 20px 20px;
+        }
+        .resource-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+        }
+        .resource-description {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #6b7280;
+        }
+        .resource-tags {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .resource-tag {
+            background: #f3f4f6;
+            color: #6b7280;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+        }
+        .resource-actions {
+            padding: 15px 20px;
+            background: #f9fafb;
+            display: flex;
+            gap: 10px;
+        }
+        .btn-resource {
+            flex: 1;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a67d8;
+            text-decoration: none;
+            color: white;
+        }
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #e2e8f0;
+            font-size: 1.5em;
+        }
+        
+        /* Toast Notifications */
+        .dashboard-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            color: #2c3e50;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #667eea;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            z-index: 1001;
+            max-width: 400px;
+        }
+        .dashboard-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast-success {
+            border-left-color: #10b981;
+        }
+        .toast-error {
+            border-left-color: #ef4444;
+        }
+        
+        /* Resource Modal */
+        .resource-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 0;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        .modal-body {
+            padding: 30px;
+        }
+        .modal-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #6b7280;
+        }
+        .modal-content-text {
+            line-height: 1.8;
+            color: #374151;
+            font-size: 1.1em;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .bookmarks-actions {
+                flex-direction: column;
+                text-align: center;
+            }
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                margin: 20px auto;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><a href="{{ url_for('dashboard') }}">🧠 CUEA MindConnect</a></h2>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link dashboard-nav-link">Dashboard</a>
+                <a href="{{ url_for('assessment') }}" class="nav-link dashboard-nav-link">Assessment</a>
+                <a href="{{url_for('student_appointments') }}" class="nav-link dashboard-nav-link">Appointments</a>
+                <a href="{{ url_for('community') }}" class="nav-link dashboard-nav-link">Community</a>
+                <a href="{{ url_for('my_bookmarks') }}" class="nav-link dashboard-nav-link active">
+                    <i class="fas fa-bookmark"></i> My Bookmarks</a>
+                <a href="{{ url_for('resources') }}" class="nav-link dashboard-nav-link">Resources</a>
+                <a href="{{ url_for('profile') }}" class="nav-link dashboard-nav-link">Profile</a>
+                <a href="{{ url_for('logout') }}" class="nav-link dashboard-nav-link logout">Logout</a>
+            </div>
+            <div class="nav-toggle dashboard-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bookmarks-container">
+        <!-- Bookmarks Header -->
+        <div class="bookmarks-header">
+            <h1>My Bookmarks 🔖</h1>
+            <p>Your saved wellness resources for quick access</p>
+        </div>
+
+        <!-- Actions Bar -->
+        <div class="bookmarks-actions">
+            <div class="bookmark-count">
+                <i class="fas fa-bookmark"></i> 
+                {{ total_bookmarks }} saved resource{{ 's' if total_bookmarks != 1 else '' }}
+            </div>
+        </div>
+
+        <!-- Bookmarks Grid -->
+        <div class="resources-grid">
+            {% if bookmarks %}
+                {% for resource in bookmarks %}
+                <div class="resource-card" onclick="openResourceModal({{ resource.id }})">
+                    <button class="bookmark-remove" onclick="event.stopPropagation(); removeBookmark({{ resource.id }})" title="Remove bookmark">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <div class="resource-header">
+                        <span class="resource-category category-{{ resource.category }}">
+                            <i class="fas fa-
+                                {% if resource.category == 'article' %}newspaper
+                                {% elif resource.category == 'video' %}play
+                                {% elif resource.category == 'meditation' %}leaf
+                                {% else %}dumbbell{% endif %}"></i>
+                            {{ resource.category.title() }}
+                        </span>
+                        {% if resource.is_featured %}
+                        <div class="resource-featured" title="Featured Resource">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="resource-content">
+                        <h3 class="resource-title">{{ resource.title }}</h3>
+                        <p class="resource-description">
+                            {{ resource.content[:150] }}{% if resource.content|length > 150 %}...{% endif %}
+                        </p>
+                        
+                        {% if resource.tags %}
+                        <div class="resource-tags">
+                            {% for tag in resource.tags.split(',')[:3] %}
+                            <span class="resource-tag">{{ tag.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="resource-meta">
+                            <span>{{ resource.created_at.strftime('%B %d, %Y') }}</span>
+                            <span>
+                                {% if resource.resource_type == 'external_link' %}
+                                    <i class="fas fa-external-link-alt"></i> External
+                                {% elif resource.file_url %}
+                                    <i class="fas fa-file-download"></i> Download
+                                {% else %}
+                                    <i class="fas fa-eye"></i> Read
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-actions">
+                        {% if resource.resource_type == 'external_link' and resource.url %}
+                        <a href="{{ resource.url }}" target="_blank" class="btn-resource btn-primary" onclick="event.stopPropagation();">
+                            <i class="fas fa-external-link-alt"></i> Visit Link
+                        </a>
+                        {% elif resource.file_url %}
+                        <a href="{{ resource.file_url }}" target="_blank" class="btn-resource btn-primary" onclick="event.stopPropagation();">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                        {% else %}
+                        <button class="btn-resource btn-primary" onclick="event.stopPropagation(); openResourceModal({{ resource.id }});">
+                            <i class="fas fa-eye"></i> Read More
+                        </button>
+                        {% endif %}
+                        <button class="btn-resource btn-secondary" onclick="event.stopPropagation(); removeBookmark({{ resource.id }});">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🔖</div>
+                <h3>No bookmarks yet</h3>
+                <p>Start bookmarking useful resources to see them here!</p>
+                <a href="{{ url_for('resources') }}" class="btn-resource btn-primary" style="display: inline-block; margin-top: 20px;">
+                    <i class="fas fa-search"></i> Browse Resources
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Resource Modal -->
+    <div id="resourceModal" class="resource-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle" class="modal-title"></h2>
+                <button class="modal-close" onclick="closeResourceModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalMeta" class="modal-meta"></div>
+                <div id="modalContent" class="modal-content-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Remove bookmark
+        function removeBookmark(resourceId) {
+            if (confirm('Remove this resource from your bookmarks?')) {
+                // Find the bookmark by resource ID
+                fetch(`/api/resource/${resourceId}/unbookmark`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showToast('Bookmark removed successfully!', 'success');
+                        location.reload(); // Refresh to update the page
+                    } else {
+                        showToast('Failed to remove bookmark.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing bookmark:', error);
+                    showToast('Failed to remove bookmark.', 'error');
+                });
+            }
+        }
+
+        // Resource modal functionality (same as resources page)
+        function openResourceModal(resourceId) {
+            fetch(`/api/resource/${resourceId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const resource = data.resource;
+                        document.getElementById('modalTitle').textContent = resource.title;
+                        document.getElementById('modalMeta').innerHTML = `
+                            <span><i class="fas fa-calendar"></i> ${resource.created_at}</span>
+                            <span><i class="fas fa-tag"></i> ${resource.category}</span>
+                            ${resource.tags ? `<span><i class="fas fa-tags"></i> ${resource.tags}</span>` : ''}
+                        `;
+                        document.getElementById('modalContent').innerHTML = resource.content.replace(/\n/g, '<br>');
+                        document.getElementById('resourceModal').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading resource:', error);
+                    alert('Failed to load resource details. Please try again.');
+                });
+        }
+
+        function closeResourceModal() {
+            document.getElementById('resourceModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('resourceModal');
+            if (event.target === modal) {
+                closeResourceModal();
+            }
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `dashboard-toast toast-${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Mobile navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.querySelector('.dashboard-nav-toggle');
+            const navLinks = document.querySelector('.nav-links');
+
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navToggle.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

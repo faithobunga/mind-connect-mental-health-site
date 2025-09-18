@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - CUEA MindConnect</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="auth-body admin-auth">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
+                <div class="logo">
+                    <h2>🧠 CUEA MindConnect</h2>
+                </div>
+                <h1>Administration Portal</h1>
+                <p>Platform management and system oversight</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                                <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="admin-security-notice">
+                <div class="security-icon">🔐</div>
+                <div class="security-text">
+                    <strong>Secure Administrative Access</strong>
+                    <p>This portal is restricted to authorized CUEA MindConnect administrators only.</p>
+                </div>
+            </div>
+
+            <form method="POST" class="auth-form" id="adminLoginForm">
+                <div class="form-group">
+                    <label for="username">Administrator Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        required 
+                        autocomplete="username"
+                        placeholder="Enter your admin username"
+                        value="{{ request.form.username if request.form.username }}"
+                    >
+                    <div class="input-icon">👨‍💼</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Administrator Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        autocomplete="current-password"
+                        placeholder="Enter your admin password"
+                    >
+                    <div class="input-icon">🔒</div>
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                        <span id="passwordToggleIcon">👁️</span>
+                    </button>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember_me" {{ 'checked' if request.form.remember_me }}>
+                        <span class="checkmark"></span>
+                        Keep me signed in (not recommended on shared devices)
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-auth-primary admin-btn">
+                    <span class="btn-text">Access Admin Dashboard</span>
+                    <div class="btn-loader" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
+
+            <div class="auth-divider">
+                <span>or</span>
+            </div>
+
+            <div class="auth-alternatives">
+                <div class="role-links">
+                    <p class="role-text">Switch login portal:</p>
+                    <div class="role-buttons">
+                        <a href="{{ url_for('login') }}" class="role-btn">
+                            👩‍🎓 Student Login
+                        </a>
+                        <a href="{{ url_for('counselor_login') }}" class="role-btn">
+                            🧑‍⚕️ Counselor Login
+                        </a>
+                        <a href="{{ url_for('admin_login') }}" class="role-btn active">
+                            👨‍💼 Admin Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-help">
+                <h4>Administrative Support</h4>
+                <div class="help-options">
+                    <a href="mailto:it-support@cuea.edu" class="help-link">
+                        <span class="help-icon">🛠️</span>
+                        <div>
+                            <strong>IT Support</strong>
+                            <small>Technical system assistance</small>
+                        </div>
+                    </a>
+                    <a href="tel:+254719887000" class="help-link">
+                        <span class="help-icon">📞</span>
+                        <div>
+                            <strong>Emergency Contact</strong>
+                            <small>Critical system issues</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="admin-warning">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-content">
+                    <h4>Security Notice</h4>
+                    <p>Administrative access is logged and monitored. Unauthorized access attempts are tracked and reported.</p>
+                    <p>If you are not an authorized administrator, please use the appropriate login portal above.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-visual admin-visual">
+            <div class="visual-content">
+                <h3>Platform Administration Center</h3>
+                <div class="admin-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <div>
+                            <h4>System Analytics</h4>
+                            <p>Comprehensive platform usage statistics and performance metrics</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">👥</div>
+                        <div>
+                            <h4>User Management</h4>
+                            <p>Manage student accounts, counselor profiles, and access permissions</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🔧</div>
+                        <div>
+                            <h4>System Configuration</h4>
+                            <p>Platform settings, feature toggles, and system maintenance</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📋</div>
+                        <div>
+                            <h4>Content Management</h4>
+                            <p>Wellness resources, announcements, and platform content</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🛡️</div>
+                        <div>
+                            <h4>Security Monitoring</h4>
+                            <p>Access logs, security alerts, and system integrity checks</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📈</div>
+                        <div>
+                            <h4>Reporting Tools</h4>
+                            <p>Generate reports on platform usage and student wellness trends</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-stats">
+                    <h4>Platform Overview</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <strong>24/7</strong>
+                            <span>System Monitoring</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>99.9%</strong>
+                            <span>Uptime</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>Secure</strong>
+                            <span>Data Protection</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById('passwordToggleIcon');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Form submission handling with extra security confirmation
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoader = submitBtn.querySelector('.btn-loader');
+            
+            // Show loading state
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'block';
+            submitBtn.disabled = true;
+            
+            // Reset after a delay (form will actually submit)
+            setTimeout(() => {
+                btnText.style.display = 'block';
+                btnLoader.style.display = 'none';
+                submitBtn.disabled = false;
+            }, 2000);
+        });
+
+        // Security warning for failed attempts
+        let failedAttempts = 0;
+        const maxAttempts = 3;
+
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            // This would be handled server-side in a real application
+            setTimeout(() => {
+                const hasError = document.querySelector('.flash-error');
+                if (hasError) {
+                    failedAttempts++;
+                    if (failedAttempts >= maxAttempts) {
+                        showToast('Multiple failed attempts detected. Access temporarily restricted.', 'error');
+                        setTimeout(() => {
+                            window.location.href = '{{ url_for("index") }}';
+                        }, 3000);
+                    }
+                }
+            }, 1000);
+        });
+
+        // Auto-focus username field
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('username').focus();
+            
+            // Show security reminder
+            setTimeout(() => {
+                showToast('Remember: Admin access is monitored and logged.', 'info');
+            }, 2000);
+        });
+
+        // Prevent right-click context menu on admin page
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Prevent F12 and other dev tools shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                showToast('Developer tools are restricted on admin pages.', 'warning');
+            }
+        });
+    </script>
+</body>
+</html>

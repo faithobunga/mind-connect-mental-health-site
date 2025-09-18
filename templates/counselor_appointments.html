@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments - CUEA MindConnect</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+     <style> 
+    /* ============= CSS RESET & BASE STYLES ============= */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    html {
+        scroll-behavior: smooth;
+        font-size: 16px;
+    }
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f8fafc;
+    }
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    a {
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+    }
+    ul {
+        list-style: none;
+    }
+    button {
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-family: inherit;
+    }
+    input, select, textarea {
+        font-family: inherit;
+        border: none;
+        outline: none;
+    }
+    /* ============= COLOR VARIABLES ============= */
+    :root {
+        --primary-blue: #3b82f6;
+        --primary-blue-dark: #2563eb;
+        --primary-blue-light: #93c5fd;
+        --secondary-purple: #8b5cf6;
+        --secondary-green: #10b981;
+        --secondary-orange: #f59e0b;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --info: #3b82f6;
+        --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
+        --gradient-success: linear-gradient(135deg, var(--secondary-green) 0%, #059669 100%);
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.3s ease;
+        --transition-slow: 0.5s ease;
+    }
+    /* ============= NAVIGATION ============= */
+    .navbar {
+        background: var(--gradient-primary);
+        padding: 1rem 0;
+        box-shadow: var(--shadow-lg);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+    .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .nav-brand {
+        color: var(--white);
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-back {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--white);
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        transition: var(--transition-normal);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+    /* ============= MAIN CONTENT ============= */
+    .main-content {
+        padding: 2rem 0;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    /* ============= HEADER SECTION ============= */
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .page-subtitle {
+        color: var(--gray-600);
+        font-size: 1.1rem;
+    }
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    /* ============= STATISTICS CARDS ============= */
+    .stats-container {
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        background: var(--white);
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition-normal);
+        height: 100%;
+        border-top: 4px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    .stat-card.total {
+        border-top-color: var(--primary-blue);
+    }
+    .stat-card.pending {
+        border-top-color: var(--warning);
+    }
+    .stat-card.scheduled {
+        border-top-color: var(--success);
+    }
+    .stat-card.completed {
+        border-top-color: var(--info);
+    }
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .stat-card.total .stat-icon {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary-blue);
+    }
+    .stat-card.pending .stat-icon {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+    .stat-card.scheduled .stat-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+    .stat-card.completed .stat-icon {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--info);
+    }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    .stat-label {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* ============= FILTER SECTION ============= */
+    .filter-section {
+        background: var(--white);
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 2rem;
+    }
+    .filter-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .filter-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    
+    /* ============= APPOINTMENT TABLE ============= */
+    .table-container {
+        background: var(--white);
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+    }
+    .table-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .appointment-table-container {
+        overflow-x: auto;
+    }
+    table.dataTable thead th {
+        background-color: var(--gray-50);
+        border-bottom: 2px solid var(--gray-200);
+        font-weight: 600;
+        color: var(--gray-700);
+    }
+    table.dataTable tbody tr {
+        border-bottom: 1px solid var(--gray-100);
+    }
+    table.dataTable tbody tr:hover {
+        background-color: var(--gray-50);
+    }
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .student-avatar {
+        width: 40px;
+        height: 40px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--white);
+        flex-shrink: 0;
+    }
+    .student-details {
+        display: flex;
+        flex-direction: column;
+    }
+    .student-name {
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+    .student-meta {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+    }
+    .appointment-time {
+        font-weight: 500;
+    }
+    .appointment-topic {
+        font-weight: 500;
+    }
+    .action-btn {
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--radius-md);
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        transition: var(--transition-normal);
+    }
+    .btn-accept {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+    .btn-accept:hover {
+        background-color: var(--success);
+        color: var(--white);
+    }
+    .btn-reject {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--error);
+    }
+    .btn-reject:hover {
+        background-color: var(--error);
+        color: var(--white);
+    }
+    .btn-reschedule {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+    .btn-reschedule:hover {
+        background-color: var(--warning);
+        color: var(--white);
+    }
+    .btn-notes {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: var(--info);
+    }
+    .btn-notes:hover {
+        background-color: var(--info);
+        color: var(--white);
+    }
+    
+    /* ============= MODAL STYLES ============= */
+    .modal-content {
+        border: none;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+    }
+    .modal-header {
+        border-bottom: 1px solid var(--gray-200);
+        padding: 1.5rem;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+    .modal-body {
+        padding: 1.5rem;
+    }
+    .modal-footer {
+        border-top: 1px solid var(--gray-200);
+        padding: 1.5rem;
+        border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    }
+    .modal-title {
+        font-weight: 600;
+    }
+    
+    /* ============= TIME SLOTS ============= */
+    .time-slot {
+        display: inline-block;
+        padding: 0.5rem 0.75rem;
+        margin: 0.25rem;
+        background-color: var(--gray-100);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: var(--transition-normal);
+    }
+    .time-slot:hover {
+        background-color: var(--gray-200);
+    }
+    .time-slot.selected {
+        background-color: var(--primary-blue);
+        color: var(--white);
+    }
+    
+    /* ============= RESPONSIVE DESIGN ============= */
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+        }
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+        .action-btn {
+            margin-right: 0;
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/counselor-dashboard">
+                <i class="fas fa-brain me-2"></i>
+                CUEA MindConnect - Counselor Portal
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/counselor-dashboard">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            Dr. {{ current_user.first_name }} {{ current_user.last_name }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        <!-- Main Header -->
+        <div class="main-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2><i class="fas fa-calendar-check me-3"></i>My Appointments</h2>
+                    <p class="text-muted mb-0">Manage your counseling sessions and student appointments</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-primary" onclick="refreshAppointments()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                    <button class="btn btn-success ms-2" data-bs-toggle="modal" data-bs-target="#availabilityModal">
+                        <i class="fas fa-clock me-2"></i>Set Availability
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Row -->
+        <div class="stats-row">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalAppointments">{{ total_appointments or 0 }}</div>
+                        <div class="stat-label">Total Appointments</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number text-warning" id="pendingCount">{{ pending_count or 0 }}</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number text-success" id="scheduledCount">{{ scheduled_count or 0 }}</div>
+                        <div class="stat-label">Scheduled</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number text-info" id="completedCount">{{ completed_count or 0 }}</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label">Filter by Status:</label>
+                    <select class="form-select" id="statusFilter" onchange="filterAppointments()">
+                        <option value="all">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="assigned">Assigned</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Date Range:</label>
+                    <select class="form-select" id="dateFilter" onchange="filterAppointments()">
+                        <option value="all">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="tomorrow">Tomorrow</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Priority:</label>
+                    <select class="form-select" id="priorityFilter" onchange="filterAppointments()">
+                        <option value="all">All Priorities</option>
+                        <option value="high">High Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="normal">Normal Priority</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Search:</label>
+                    <input type="text" class="form-control" id="searchFilter" placeholder="Search by student name..." onkeyup="filterAppointments()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments Table -->
+        <div class="appointment-table-container">
+            <div class="table-responsive">
+                <table class="table table-striped" id="appointmentsTable">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Student</th>
+                            <th>Topic</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Duration</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentsTableBody">
+                        <!-- Data will be loaded here via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accept Appointment Modal -->
+    <div class="modal fade" id="acceptModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-check me-2"></i>Accept Appointment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to accept this appointment?</p>
+                    <div class="notes-section">
+                        <label class="form-label">Confirmation Notes (Optional):</label>
+                        <textarea class="form-control" id="acceptNotes" rows="3" placeholder="Add any notes for this appointment..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="confirmAccept()">Accept Appointment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Appointment Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title"><i class="fas fa-times me-2"></i>Reject Appointment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please provide a reason for rejecting this appointment:</p>
+                    <div class="mb-3">
+                        <label class="form-label">Rejection Reason:</label>
+                        <select class="form-select" id="rejectReason" required>
+                            <option value="">Select a reason...</option>
+                            <option value="schedule_conflict">Schedule Conflict</option>
+                            <option value="not_my_specialty">Not My Specialty</option>
+                            <option value="insufficient_info">Insufficient Information</option>
+                            <option value="emergency_only">Emergency Cases Only</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Additional Notes:</label>
+                        <textarea class="form-control" id="rejectNotes" rows="3" placeholder="Provide additional details..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmReject()">Reject Appointment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reschedule Modal -->
+    <div class="modal fade" id="rescheduleModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title"><i class="fas fa-calendar-alt me-2"></i>Reschedule Appointment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Select New Date:</label>
+                            <input type="date" class="form-control" id="rescheduleDate" min="{{ today_date }}" onchange="loadAvailableSlots()">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Duration:</label>
+                            <select class="form-select" id="rescheduleDuration">
+                                <option value="30">30 minutes</option>
+                                <option value="60" selected>1 hour</option>
+                                <option value="90">1.5 hours</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">Available Time Slots:</label>
+                        <div id="availableSlots" class="mt-2">
+                            <p class="text-muted">Please select a date to see available time slots.</p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">Reason for Rescheduling:</label>
+                        <textarea class="form-control" id="rescheduleReason" rows="2" placeholder="Briefly explain why you're rescheduling..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" onclick="confirmReschedule()">Reschedule</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Notes Modal -->
+    <div class="modal fade" id="notesModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-sticky-note me-2"></i>Session Notes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Student Information:</h6>
+                            <div id="studentInfo" class="mb-3">
+                                <!-- Student info will be loaded here -->
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Session Details:</h6>
+                            <div id="sessionInfo" class="mb-3">
+                                <!-- Session info will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Session Notes:</label>
+                        <textarea class="form-control" id="sessionNotes" rows="6" placeholder="Document your session observations, recommendations, and follow-up actions..."></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Session Outcome:</label>
+                            <select class="form-select" id="sessionOutcome">
+                                <option value="">Select outcome...</option>
+                                <option value="successful">Successful Session</option>
+                                <option value="followup_needed">Follow-up Needed</option>
+                                <option value="referral_required">Referral Required</option>
+                                <option value="no_show">Student No-Show</option>
+                                <option value="cancelled">Session Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Next Steps:</label>
+                            <select class="form-select" id="nextSteps">
+                                <option value="">Select next steps...</option>
+                                <option value="schedule_followup">Schedule Follow-up</option>
+                                <option value="refer_specialist">Refer to Specialist</option>
+                                <option value="monitor_progress">Monitor Progress</option>
+                                <option value="case_closed">Case Closed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSessionNotes()">Save Notes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Availability Setting Modal -->
+    <div class="modal fade" id="availabilityModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-clock me-2"></i>Set Availability</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>Set your available hours for each day of the week:</p>
+                            <div class="availability-grid">
+                                <div class="row mb-2">
+                                    <div class="col-2"><strong>Day</strong></div>
+                                    <div class="col-3"><strong>Start Time</strong></div>
+                                    <div class="col-3"><strong>End Time</strong></div>
+                                    <div class="col-2"><strong>Available</strong></div>
+                                    <div class="col-2"><strong>Break</strong></div>
+                                </div>
+                                <div class="row mb-2" data-day="monday">
+                                    <div class="col-2">Monday</div>
+                                    <div class="col-3"><input type="time" class="form-control" value="09:00"></div>
+                                    <div class="col-3"><input type="time" class="form-control" value="17:00"></div>
+                                    <div class="col-2"><input type="checkbox" class="form-check-input" checked></div>
+                                    <div class="col-2"><input type="time" class="form-control" value="12:00" title="Lunch break"></div>
+                                </div>
+                                <div class="row mb-2" data-day="tuesday">
+                                    <div class="col-2">Tuesday</div>
+                                    <div class="col-3"><input type="time" class="form-control" value="09:00"></div>
+                                    <div class="col-3"><input type="time" class="form-control" value="17:00"></div>
+                                    <div class="col-2"><input type="checkbox" class="form-check-input" checked></div>
+                                    <div class="col-2"><input type="time" class="form-control" value="12:00" title="Lunch break"></div>
+                                </div>
+                                <div class="row mb-2" data-day="wednesday">
+                                    <div class="col-2">Wednesday</div>
+                                    <div class="col-3"><input type="time" class="form-control" value="09:00"></div>
+                                    <div class="col-3"><input type="time" class="form-control" value="17:00"></div>
+                                    <div class="col-2"><input type="checkbox" class="form-check-input" checked></div>
+                                    <div class="col-2"><input type="time" class="form-control" value="12:00" title="Lunch break"></div>
+                                </div>
+                                <div class="row mb-2" data-day="thursday">
+                                    <div class="col-2">Thursday</div>
+                                    <div class="col-3"><input type="time" class="form-control" value="09:00"></div>
+                                    <div class="col-3"><input type="time" class="form-control" value="17:00"></div>
+                                    <div class="col-2"><input type="checkbox" class="form-check-input" checked></div>
+                                    <div class="col-2"><input type="time" class="form-control" value="12:00" title="Lunch break"></div>
+                                </div>
+                                <div class="row mb-2" data-day="friday">
+                                    <div class="col-2">Friday</div>
+                                    <div class="col-3"><input type="time" class="form-control" value="09:00"></div>
+                                    <div class="col-3"><input type="time" class="form-control" value="17:00"></div>
+                                    <div class="col-2"><input type="checkbox" class="form-check-input" checked></div>
+                                    <div class="col-2"><input type="time" class="form-control" value="12:00" title="Lunch break"></div>
+                                </div>
+                                <div class="row mb-2" data-day="saturday">
+                                    <div class="col-2">Saturday</div>
+                                    <div class="col-3"><input type="time" class="form-control" value="09:00"></div>
+                                    <div class="col-3"><input type="time" class="form-control" value="13:00"></div>
+                                    <div class="col-2"><input type="checkbox" class="form-check-input"></div>
+                                    <div class="col-2"><input type="time" class="form-control" value="12:00" title="Lunch break"></div>
+                                </div>
+                                <div class="row mb-2" data-day="sunday">
+                                    <div class="col-2">Sunday</div>
+                                    <div class="col-3"><input type="time" class="form-control" value="09:00"></div>
+                                    <div class="col-3"><input type="time" class="form-control" value="13:00"></div>
+                                    <div class="col-2"><input type="checkbox" class="form-check-input"></div>
+                                    <div class="col-2"><input type="time" class="form-control" value="12:00" title="Lunch break"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAvailability()">Save Availability</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap5.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Global variables
+        let appointmentsData = [];
+        let currentAppointmentId = null;
+        let selectedTimeSlot = null;
+        let dataTable = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            loadAppointments();
+            setupEventListeners();
+        });
+
+        function initializePage() {
+            // Set minimum date for reschedule
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('rescheduleDate').min = today;
+        }
+
+        function setupEventListeners() {
+            // Modal event listeners
+            document.getElementById('acceptModal').addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                currentAppointmentId = button.getAttribute('data-appointment-id');
+            });
+
+            document.getElementById('rejectModal').addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                currentAppointmentId = button.getAttribute('data-appointment-id');
+            });
+
+            document.getElementById('rescheduleModal').addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                currentAppointmentId = button.getAttribute('data-appointment-id');
+            });
+
+            document.getElementById('notesModal').addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                currentAppointmentId = button.getAttribute('data-appointment-id');
+                loadAppointmentForNotes(currentAppointmentId);
+            });
+        }
+
+        function loadAppointments() {
+            // Show loading state
+            showLoadingState();
+
+            fetch('/api/counselor/appointments')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        appointmentsData = data.appointments;
+                        populateAppointmentsTable(appointmentsData);
+                        updateStatistics(data.statistics);
+                    } else {
+                        showError('Failed to load appointments: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading appointments:', error);
+                    showError('Failed to load appointments. Please refresh the page.');
+                })
+                .finally(() => {
+                    hideLoadingState();
+                });
+        }
+
+        function showLoadingState() {
+            document.getElementById('appointmentsTableBody').innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-2">Loading appointments...</div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function hideLoadingState() {
+            // Loading will be hidden when table is populated
+        }
+
+        function populateAppointmentsTable(appointments) {
+            const tbody = document.getElementById('appointmentsTableBody');
+            
+            if (!appointments.length) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h6 class="text-muted">No appointments found</h6>
+                            <p class="text-muted">New appointment requests will appear here.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = appointments.map(appointment => {
+                const studentInitials = appointment.student.name.split(' ').map(n => n[0]).join('');
+                const appointmentDate = new Date(appointment.scheduled_date || appointment.requested_date);
+                const isToday = appointmentDate.toDateString() === new Date().toDateString();
+                const isPast = appointmentDate < new Date();
+                
+                return `
+                    <tr class="priority-${appointment.priority || 'normal'}" data-appointment-id="${appointment.id}">
+                        <td>
+                            <div class="appointment-time">
+                                ${appointmentDate.toLocaleDateString('en-US', {
+                                    weekday: 'short',
+                                    month: 'short',
+                                    day: 'numeric'
+                                })}
+                            </div>
+                            <div class="text-muted small">
+                                ${appointmentDate.toLocaleTimeString('en-US', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}
+                                ${isToday ? '<span class="badge bg-warning text-dark ms-1">Today</span>' : ''}
+                                ${isPast && appointment.status !== 'completed' ? '<span class="badge bg-danger ms-1">Overdue</span>' : ''}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">${studentInitials}</div>
+                                <div>
+                                    <div class="fw-bold">${appointment.student.name}</div>
+                                    <div class="text-muted small">${appointment.student.student_id}</div>
+                                    <div class="text-muted small">${appointment.student.course}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="appointment-topic">${appointment.topic || 'General Counseling'}</div>
+                            ${appointment.notes ? `<div class="text-muted small mt-1">${appointment.notes.substring(0, 50)}${appointment.notes.length > 50 ? '...' : ''}</div>` : ''}
+                        </td>
+                        <td>
+                            <span class="status-badge status-${appointment.status}">
+                                ${appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-${appointment.priority === 'high' ? 'danger' : appointment.priority === 'medium' ? 'warning' : 'success'}">
+                                ${(appointment.priority || 'normal').charAt(0).toUpperCase() + (appointment.priority || 'normal').slice(1)}
+                            </span>
+                        </td>
+                        <td>${appointment.duration} min</td>
+                        <td>
+                            ${generateActionButtons(appointment)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Initialize DataTable if not already initialized
+            if (dataTable) {
+                dataTable.destroy();
+            }
+            
+            dataTable = $('#appointmentsTable').DataTable({
+                pageLength: 10,
+                order: [[0, 'asc']], // Sort by date
+                columnDefs: [
+                    { orderable: false, targets: [6] } // Disable sorting for actions column
+                ]
+            });
+        }
+
+        function generateActionButtons(appointment) {
+            const buttons = [];
+            
+            switch (appointment.status) {
+                case 'assigned':
+                case 'pending':
+                    buttons.push(`
+                        <button class="action-btn btn-accept" onclick="showAcceptModal(${appointment.id})" title="Accept Appointment">
+                            <i class="fas fa-check"></i> Accept
+                        </button>
+                        <button class="action-btn btn-reject" onclick="showRejectModal(${appointment.id})" title="Reject Appointment">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    `);
+                    break;
+                    
+                case 'scheduled':
+                    buttons.push(`
+                        <button class="action-btn btn-reschedule" onclick="showRescheduleModal(${appointment.id})" title="Reschedule">
+                            <i class="fas fa-calendar-alt"></i> Reschedule
+                        </button>
+                        <button class="action-btn btn-notes" onclick="showNotesModal(${appointment.id})" title="Add Notes">
+                            <i class="fas fa-sticky-note"></i> Notes
+                        </button>
+                    `);
+                    break;
+                    
+                case 'completed':
+                    buttons.push(`
+                        <button class="action-btn btn-notes" onclick="showNotesModal(${appointment.id})" title="View/Edit Notes">
+                            <i class="fas fa-eye"></i> View Notes
+                        </button>
+                    `);
+                    break;
+            }
+            
+            // Always show details button
+            buttons.push(`
+                <button class="action-btn btn-outline-primary" onclick="viewAppointmentDetails(${appointment.id})" title="View Details">
+                    <i class="fas fa-info-circle"></i>
+                </button>
+            `);
+            
+            return buttons.join('');
+        }
+
+        function updateStatistics(stats) {
+            if (stats) {
+                document.getElementById('totalAppointments').textContent = stats.total || 0;
+                document.getElementById('pendingCount').textContent = stats.pending || 0;
+                document.getElementById('scheduledCount').textContent = stats.scheduled || 0;
+                document.getElementById('completedCount').textContent = stats.completed || 0;
+            }
+        }
+
+        function showAcceptModal(appointmentId) {
+            currentAppointmentId = appointmentId;
+            document.getElementById('acceptNotes').value = '';
+            new bootstrap.Modal(document.getElementById('acceptModal')).show();
+        }
+
+        function showRejectModal(appointmentId) {
+            currentAppointmentId = appointmentId;
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectNotes').value = '';
+            new bootstrap.Modal(document.getElementById('rejectModal')).show();
+        }
+
+        function showRescheduleModal(appointmentId) {
+            currentAppointmentId = appointmentId;
+            document.getElementById('rescheduleDate').value = '';
+            document.getElementById('rescheduleDuration').value = '60';
+            document.getElementById('rescheduleReason').value = '';
+            document.getElementById('availableSlots').innerHTML = '<p class="text-muted">Please select a date to see available time slots.</p>';
+            selectedTimeSlot = null;
+            new bootstrap.Modal(document.getElementById('rescheduleModal')).show();
+        }
+
+        function showNotesModal(appointmentId) {
+            currentAppointmentId = appointmentId;
+            loadAppointmentForNotes(appointmentId);
+            new bootstrap.Modal(document.getElementById('notesModal')).show();
+        }
+
+        function confirmAccept() {
+            if (!currentAppointmentId) return;
+            
+            const notes = document.getElementById('acceptNotes').value;
+            
+            fetch(`/api/counselor/appointments/${currentAppointmentId}/accept`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    notes: notes
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Appointment accepted successfully!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('acceptModal')).hide();
+                    loadAppointments(); // Refresh the table
+                } else {
+                    showToast(data.message || 'Failed to accept appointment', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error accepting appointment:', error);
+                showToast('Error accepting appointment', 'error');
+            });
+        }
+
+        function confirmReject() {
+            if (!currentAppointmentId) return;
+            
+            const reason = document.getElementById('rejectReason').value;
+            const notes = document.getElementById('rejectNotes').value;
+            
+            if (!reason) {
+                showToast('Please select a reason for rejection', 'error');
+                return;
+            }
+            
+            fetch(`/api/counselor/appointments/${currentAppointmentId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    reason: reason,
+                    notes: notes
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Appointment rejected successfully', 'warning');
+                    bootstrap.Modal.getInstance(document.getElementById('rejectModal')).hide();
+                    loadAppointments(); // Refresh the table
+                } else {
+                    showToast(data.message || 'Failed to reject appointment', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error rejecting appointment:', error);
+                showToast('Error rejecting appointment', 'error');
+            });
+        }
+
+        function loadAvailableSlots() {
+            const date = document.getElementById('rescheduleDate').value;
+            const duration = document.getElementById('rescheduleDuration').value;
+            
+            if (!date) return;
+            
+            fetch(`/api/counselor/available-slots?date=${date}&duration=${duration}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayAvailableSlots(data.slots);
+                    } else {
+                        document.getElementById('availableSlots').innerHTML = '<p class="text-muted">No available slots for this date.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading slots:', error);
+                    document.getElementById('availableSlots').innerHTML = '<p class="text-danger">Error loading available slots.</p>';
+                });
+        }
+
+        function displayAvailableSlots(slots) {
+            const container = document.getElementById('availableSlots');
+            
+            if (!slots.length) {
+                container.innerHTML = '<p class="text-muted">No available slots for this date.</p>';
+                return;
+            }
+            
+            container.innerHTML = slots.map(slot => `
+                <span class="time-slot" onclick="selectTimeSlot('${slot}')">${slot}</span>
+            `).join('');
+        }
+
+        function selectTimeSlot(time) {
+            // Remove previous selection
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            // Add selection to clicked slot
+            event.target.classList.add('selected');
+            selectedTimeSlot = time;
+        }
+
+        function confirmReschedule() {
+            if (!currentAppointmentId || !selectedTimeSlot) {
+                showToast('Please select a time slot', 'error');
+                return;
+            }
+            
+            const date = document.getElementById('rescheduleDate').value;
+            const reason = document.getElementById('rescheduleReason').value;
+            
+            fetch(`/api/counselor/appointments/${currentAppointmentId}/reschedule`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    new_date: date,
+                    new_time: selectedTimeSlot,
+                    reason: reason
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Appointment rescheduled successfully!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('rescheduleModal')).hide();
+                    loadAppointments(); // Refresh the table
+                } else {
+                    showToast(data.message || 'Failed to reschedule appointment', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error rescheduling appointment:', error);
+                showToast('Error rescheduling appointment', 'error');
+            });
+        }
+
+        function loadAppointmentForNotes(appointmentId) {
+            fetch(`/api/counselor/appointments/${appointmentId}/details`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const appointment = data.appointment;
+                        
+                        // Populate student info
+                        document.getElementById('studentInfo').innerHTML = `
+                            <p><strong>Name:</strong> ${appointment.student.name}</p>
+                            <p><strong>Student ID:</strong> ${appointment.student.student_id}</p>
+                            <p><strong>Course:</strong> ${appointment.student.course}</p>
+                            <p><strong>Email:</strong> ${appointment.student.email}</p>
+                        `;
+                        
+                        // Populate session info
+                        const sessionDate = new Date(appointment.scheduled_date || appointment.requested_date);
+                        document.getElementById('sessionInfo').innerHTML = `
+                            <p><strong>Date:</strong> ${sessionDate.toLocaleDateString()}</p>
+                            <p><strong>Time:</strong> ${sessionDate.toLocaleTimeString()}</p>
+                            <p><strong>Duration:</strong> ${appointment.duration} minutes</p>
+                            <p><strong>Status:</strong> ${appointment.status}</p>
+                        `;
+                        
+                        // Load existing notes
+                        document.getElementById('sessionNotes').value = appointment.counselor_notes || '';
+                        document.getElementById('sessionOutcome').value = appointment.outcome || '';
+                        document.getElementById('nextSteps').value = appointment.next_steps || '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading appointment details:', error);
+                    showToast('Error loading appointment details', 'error');
+                });
+        }
+
+        function saveSessionNotes() {
+            if (!currentAppointmentId) return;
+            
+            const notes = document.getElementById('sessionNotes').value;
+            const outcome = document.getElementById('sessionOutcome').value;
+            const nextSteps = document.getElementById('nextSteps').value;
+            
+            fetch(`/api/counselor/appointments/${currentAppointmentId}/add-notes`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    notes: notes,
+                    outcome: outcome,
+                    next_steps: nextSteps
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Session notes saved successfully!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('notesModal')).hide();
+                    loadAppointments(); // Refresh the table
+                } else {
+                    showToast(data.message || 'Failed to save notes', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving notes:', error);
+                showToast('Error saving notes', 'error');
+            });
+        }
+
+        function saveAvailability() {
+            const availability = {};
+            
+            document.querySelectorAll('[data-day]').forEach(row => {
+                const day = row.getAttribute('data-day');
+                const inputs = row.querySelectorAll('input');
+                
+                availability[day] = {
+                    start_time: inputs[0].value,
+                    end_time: inputs[1].value,
+                    available: inputs[2].checked,
+                    break_time: inputs[3].value
+                };
+            });
+            
+            fetch('/api/counselor/availability', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ availability: availability })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Availability updated successfully!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('availabilityModal')).hide();
+                } else {
+                    showToast(data.message || 'Failed to update availability', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving availability:', error);
+                showToast('Error saving availability', 'error');
+            });
+        }
+
+        function filterAppointments() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+            
+            let filteredData = appointmentsData;
+            
+            // Filter by status
+            if (statusFilter !== 'all') {
+                filteredData = filteredData.filter(apt => apt.status === statusFilter);
+            }
+            
+            // Filter by date range
+            if (dateFilter !== 'all') {
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                
+                filteredData = filteredData.filter(apt => {
+                    const aptDate = new Date(apt.scheduled_date || apt.requested_date);
+                    const aptDay = new Date(aptDate.getFullYear(), aptDate.getMonth(), aptDate.getDate());
+                    
+                    switch (dateFilter) {
+                        case 'today':
+                            return aptDay.getTime() === today.getTime();
+                        case 'tomorrow':
+                            const tomorrow = new Date(today);
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+                            return aptDay.getTime() === tomorrow.getTime();
+                        case 'week':
+                            const weekEnd = new Date(today);
+                            weekEnd.setDate(weekEnd.getDate() + 7);
+                            return aptDay >= today && aptDay <= weekEnd;
+                        case 'month':
+                            const monthEnd = new Date(today);
+                            monthEnd.setMonth(monthEnd.getMonth() + 1);
+                            return aptDay >= today && aptDay <= monthEnd;
+                        default:
+                            return true;
+                    }
+                });
+            }
+            
+            // Filter by priority
+            if (priorityFilter !== 'all') {
+                filteredData = filteredData.filter(apt => (apt.priority || 'normal') === priorityFilter);
+            }
+            
+            // Filter by search term
+            if (searchFilter) {
+                filteredData = filteredData.filter(apt => 
+                    apt.student.name.toLowerCase().includes(searchFilter) ||
+                    apt.student.student_id.toLowerCase().includes(searchFilter) ||
+                    (apt.topic && apt.topic.toLowerCase().includes(searchFilter))
+                );
+            }
+            
+            populateAppointmentsTable(filteredData);
+        }
+
+        function refreshAppointments() {
+            loadAppointments();
+            showToast('Appointments refreshed!', 'success');
+        }
+
+        function viewAppointmentDetails(appointmentId) {
+            // This could open a detailed view modal or navigate to a details page
+            window.location.href = `/counselor/appointments/${appointmentId}/details`;
+        }
+
+        function showToast(message, type = 'info') {
+            // Create and show bootstrap toast
+            const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', function() {
+                toast.remove();
+            });
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '1055';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        function showError(message) {
+            showToast(message, 'error');
+        }
+
+        // Auto-refresh appointments every 2 minutes
+        setInterval(function() {
+            loadAppointments();
+        }, 120000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CUEA MindConnect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --card-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 20px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: var(--secondary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            border: none;
+            transition: transform 0.3s ease;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 5px 0;
+            line-height: 1;
+        }
+
+        .stats-label {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            height: 400px;
+        }
+
+        .chart-container canvas {
+            max-height: 300px !important;
+        }
+
+        .quick-actions {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            height: fit-content;
+        }
+
+        .recent-users-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .recent-users-container .card-body {
+            height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+
+        .avatar-circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .stats-card {
+                height: 120px;
+                padding: 15px;
+            }
+            
+            .stats-number {
+                font-size: 1.5rem;
+            }
+            
+            .chart-container {
+                height: 300px;
+                padding: 15px;
+            }
+            
+            .chart-container canvas {
+                max-height: 200px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Admin Panel</h4>
+                        <small class="text-muted">CUEA MindConnect</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('admin_dashboard') }}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_users') }}">
+                                <i class="fas fa-users"></i>
+                                User Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_counselors') }}">
+                                <i class="fas fa-user-md"></i>
+                                Counselor Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_appointments') }}">
+                                <i class="fas fa-calendar-check"></i>
+                                Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_content') }}">
+                                <i class="fas fa-file-alt"></i>
+                                Content Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_forum_oversight') }}">
+                                <i class="fas fa-comments"></i>
+                                Forum Oversight
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_analytics') }}">
+                                <i class="fas fa-chart-bar"></i>
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_settings') }}">
+                                <i class="fas fa-cog"></i>
+                                Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_system_health') }}">
+                                <i class="fas fa-heartbeat"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Dashboard Overview</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="exportDashboard">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" id="refreshDashboard">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stats-card" data-stat="users">
+                            <div class="stats-icon bg-primary">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stats-number">{{ total_users }}</div>
+                            <div class="stats-label">Total Students</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stats-card" data-stat="counselors">
+                            <div class="stats-icon bg-success">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="stats-number">{{ total_counselors }}</div>
+                            <div class="stats-label">Active Counselors</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stats-card" data-stat="appointments">
+                            <div class="stats-icon bg-warning">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stats-number">{{ upcoming_appointments or 0 }}</div>
+                            <div class="stats-label">Appointments</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stats-card" data-stat="assessments">
+                            <div class="stats-icon bg-info">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stats-number">{{ total_assessments }}</div>
+                            <div class="stats-label">Total Assessments</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row mb-4">
+                    <div class="col-lg-8 mb-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">User Registration Trends (Last 7 Days)</h5>
+                            <canvas id="registrationChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 mb-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">Mood Assessment Distribution</h5>
+                            <canvas id="moodChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Quick Actions -->
+                <div class="row">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card recent-users-container">
+                            <div class="card-header">
+                                <h5 class="mb-0">Recent User Registrations</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Course</th>
+                                                <th>Registration Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for user in recent_users %}
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-circle me-2">
+                                                            {{ user.first_name[0] }}{{ user.last_name[0] }}
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-bold">{{ user.get_full_name() }}</div>
+                                                            <small class="text-muted">{{ user.student_id }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{{ user.email }}</td>
+                                                <td>{{ user.course }}</td>
+                                                <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                                                <td>
+                                                    {% if user.is_active %}
+                                                        <span class="badge bg-success">Active</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Inactive</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 mb-4">
+                        <div class="card quick-actions">
+                            <div class="card-header">
+                                <h5 class="mb-0">Quick Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-outline-primary" onclick="quickActionAddUser()">
+                                        <i class="fas fa-user-plus"></i> Add New Student
+                                    </button>
+                                    <button type="button" class="btn btn-outline-success" onclick="quickActionAddCounselor()">
+                                        <i class="fas fa-user-md"></i> Add New Counselor
+                                    </button>
+                                    <button type="button" class="btn btn-outline-info" onclick="quickActionViewReports()">
+                                        <i class="fas fa-chart-bar"></i> View Analytics
+                                    </button>
+                                    <button type="button" class="btn btn-outline-warning" onclick="quickActionSystemHealth()">
+                                        <i class="fas fa-heartbeat"></i> System Health
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- System Status -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">System Status</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Database</span>
+                                    <span class="badge bg-success">Online</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Server</span>
+                                    <span class="badge bg-success">Healthy</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Storage</span>
+                                    <span class="badge bg-warning">75% Used</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Memory</span>
+                                    <span class="badge bg-info">Normal</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dashboard Controls -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Dashboard Controls</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-sm btn-success" id="autoRefreshBtn">
+                                        <i class="fas fa-play"></i> Enable Auto-refresh
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-secondary" onclick="window.print()">
+                                        <i class="fas fa-print"></i> Print Dashboard
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Pass real data to JavaScript -->
+    <script>
+        // Real data from Flask backend
+        window.dashboardData = {
+            chartLabels: {{ chart_labels | tojson }},
+            chartData: {{ chart_data | tojson }},
+            moodPositive: {{ mood_positive | tojson }},
+            moodNeutral: {{ mood_neutral | tojson }},
+            moodNeedsSupport: {{ mood_needs_support | tojson }},
+            monthlyLabels: {{ monthly_labels | tojson }},
+            monthlyData: {{ monthly_data | tojson }}
+        };
+    </script>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_edit %}Edit Post{% else %}Create New Post{% endif %} - CUEA MindConnect</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+    /* Navigation Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f23;
+            min-height: 100vh;
+            color: #e2e8f0;
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+        .navbar {
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-logo h2 {
+            margin: 0;
+        }
+        .nav-logo a {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .nav-logo a:hover {
+            color: #667eea;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        .nav-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-link:hover {
+            color: white;
+            background: rgba(102, 126, 234, 0.2);
+            text-decoration: none;
+        }
+        .nav-link.active {
+            color: white;
+            background: rgba(102, 126, 234, 0.3);
+            font-weight: 600;
+        }
+        .nav-link.logout {
+            color: #ef4444;
+        }
+        .nav-link.logout:hover {
+            color: white;
+            background: #ef4444;
+        }
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        /* Mobile Navigation */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: rgba(15, 15, 35, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding: 50px 20px;
+                transition: left 0.3s ease;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+            .nav-links.active {
+                left: 0;
+            }
+            .nav-link {
+                font-size: 1.1rem;
+                padding: 15px 30px;
+                width: 100%;
+                text-align: center;
+                border-radius: 12px;
+                margin: 5px 0;
+                color: white;
+            }
+            .nav-toggle {
+                display: flex;
+            }
+            .nav-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(6px, 6px);
+            }
+            .nav-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+            .nav-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(6px, -6px);
+            }
+        }
+        
+        /* Container */
+        .create-post-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            margin-top: 20px;
+        }
+        
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .header-text h1 {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .header-text p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .breadcrumb a:hover {
+            color: #818cf8;
+        }
+        .breadcrumb i {
+            margin: 0 10px;
+            color: #6b7280;
+        }
+        .breadcrumb span {
+            color: #9ca3af;
+            font-weight: 500;
+        }
+        
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 30px;
+        }
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .flash-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .flash-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .flash-message.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Form Container */
+        .form-container {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .form-header {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .form-header h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .form-header p {
+            color: #d1d5db;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        .form-content {
+            padding: 30px;
+        }
+        
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+        }
+        .required {
+            color: #ef4444;
+            margin-left: 4px;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .form-input.invalid, .form-textarea.invalid {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+        
+        /* Character Counter */
+        .character-counter {
+            text-align: right;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            transition: color 0.3s ease;
+        }
+        .character-counter.warning {
+            color: #fbbf24;
+        }
+        .character-counter.danger {
+            color: #ef4444;
+        }
+        
+        /* Error Message */
+        .error-message {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        .error-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Form Help */
+        .form-help {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #9ca3af;
+            font-style: italic;
+        }
+        
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .category-option {
+            position: relative;
+        }
+        .category-radio {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .category-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .category-label:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+        .category-radio:checked + .category-label {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        .category-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        .category-name {
+            font-weight: 600;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+        }
+        
+        /* Anonymous Option */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .checkbox-input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: #e2e8f0;
+            cursor: pointer;
+        }
+        .anonymous-info {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            color: #a5b4fc;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .anonymous-info i {
+            margin-top: 3px;
+        }
+        
+        /* Preview Section */
+        .preview-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin: 30px 0;
+            overflow: hidden;
+            display: none;
+        }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .preview-title {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        .preview-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .preview-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+        .preview-content {
+            padding: 20px;
+        }
+        .preview-post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .preview-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .preview-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .preview-author-info h4 {
+            margin: 0 0 3px 0;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+        }
+        .preview-author-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+        .preview-category {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .preview-category.general { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+        .preview-category.mental-health { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+        .preview-category.study-tips { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        .preview-category.campus-life { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .preview-category.support { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+        .preview-category.academic { background: rgba(139, 92, 246, 0.2); color: #8b5cf6; }
+        .preview-post-title {
+            margin: 0 0 15px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .preview-post-content {
+            color: #d1d5db;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            text-decoration: none;
+        }
+        .btn-draft {
+            background: rgba(102, 126, 234, 0.1);
+            color: #a5b4fc;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+        .btn-draft:hover {
+            background: rgba(102, 126, 234, 0.2);
+            color: #c7d2fe;
+            text-decoration: none;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .loading-spinner {
+            background: rgba(15, 15, 35, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 90%;
+            max-width: 300px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-spinner p {
+            margin: 0;
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+        
+        /* Auto-save Indicator */
+        .autosave-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            z-index: 100;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .autosave-indicator.show {
+            display: flex;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            
+            .create-post-container {
+                padding: 15px;
+            }
+            
+            .header-text h1 {
+                font-size: 1.8rem;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .preview-post-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .loading-overlay {
+                padding: 20px;
+            }
+            
+            .autosave-indicator {
+                right: 15px;
+                bottom: 15px;
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="{{ url_for('dashboard') }}">🧠 CUEA MindConnect</a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('assessment') }}" class="nav-link">Assessment</a>
+                <a href="{{ url_for('student_appointments') }}" class="nav-link">Appointments</a>
+                <a href="{{ url_for('community') }}" class="nav-link active">Community</a>
+                <a href="{{ url_for('resources') }}" class="nav-link">Resources</a>
+                <a href="{{ url_for('profile') }}" class="nav-link">Profile</a>
+                <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="create-post-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-{% if is_edit %}edit{% else %}plus{% endif %}"></i>
+                {% if is_edit %}Edit Your Post{% else %}Create New Post{% endif %}
+            </h1>
+            <p>{% if is_edit %}Update your post and share your thoughts with the community{% else %}Share your thoughts, experiences, and support others in the community{% endif %}</p>
+        </div>
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="{{ url_for('community') }}">Community Forum</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>{% if is_edit %}Edit Post{% else %}Create Post{% endif %}</span>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Form Container -->
+        <form method="POST" class="form-container" id="postForm" novalidate>
+            <div class="form-header">
+                <h2>{% if is_edit %}Edit Your Post{% else %}Post Details{% endif %}</h2>
+                <p>{% if is_edit %}Make your changes below{% else %}Fill in the details for your new community post{% endif %}</p>
+            </div>
+
+            <div class="form-content">
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        Post Title <span class="required">*</span>
+                    </label>
+                    <input type="text" 
+                           id="title" 
+                           name="title" 
+                           class="form-input" 
+                           placeholder="What would you like to discuss?"
+                           value="{% if post %}{{ post.title }}{% endif %}"
+                           maxlength="200"
+                           required>
+                    <div class="character-counter">
+                        <span id="titleCounter">0</span> / 200 characters
+                    </div>
+                    <div class="error-message" id="titleError">Please enter a title between 3 and 200 characters.</div>
+                    <div class="form-help">
+                        Choose a clear, descriptive title that summarizes your post topic.
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Category <span class="required">*</span>
+                    </label>
+                    <div class="category-grid">
+                        {% for category in categories %}
+                        <div class="category-option">
+                            <input type="radio" 
+                                   id="category-{{ category.value }}" 
+                                   name="category" 
+                                   value="{{ category.value }}"
+                                   class="category-radio"
+                                   {% if post and post.category == category.value %}checked{% endif %}
+                                   {% if not post and loop.first %}checked{% endif %}
+                                   required>
+                            <label for="category-{{ category.value }}" class="category-label">
+                                <span class="category-icon">
+                                    {% if category.value == 'general' %}🗣️
+                                    {% elif category.value == 'mental-health' %}🧠
+                                    {% elif category.value == 'study-tips' %}📚
+                                    {% elif category.value == 'campus-life' %}🏫
+                                    {% elif category.value == 'support' %}🤝
+                                    {% elif category.value == 'academic' %}🎓
+                                    {% else %}💭{% endif %}
+                                </span>
+                                <p class="category-name">{{ category.label }}</p>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="error-message" id="categoryError">Please select a category for your post.</div>
+                    <div class="form-help">
+                        Choose the category that best fits your post topic to help others find it.
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="form-group">
+                    <label for="content" class="form-label">
+                        Content <span class="required">*</span>
+                    </label>
+                    <textarea id="content" 
+                              name="content" 
+                              class="form-textarea" 
+                              placeholder="Share your thoughts, experiences, or questions here..."
+                              maxlength="5000"
+                              required>{% if post %}{{ post.content }}{% endif %}</textarea>
+                    <div class="character-counter">
+                        <span id="contentCounter">0</span> / 5000 characters
+                    </div>
+                    <div class="error-message" id="contentError">Please enter content between 10 and 5000 characters.</div>
+                    <div class="form-help">
+                        Share your thoughts, experiences, questions, or advice. Be respectful and supportive.
+                    </div>
+                </div>
+
+                <!-- Anonymous Option -->
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" 
+                               id="is_anonymous" 
+                               name="is_anonymous" 
+                               class="checkbox-input"
+                               {% if post and post.is_anonymous %}checked{% endif %}>
+                        <label for="is_anonymous" class="checkbox-label">
+                            <i class="fas fa-user-secret"></i>
+                            Post anonymously
+                        </label>
+                    </div>
+                    <div class="anonymous-info" id="anonymousInfo" style="display: none;">
+                        <i class="fas fa-info-circle"></i>
+                        Your post will be displayed as "Anonymous User" and your identity will not be revealed to other community members.
+                    </div>
+                    <div class="form-help">
+                        Check this option if you prefer to post without revealing your identity.
+                    </div>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="preview-section" id="previewSection">
+                    <div class="preview-header">
+                        <h3 class="preview-title">Post Preview</h3>
+                        <button type="button" class="preview-close" onclick="hidePreview()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-post-header">
+                            <div class="preview-author">
+                                <div class="preview-avatar" id="previewAvatar">
+                                    {{ current_user.first_name[0].upper() }}
+                                </div>
+                                <div class="preview-author-info">
+                                    <h4 id="previewAuthor">{{ current_user.get_full_name() }}</h4>
+                                    <p>Just now</p>
+                                </div>
+                            </div>
+                            <span class="preview-category" id="previewCategory">General Discussion</span>
+                        </div>
+                        <h2 class="preview-post-title" id="previewTitle">Your post title will appear here</h2>
+                        <div class="preview-post-content" id="previewContent">Your post content will appear here...</div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a href="{{ url_for('community') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Cancel
+                    </a>
+                    
+                    <button type="button" class="btn btn-draft" onclick="showPreview()">
+                        <i class="fas fa-eye"></i>
+                        Preview
+                    </button>
+                    
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-{% if is_edit %}save{% else %}paper-plane{% endif %}"></i>
+                        {% if is_edit %}Update Post{% else %}Publish Post{% endif %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>{% if is_edit %}Updating your post...{% else %}Publishing your post...{% endif %}</p>
+        </div>
+    </div>
+
+    <!-- Auto-save Indicator -->
+    <div class="autosave-indicator" id="autosaveIndicator">
+        <i class="fas fa-check"></i> Draft saved
+    </div>
+
+    <script>
+        // Form elements
+        const titleInput = document.getElementById('title');
+        const contentTextarea = document.getElementById('content');
+        const anonymousCheckbox = document.getElementById('is_anonymous');
+        const categoryRadios = document.querySelectorAll('input[name="category"]');
+        const postForm = document.getElementById('postForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Counter elements
+        const titleCounter = document.getElementById('titleCounter');
+        const contentCounter = document.getElementById('contentCounter');
+
+        // Preview elements
+        const previewSection = document.getElementById('previewSection');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewContent = document.getElementById('previewContent');
+        const previewCategory = document.getElementById('previewCategory');
+        const previewAuthor = document.getElementById('previewAuthor');
+        const previewAvatar = document.getElementById('previewAvatar');
+
+        // Loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // Category labels mapping
+        const categoryLabels = {
+            'general': 'General Discussion',
+            'mental-health': 'Mental Health',
+            'study-tips': 'Study Tips',
+            'campus-life': 'Campus Life',
+            'support': 'Support & Encouragement',
+            'academic': 'Academic Help'
+        };
+
+        // Initialize character counters
+        function updateCharacterCounters() {
+            const titleLength = titleInput.value.length;
+            const contentLength = contentTextarea.value.length;
+
+            titleCounter.textContent = titleLength;
+            contentCounter.textContent = contentLength;
+
+            // Update counter colors
+            titleCounter.parentElement.className = 'character-counter';
+            if (titleLength > 180) titleCounter.parentElement.classList.add('warning');
+            if (titleLength > 195) titleCounter.parentElement.classList.add('danger');
+
+            contentCounter.parentElement.className = 'character-counter';
+            if (contentLength > 4500) contentCounter.parentElement.classList.add('warning');
+            if (contentLength > 4800) contentCounter.parentElement.classList.add('danger');
+        }
+
+        // Initialize anonymous info display
+        function toggleAnonymousInfo() {
+            const anonymousInfo = document.getElementById('anonymousInfo');
+            anonymousInfo.style.display = anonymousCheckbox.checked ? 'block' : 'none';
+        }
+
+        // Show preview
+        function showPreview() {
+            const title = titleInput.value.trim() || 'Your post title will appear here';
+            const content = contentTextarea.value.trim() || 'Your post content will appear here...';
+            const isAnonymous = anonymousCheckbox.checked;
+            const selectedCategory = document.querySelector('input[name="category"]:checked')?.value || 'general';
+
+            // Update preview content
+            previewTitle.textContent = title;
+            previewContent.textContent = content;
+            previewCategory.textContent = categoryLabels[selectedCategory] || 'General Discussion';
+
+            // Update author display
+            if (isAnonymous) {
+                previewAuthor.textContent = 'Anonymous User';
+                previewAvatar.innerHTML = '<i class="fas fa-user-secret"></i>';
+                previewAvatar.style.background = 'linear-gradient(135deg, #9ca3af, #6b7280)';
+            } else {
+                previewAuthor.textContent = '{{ current_user.get_full_name() }}';
+                previewAvatar.textContent = '{{ current_user.first_name[0].upper() }}';
+                previewAvatar.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            }
+
+            // Update category color
+            previewCategory.className = `preview-category ${selectedCategory}`;
+
+            previewSection.style.display = 'block';
+            previewSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Hide preview
+        function hidePreview() {
+            previewSection.style.display = 'none';
+        }
+
+        // Validate form
+        function validateForm() {
+            let isValid = true;
+            
+            // Validate title
+            const title = titleInput.value.trim();
+            const titleError = document.getElementById('titleError');
+            if (title.length < 3 || title.length > 200) {
+                titleInput.classList.add('invalid');
+                titleError.classList.add('show');
+                isValid = false;
+            } else {
+                titleInput.classList.remove('invalid');
+                titleError.classList.remove('show');
+            }
+
+            // Validate content
+            const content = contentTextarea.value.trim();
+            const contentError = document.getElementById('contentError');
+            if (content.length < 10 || content.length > 5000) {
+                contentTextarea.classList.add('invalid');
+                contentError.classList.add('show');
+                isValid = false;
+            } else {
+                contentTextarea.classList.remove('invalid');
+                contentError.classList.remove('show');
+            }
+
+            // Validate category
+            const categorySelected = document.querySelector('input[name="category"]:checked');
+            const categoryError = document.getElementById('categoryError');
+            if (!categorySelected) {
+                categoryError.classList.add('show');
+                isValid = false;
+            } else {
+                categoryError.classList.remove('show');
+            }
+
+            return isValid;
+        }
+
+        // Auto-save functionality
+        let autoSaveTimeout;
+        function autoSave() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                const formData = {
+                    title: titleInput.value,
+                    content: contentTextarea.value,
+                    category: document.querySelector('input[name="category"]:checked')?.value,
+                    is_anonymous: anonymousCheckbox.checked
+                };
+                
+                localStorage.setItem('forum_draft', JSON.stringify(formData));
+                
+                // Show auto-save indicator
+                const indicator = document.getElementById('autosaveIndicator');
+                indicator.classList.add('show');
+                setTimeout(() => indicator.classList.remove('show'), 3000);
+            }, 2000);
+        }
+
+        // Load draft on page load
+        function loadDraft() {
+            const draft = localStorage.getItem('forum_draft');
+            if (draft && !{% if post %}true{% else %}false{% endif %}) {
+                try {
+                    const data = JSON.parse(draft);
+                    if (data.title) titleInput.value = data.title;
+                    if (data.content) contentTextarea.value = data.content;
+                    if (data.is_anonymous) anonymousCheckbox.checked = data.is_anonymous;
+                    if (data.category) {
+                        const categoryRadio = document.querySelector(`input[name="category"][value="${data.category}"]`);
+                        if (categoryRadio) categoryRadio.checked = true;
+                    }
+                    updateCharacterCounters();
+                    toggleAnonymousInfo();
+                } catch (e) {
+                    console.error('Error loading draft:', e);
+                }
+            }
+        }
+
+        // Clear draft
+        function clearDraft() {
+            localStorage.removeItem('forum_draft');
+        }
+
+        // Handle form submission
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            if (!validateForm()) {
+                // Scroll to first error
+                const firstError = document.querySelector('.form-input.invalid, .form-textarea.invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+                return;
+            }
+
+            // Show loading overlay
+            loadingOverlay.style.display = 'flex';
+            submitBtn.disabled = true;
+
+            // Clear draft on successful submission
+            clearDraft();
+
+            // Submit form
+            postForm.submit();
+        }
+
+        // Event listeners
+        titleInput.addEventListener('input', () => {
+            updateCharacterCounters();
+            autoSave();
+        });
+
+        contentTextarea.addEventListener('input', () => {
+            updateCharacterCounters();
+            autoSave();
+        });
+
+        anonymousCheckbox.addEventListener('change', () => {
+            toggleAnonymousInfo();
+            autoSave();
+        });
+
+        categoryRadios.forEach(radio => {
+            radio.addEventListener('change', autoSave);
+        });
+
+        postForm.addEventListener('submit', handleSubmit);
+
+        // Prevent accidental page leave
+        window.addEventListener('beforeunload', (e) => {
+            const hasContent = titleInput.value.trim() || contentTextarea.value.trim();
+            if (hasContent && !postForm.submitted) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Mark form as submitted to prevent beforeunload
+        postForm.addEventListener('submit', () => {
+            postForm.submitted = true;
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCharacterCounters();
+            toggleAnonymousInfo();
+            loadDraft();
+
+            // Focus on title input
+            titleInput.focus();
+
+            // Mobile navigation toggle
+            const navToggle = document.querySelector('.nav-toggle');
+            const navLinks = document.querySelector('.nav-links');
+
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navToggle.classList.toggle('active');
+                });
+            }
+
+            // Add smooth scrolling for better UX
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Auto-resize textarea
+            const autoResize = () => {
+                contentTextarea.style.height = 'auto';
+                contentTextarea.style.height = Math.max(150, contentTextarea.scrollHeight) + 'px';
+            };
+
+            contentTextarea.addEventListener('input', autoResize);
+            autoResize(); // Initial resize
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + Enter to submit
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmit(e);
+                }
+                
+                // Ctrl/Cmd + P to preview
+                if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                    e.preventDefault();
+                    showPreview();
+                }
+                
+                // Escape to hide preview
+                if (e.key === 'Escape' && previewSection.style.display === 'block') {
+                    hidePreview();
+                }
+            });
+
+            // Add tooltips for keyboard shortcuts
+            submitBtn.title = 'Ctrl/Cmd + Enter to submit';
+            
+            // Enhanced form validation
+            const inputs = [titleInput, contentTextarea];
+            inputs.forEach(input => {
+                input.addEventListener('blur', () => {
+                    if (input.value.trim()) {
+                        validateForm();
+                    }
+                });
+
+                input.addEventListener('focus', () => {
+                    input.classList.remove('invalid');
+                    const errorId = input.id + 'Error';
+                    const errorElement = document.getElementById(errorId);
+                    if (errorElement) {
+                        errorElement.classList.remove('show');
+                    }
+                });
+            });
+
+            // Category selection validation
+            categoryRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    document.getElementById('categoryError').classList.remove('show');
+                });
+            });
+
+            // Add visual feedback for form progress
+            const requiredFields = [titleInput, contentTextarea];
+            const updateProgress = () => {
+                const filledFields = requiredFields.filter(field => field.value.trim().length > 0).length;
+                const categorySelected = document.querySelector('input[name="category"]:checked') ? 1 : 0;
+                const totalRequired = requiredFields.length + 1; // +1 for category
+                const progress = ((filledFields + categorySelected) / totalRequired) * 100;
+                
+                // Update submit button state
+                if (progress === 100) {
+                    submitBtn.classList.remove('btn-secondary');
+                    submitBtn.classList.add('btn-primary');
+                } else {
+                    submitBtn.classList.add('btn-secondary');
+                    submitBtn.classList.remove('btn-primary');
+                }
+            };
+
+            requiredFields.forEach(field => {
+                field.addEventListener('input', updateProgress);
+            });
+
+            categoryRadios.forEach(radio => {
+                radio.addEventListener('change', updateProgress);
+            });
+
+            updateProgress(); // Initial check
+        });
+
+        // Helper function to show notifications
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `flash-message ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+            `;
+            
+            // Insert at top of container
+            const container = document.querySelector('.create-post-container');
+            container.insertBefore(notification, container.firstChild);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+            
+            // Scroll to top to show notification
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Global functions for button actions (needed for onclick handlers)
+        window.showPreview = showPreview;
+        window.hidePreview = hidePreview;
+    </script>
+</body>
+</html>

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Session - CUEA MindConnect</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .session-header {
+            background: linear-gradient(135deg, var(--success-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .session-timer {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .session-content {
+            padding: 30px 0;
+        }
+
+        .session-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--success-color);
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .student-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .notes-area {
+            min-height: 300px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            background: white;
+        }
+
+        .notes-area:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+
+        .session-tools {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 20px;
+        }
+
+        .tool-btn {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tool-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .session-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .mood-scale {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .mood-item {
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            flex: 1;
+            margin: 0 2px;
+        }
+
+        .mood-item:hover {
+            background: var(--light-bg);
+        }
+
+        .mood-item.selected {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .quick-notes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .quick-note-btn {
+            background: var(--light-bg);
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-note-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Session Status Indicator -->
+    <div class="session-status pulse">
+        <i class="fas fa-circle me-2"></i>
+        Session Active
+    </div>
+
+    <!-- Session Header -->
+    <div class="session-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h3><i class="fas fa-comments me-2"></i>Active Counseling Session</h3>
+                    <p class="mb-0">{{ appointment.topic or 'General Counseling Session' }}</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="session-timer">
+                        <div class="timer-display" id="sessionTimer">00:00:00</div>
+                        <small>Session Duration</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container session-content">
+        <div class="row">
+            <!-- Main Session Area -->
+            <div class="col-lg-8">
+                <!-- Student Information -->
+                <div class="session-card">
+                    <div class="student-info">
+                        <div class="student-avatar">
+                            {{ appointment.user.first_name[0] }}{{ appointment.user.last_name[0] }}
+                        </div>
+                        <div>
+                            <h4 class="mb-1">{{ appointment.user.get_full_name() }}</h4>
+                            <p class="text-muted mb-1">{{ appointment.user.student_id }} • {{ appointment.user.course }}</p>
+                            <p class="text-muted mb-0">Year {{ appointment.user.year_of_study }}</p>
+                        </div>
+                        <div class="ms-auto">
+                            <span class="badge bg-success">Present</span>
+                        </div>
+                    </div>
+
+                    <!-- Session Notes -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-sticky-note me-2"></i>Session Notes</h5>
+                        
+                        <!-- Quick Notes -->
+                        <div class="quick-notes">
+                            <span class="quick-note-btn" onclick="addQuickNote('Student appears anxious')">Anxious</span>
+                            <span class="quick-note-btn" onclick="addQuickNote('Student is cooperative')">Cooperative</span>
+                            <span class="quick-note-btn" onclick="addQuickNote('Good progress noted')">Good Progress</span>
+                            <span class="quick-note-btn" onclick="addQuickNote('Requires follow-up')">Follow-up Needed</span>
+                            <span class="quick-note-btn" onclick="addQuickNote('Student shared personal concerns')">Personal Concerns</span>
+                            <span class="quick-note-btn" onclick="addQuickNote('Academic stress discussed')">Academic Stress</span>
+                        </div>
+
+                        <textarea class="notes-area form-control" id="sessionNotes" 
+                                  placeholder="Document your observations, student responses, interventions used, and any significant moments during the session..."></textarea>
+                    </div>
+
+                    <!-- Mood Assessment -->
+                    <div class="mb-4">
+                        <h6><i class="fas fa-chart-line me-2"></i>Student Mood Assessment</h6>
+                        <div class="mood-scale">
+                            <div class="mood-item" data-mood="1" onclick="selectMood(1)">
+                                <div style="font-size: 1.5rem;">😟</div>
+                                <small>Very Low</small>
+                            </div>
+                            <div class="mood-item" data-mood="2" onclick="selectMood(2)">
+                                <div style="font-size: 1.5rem;">😕</div>
+                                <small>Low</small>
+                            </div>
+                            <div class="mood-item" data-mood="3" onclick="selectMood(3)">
+                                <div style="font-size: 1.5rem;">😐</div>
+                                <small>Neutral</small>
+                            </div>
+                            <div class="mood-item" data-mood="4" onclick="selectMood(4)">
+                                <div style="font-size: 1.5rem;">😊</div>
+                                <small>Good</small>
+                            </div>
+                            <div class="mood-item" data-mood="5" onclick="selectMood(5)">
+                                <div style="font-size: 1.5rem;">😄</div>
+                                <small>Very Good</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Items -->
+                    <div class="mb-4">
+                        <h6><i class="fas fa-tasks me-2"></i>Action Items & Recommendations</h6>
+                        <textarea class="form-control" id="actionItems" rows="3" 
+                                  placeholder="List any homework, follow-up actions, or recommendations for the student..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Tools Sidebar -->
+            <div class="col-lg-4">
+                <div class="session-tools">
+                    <h5><i class="fas fa-toolbox me-2"></i>Session Tools</h5>
+                    
+                    <button class="btn btn-outline-primary tool-btn" onclick="pauseSession()">
+                        <i class="fas fa-pause me-2"></i>Pause Session
+                    </button>
+                    
+                    <button class="btn btn-outline-info tool-btn" onclick="takeBreak()">
+                        <i class="fas fa-coffee me-2"></i>Take Break
+                    </button>
+                    
+                    <button class="btn btn-outline-secondary tool-btn" onclick="viewResources()">
+                        <i class="fas fa-book me-2"></i>View Resources
+                    </button>
+                    
+                    <button class="btn btn-outline-warning tool-btn" onclick="requestSupervision()">
+                        <i class="fas fa-user-md me-2"></i>Request Supervision
+                    </button>
+                    
+                    <hr>
+                    
+                    <button class="btn btn-success tool-btn" onclick="completeSession()">
+                        <i class="fas fa-check-circle me-2"></i>Complete Session
+                    </button>
+                    
+                    <button class="btn btn-danger tool-btn" onclick="emergencyProtocol()">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Emergency Protocol
+                    </button>
+                </div>
+
+                <!-- Session Progress -->
+                <div class="session-tools mt-3">
+                    <h6><i class="fas fa-chart-pie me-2"></i>Session Progress</h6>
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success" role="progressbar" id="sessionProgress" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted">
+                        <span id="timeElapsed">0</span> / {{ appointment.duration }} minutes
+                    </small>
+                </div>
+
+                <!-- Emergency Contacts -->
+                <div class="session-tools mt-3">
+                    <h6><i class="fas fa-phone-alt me-2"></i>Emergency Contacts</h6>
+                    <div class="mb-2">
+                        <strong>Student Emergency:</strong><br>
+                        <small>{{ appointment.user.emergency_contact }}<br>
+                        {{ appointment.user.emergency_phone }}</small>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Campus Security:</strong><br>
+                        <small>+254-700-000-000</small>
+                    </div>
+                    <div>
+                        <strong>Crisis Hotline:</strong><br>
+                        <small>+254-722-178-177</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Session Management
+        let sessionStartTime = new Date();
+        let sessionDuration = {{ appointment.duration }} * 60; // Convert to seconds
+        let timerInterval;
+        let isPaused = false;
+        let selectedMood = null;
+
+        // Start session timer
+        function startSessionTimer() {
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (isPaused) return;
+            
+            const now = new Date();
+            const elapsed = Math.floor((now - sessionStartTime) / 1000);
+            
+            // Update timer display
+            const hours = Math.floor(elapsed / 3600);
+            const minutes = Math.floor((elapsed % 3600) / 60);
+            const seconds = elapsed % 60;
+            
+            document.getElementById('sessionTimer').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update progress
+            const progress = Math.min((elapsed / sessionDuration) * 100, 100);
+            document.getElementById('sessionProgress').style.width = progress + '%';
+            document.getElementById('timeElapsed').textContent = Math.floor(elapsed / 60);
+            
+            // Alert when session time is almost up
+            if (elapsed >= sessionDuration - 300 && elapsed < sessionDuration - 295) { // 5 minutes warning
+                alert('Session will end in 5 minutes. Please begin wrapping up.');
+            }
+        }
+
+        function addQuickNote(note) {
+            const notesArea = document.getElementById('sessionNotes');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            if (notesArea.value) {
+                notesArea.value += `\n[${timestamp}] ${note}`;
+            } else {
+                notesArea.value = `[${timestamp}] ${note}`;
+            }
+            
+            // Auto-save
+            autoSaveNotes();
+        }
+
+        function selectMood(moodValue) {
+            // Remove previous selection
+            document.querySelectorAll('.mood-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            document.querySelector(`[data-mood="${moodValue}"]`).classList.add('selected');
+            selectedMood = moodValue;
+            
+            // Auto-save
+            autoSaveNotes();
+        }
+
+        function autoSaveNotes() {
+            const notes = document.getElementById('sessionNotes').value;
+            const actionItems = document.getElementById('actionItems').value;
+            
+            // Save to session storage for now
+            sessionStorage.setItem('sessionNotes', notes);
+            sessionStorage.setItem('actionItems', actionItems);
+            sessionStorage.setItem('selectedMood', selectedMood);
+        }
+
+        function pauseSession() {
+            isPaused = !isPaused;
+            const btn = event.target;
+            
+            if (isPaused) {
+                btn.innerHTML = '<i class="fas fa-play me-2"></i>Resume Session';
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-warning');
+            } else {
+                btn.innerHTML = '<i class="fas fa-pause me-2"></i>Pause Session';
+                btn.classList.remove('btn-warning');
+                btn.classList.add('btn-outline-primary');
+            }
+        }
+
+        function takeBreak() {
+            if (confirm('Take a 5-minute break? The timer will pause.')) {
+                isPaused = true;
+                setTimeout(() => {
+                    alert('Break time is over. Ready to resume?');
+                    isPaused = false;
+                }, 300000); // 5 minutes
+            }
+        }
+
+        function viewResources() {
+            window.open('/counselor/resources', '_blank');
+        }
+
+        function requestSupervision() {
+            if (confirm('Request immediate supervision? This will alert your supervisor.')) {
+                fetch('/api/counselor/request-supervision', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        appointment_id: {{ appointment.id }},
+                        reason: 'supervision_requested_during_session'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Supervision request sent successfully.');
+                    } else {
+                        alert('Error sending supervision request.');
+                    }
+                });
+            }
+        }
+
+        function completeSession() {
+            const notes = document.getElementById('sessionNotes').value;
+            const actionItems = document.getElementById('actionItems').value;
+            
+            if (!notes.trim()) {
+                if (!confirm('No session notes entered. Are you sure you want to complete the session?')) {
+                    return;
+                }
+            }
+            
+            if (confirm('Complete this counseling session?')) {
+                fetch(`/api/counselor/appointments/{{ appointment.id }}/add-notes`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        notes: notes,
+                        action_items: actionItems,
+                        mood_assessment: selectedMood,
+                        outcome: 'successful',
+                        next_steps: actionItems ? 'follow_up_scheduled' : 'monitor_progress'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Session completed successfully!');
+                        // Clear session storage
+                        sessionStorage.clear();
+                        // Redirect to appointments page
+                        window.location.href = '/counselor/appointments';
+                    } else {
+                        alert('Error completing session: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error completing session');
+                });
+            }
+        }
+
+        function emergencyProtocol() {
+            if (confirm('EMERGENCY PROTOCOL: This will immediately alert campus security and your supervisor. Continue?')) {
+                // Pause the timer
+                isPaused = true;
+                
+                // Save emergency notes
+                const emergencyNotes = prompt('Briefly describe the emergency situation:');
+                
+                fetch('/api/counselor/emergency-protocol', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        appointment_id: {{ appointment.id }},
+                        emergency_notes: emergencyNotes,
+                        student_id: {{ appointment.user.id }},
+                        counselor_id: {{ current_user.id }}
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Emergency protocol activated. Campus security and supervisor have been notified.');
+                        // Show emergency contact information
+                        showEmergencyContacts();
+                    } else {
+                        alert('Error activating emergency protocol. Please call campus security directly.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error activating emergency protocol. Please call campus security directly at +254-700-000-000');
+                });
+            }
+        }
+
+        function showEmergencyContacts() {
+            const emergencyInfo = `
+                EMERGENCY CONTACTS:
+                
+                Campus Security: +254-700-000-000
+                Crisis Hotline: +254-722-178-177
+                Student Emergency Contact: ${document.querySelector('.session-tools').textContent.includes('{{ appointment.user.emergency_contact }}') ? '{{ appointment.user.emergency_contact }} - {{ appointment.user.emergency_phone }}' : 'See student file'}
+                
+                Your supervisor has been notified automatically.
+            `;
+            
+            alert(emergencyInfo);
+        }
+
+        // Auto-save functionality
+        let autoSaveInterval;
+
+        function startAutoSave() {
+            autoSaveInterval = setInterval(autoSaveNotes, 30000); // Auto-save every 30 seconds
+        }
+
+        function stopAutoSave() {
+            if (autoSaveInterval) {
+                clearInterval(autoSaveInterval);
+            }
+        }
+
+        // Load saved data on page load
+        function loadSavedData() {
+            const savedNotes = sessionStorage.getItem('sessionNotes');
+            const savedActionItems = sessionStorage.getItem('actionItems');
+            const savedMood = sessionStorage.getItem('selectedMood');
+            
+            if (savedNotes) {
+                document.getElementById('sessionNotes').value = savedNotes;
+            }
+            
+            if (savedActionItems) {
+                document.getElementById('actionItems').value = savedActionItems;
+            }
+            
+            if (savedMood) {
+                selectMood(parseInt(savedMood));
+            }
+        }
+
+        // Warning before leaving page
+        function setupUnloadWarning() {
+            window.addEventListener('beforeunload', function(e) {
+                const notes = document.getElementById('sessionNotes').value;
+                
+                if (notes.trim()) {
+                    e.preventDefault();
+                    e.returnValue = 'You have unsaved session notes. Are you sure you want to leave?';
+                    return e.returnValue;
+                }
+            });
+        }
+
+        // Initialize session
+        document.addEventListener('DOMContentLoaded', function() {
+            startSessionTimer();
+            startAutoSave();
+            loadSavedData();
+            setupUnloadWarning();
+            
+            // Add event listeners to form elements for auto-save
+            document.getElementById('sessionNotes').addEventListener('input', autoSaveNotes);
+            document.getElementById('actionItems').addEventListener('input', autoSaveNotes);
+            
+            // Focus on notes area
+            document.getElementById('sessionNotes').focus();
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            stopAutoSave();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+S to save notes
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                autoSaveNotes();
+                
+                // Visual feedback
+                const statusDiv = document.createElement('div');
+                statusDiv.textContent = 'Notes saved!';
+                statusDiv.style.position = 'fixed';
+                statusDiv.style.top = '70px';
+                statusDiv.style.right = '20px';
+                statusDiv.style.background = '#27ae60';
+                statusDiv.style.color = 'white';
+                statusDiv.style.padding = '10px 20px';
+                statusDiv.style.borderRadius = '5px';
+                statusDiv.style.zIndex = '1001';
+                
+                document.body.appendChild(statusDiv);
+                
+                setTimeout(() => {
+                    document.body.removeChild(statusDiv);
+                }, 2000);
+            }
+            
+            // Ctrl+Enter to complete session
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                completeSession();
+            }
+        });
+
+        // Session reminder notifications
+        function setupSessionReminders() {
+            // 10 minute reminder
+            setTimeout(() => {
+                if (!isPaused) {
+                    showNotification('10 minutes elapsed', 'info');
+                }
+            }, 600000);
+            
+            // 20 minute reminder
+            setTimeout(() => {
+                if (!isPaused) {
+                    showNotification('20 minutes elapsed - Consider checking in with student', 'warning');
+                }
+            }, 1200000);
+            
+            // Near end reminder (5 minutes before scheduled end)
+            const reminderTime = (sessionDuration - 300) * 1000; // 5 minutes before end
+            if (reminderTime > 0) {
+                setTimeout(() => {
+                    if (!isPaused) {
+                        showNotification('5 minutes remaining - Begin wrapping up', 'warning');
+                    }
+                }, reminderTime);
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '80px';
+            notification.style.right = '20px';
+            notification.style.background = type === 'warning' ? '#f39c12' : type === 'info' ? '#3498db' : '#27ae60';
+            notification.style.color = 'white';
+            notification.style.padding = '15px 20px';
+            notification.style.borderRadius = '8px';
+            notification.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+            notification.style.zIndex = '1002';
+            notification.style.maxWidth = '300px';
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-${type === 'warning' ? 'exclamation-triangle' : type === 'info' ? 'info-circle' : 'check-circle'}"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer; margin-left: auto;">&times;</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize session reminders
+        setupSessionReminders();
+
+        // Session analytics
+        let sessionAnalytics = {
+            startTime: new Date(),
+            pauseCount: 0,
+            totalPauseTime: 0,
+            quickNotesUsed: 0,
+            moodChanges: 0
+        };
+
+        // Track pause analytics
+        const originalPauseSession = pauseSession;
+        pauseSession = function() {
+            if (!isPaused) {
+                sessionAnalytics.pauseCount++;
+                sessionAnalytics.lastPauseStart = new Date();
+            } else {
+                if (sessionAnalytics.lastPauseStart) {
+                    sessionAnalytics.totalPauseTime += new Date() - sessionAnalytics.lastPauseStart;
+                }
+            }
+            originalPauseSession();
+        };
+
+        // Track quick notes usage
+        const originalAddQuickNote = addQuickNote;
+        addQuickNote = function(note) {
+            sessionAnalytics.quickNotesUsed++;
+            originalAddQuickNote(note);
+        };
+
+        // Track mood changes
+        const originalSelectMood = selectMood;
+        selectMood = function(moodValue) {
+            if (selectedMood !== null && selectedMood !== moodValue) {
+                sessionAnalytics.moodChanges++;
+            }
+            originalSelectMood(moodValue);
+        };
+    </script>
+</body>
+</html>

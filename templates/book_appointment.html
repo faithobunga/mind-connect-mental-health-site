@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - CUEA MindConnect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f0f23;
+    min-height: 100vh;
+    color: #e2e8f0;
+    line-height: 1.6;
+}
+
+/* Navigation Styles */
+.navbar {
+    background: rgba(15, 15, 35, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo a {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-logo a:hover {
+    color: #667eea;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: white;
+    background: rgba(102, 126, 234, 0.2);
+    text-decoration: none;
+}
+
+.nav-link.active {
+    color: white;
+    background: rgba(102, 126, 234, 0.3);
+    font-weight: 600;
+}
+
+.nav-link.logout {
+    color: #ef4444;
+}
+
+.nav-link.logout:hover {
+    color: white;
+    background: #ef4444;
+}
+
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.nav-toggle span {
+    width: 25px;
+    height: 3px;
+    background: #ffffff;
+    margin: 3px 0;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Navigation Breadcrumb */
+.nav-breadcrumb {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.nav-breadcrumb a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-breadcrumb a:hover {
+    color: white;
+}
+
+.nav-breadcrumb i {
+    margin: 0 10px;
+    opacity: 0.6;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header h1 {
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Progress Steps */
+.progress-steps {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.steps-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.steps-container::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    right: 25px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    z-index: 1;
+}
+
+.steps-container::after {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    height: 3px;
+    background: #667eea;
+    width: 0%;
+    transition: width 0.5s ease;
+    z-index: 2;
+}
+
+.steps-container.step-1::after { width: 0%; }
+.steps-container.step-2::after { width: 33.33%; }
+.steps-container.step-3::after { width: 66.66%; }
+.steps-container.step-4::after { width: 100%; }
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 3;
+    position: relative;
+}
+
+.step-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.step.active .step-circle {
+    background: #667eea;
+    color: white;
+    transform: scale(1.1);
+    border-color: #667eea;
+}
+
+.step.completed .step-circle {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.step-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.step.active .step-label {
+    color: #667eea;
+}
+
+.step.completed .step-label {
+    color: #28a745;
+}
+
+/* Form Container */
+.form-container {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.step-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.step-description {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: #ef4444;
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    backdrop-filter: blur(10px);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-select option {
+    background: #1a1a2e;
+    color: #ffffff;
+}
+
+/* Topic Selection */
+.topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.topic-option {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.topic-option:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.topic-option.selected {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.topic-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #667eea;
+}
+
+.topic-title {
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.topic-description {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+}
+
+/* Priority Selection */
+.priority-options {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.priority-option {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.priority-option:hover {
+    border-color: #667eea;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.priority-option.selected {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.priority-normal.selected {
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.2);
+}
+
+.priority-medium.selected {
+    border-color: #ffc107;
+    background: rgba(255, 193, 7, 0.2);
+}
+
+.priority-urgent.selected {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.2);
+}
+
+/* Mode Selection */
+.mode-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.mode-option {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.mode-option:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mode-option.selected {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.mode-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: #667eea;
+}
+
+.mode-title {
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+/* Date and Time Selection */
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.time-slot {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #ffffff;
+    backdrop-filter: blur(10px);
+}
+
+.time-slot:hover {
+    border-color: #667eea;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.time-slot.selected {
+    border-color: #667eea;
+    background: #667eea;
+    color: white;
+}
+
+.time-slot.unavailable {
+    background: rgba(255, 255, 255, 0.02);
+    color: rgba(255, 255, 255, 0.4);
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+/* Navigation Buttons */
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+}
+
+/* Alert Messages */
+.alert {
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.alert-success {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.alert-error {
+    background: rgba(220, 53, 69, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.alert-info {
+    background: rgba(102, 126, 234, 0.2);
+    color: #667eea;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+/* Summary Section */
+.appointment-summary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 25px;
+    backdrop-filter: blur(10px);
+}
+
+.summary-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.summary-value {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* Loading States */
+.loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(102, 126, 234, 0.3);
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success Animation */
+.success-animation {
+    text-align: center;
+    padding: 40px;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background: #28a745;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+    font-size: 2rem;
+    animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+    .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: rgba(15, 15, 35, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 50px 20px;
+        transition: left 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-links.active {
+        left: 0;
+    }
+
+    .nav-link {
+        font-size: 1.1rem;
+        padding: 15px 30px;
+        width: 100%;
+        text-align: center;
+        border-radius: 12px;
+        margin: 5px 0;
+    }
+
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .nav-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .nav-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .form-container {
+        padding: 25px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .topic-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .priority-options {
+        flex-direction: column;
+    }
+
+    .mode-options {
+        grid-template-columns: 1fr;
+    }
+
+    .time-slots {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+
+    .form-navigation {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .steps-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .steps-container::before,
+    .steps-container::after {
+        display: none;
+    }
+}
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="/dashboard">🧠 CUEA MindConnect</a>
+            </div>
+            <div class="nav-links">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/assessment" class="nav-link">Assessment</a>
+                <a href="/student/appointments" class="nav-link">Appointments</a>
+                <a href="/community" class="nav-link">Community</a>
+                <a href="/resources" class="nav-link">Resources</a>
+                <a href="/profile" class="nav-link">Profile</a>
+                <a href="/logout" class="nav-link logout">Logout</a>
+            </div>
+            <div class="nav-toggle" onclick="toggleNav()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Navigation Breadcrumb -->
+        <div class="nav-breadcrumb">
+            <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="/student/appointments">Appointments</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>Book New Appointment</span>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-calendar-plus"></i> Book New Appointment</h1>
+            <p>Schedule a counseling session with our professional mental health team</p>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="steps-container step-1" id="progressSteps">
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Topic & Priority</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Date & Time</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Mode & Details</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Review & Submit</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <form id="appointmentForm">
+                <!-- Step 1: Topic and Priority -->
+                <div class="form-step active" data-step="1">
+                    <h2 class="step-title">What brings you here today?</h2>
+                    <p class="step-description">Select the topic that best describes what you'd like to discuss in your counseling session.</p>
+
+                    <div class="form-group">
+                        <label class="form-label required">Session Topic</label>
+                        <div class="topic-grid">
+                            <div class="topic-option" data-topic="stress-management">
+                                <div class="topic-icon"><i class="fas fa-brain"></i></div>
+                                <div class="topic-title">Stress Management</div>
+                                <div class="topic-description">Academic pressure, work-life balance, coping strategies</div>
+                            </div>
+                            <div class="topic-option" data-topic="anxiety-depression">
+                                <div class="topic-icon"><i class="fas fa-heart"></i></div>
+                                <div class="topic-title">Anxiety & Depression</div>
+                                <div class="topic-description">Mood disorders, emotional support, mental health concerns</div>
+                            </div>
+                            <div class="topic-option" data-topic="academic-performance">
+                                <div class="topic-icon"><i class="fas fa-graduation-cap"></i></div>
+                                <div class="topic-title">Academic Performance</div>
+                                <div class="topic-description">Study habits, concentration, exam anxiety, motivation</div>
+                            </div>
+                            <div class="topic-option" data-topic="relationships">
+                                <div class="topic-icon"><i class="fas fa-users"></i></div>
+                                <div class="topic-title">Relationships</div>
+                                <div class="topic-description">Family, friends, romantic relationships, social skills</div>
+                            </div>
+                            <div class="topic-option" data-topic="self-esteem">
+                                <div class="topic-icon"><i class="fas fa-user-check"></i></div>
+                                <div class="topic-title">Self-Esteem & Identity</div>
+                                <div class="topic-description">Self-confidence, personal growth, identity issues</div>
+                            </div>
+                            <div class="topic-option" data-topic="general-support">
+                                <div class="topic-icon"><i class="fas fa-hands-helping"></i></div>
+                                <div class="topic-title">General Support</div>
+                                <div class="topic-description">General counseling, wellness check-in, preventive care</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Priority Level</label>
+                        <div class="priority-options">
+                            <div class="priority-option priority-normal selected" data-priority="normal">
+                                <div style="font-weight: 600; color: #28a745; margin-bottom: 5px;">Normal</div>
+                                <div style="font-size: 0.85rem; color: #6c757d;">Within 1-2 weeks</div>
+                            </div>
+                            <div class="priority-option priority-medium" data-priority="medium">
+                                <div style="font-weight: 600; color: #ffc107; margin-bottom: 5px;">Medium</div>
+                                <div style="font-size: 0.85rem; color: #6c757d;">Within a few days</div>
+                            </div>
+                            <div class="priority-option priority-urgent" data-priority="urgent">
+                                <div style="font-weight: 600; color: #dc3545; margin-bottom: 5px;">Urgent</div>
+                                <div style="font-size: 0.85rem; color: #6c757d;">As soon as possible</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="initialNotes" class="form-label">Brief Description (Optional)</label>
+                        <textarea id="initialNotes" class="form-textarea" 
+                                  placeholder="Please provide any additional details about what you'd like to discuss..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 2: Date and Time -->
+                <div class="form-step" data-step="2">
+                    <h2 class="step-title">When would you prefer to meet?</h2>
+                    <p class="step-description">Select your preferred date and time. We'll do our best to accommodate your schedule.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointmentDate" class="form-label required">Preferred Date</label>
+                            <input type="date" id="appointmentDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentDuration" class="form-label required">Session Duration</label>
+                            <select id="appointmentDuration" class="form-select" required>
+                                <option value="30">30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60" selected>60 minutes (Standard)</option>
+                                <option value="90">90 minutes (Extended)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Preferred Time</label>
+                        <div id="timeSlotsContainer">
+                            <div class="loading" id="timeSlotsLoading">
+                                <div class="spinner"></div>
+                                <p>Loading available times...</p>
+                            </div>
+                            <div class="time-slots" id="timeSlots"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="alternativeTimes" class="form-label">Alternative Times (Optional)</label>
+                        <textarea id="alternativeTimes" class="form-textarea" 
+                                  placeholder="If your preferred time isn't available, please suggest alternative times or days..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 3: Mode and Details -->
+                <div class="form-step" data-step="3">
+                    <h2 class="step-title">How would you like to meet?</h2>
+                    <p class="step-description">Choose your preferred meeting format and provide any additional details.</p>
+
+                    <div class="form-group">
+                        <label class="form-label required">Meeting Mode</label>
+                        <div class="mode-options">
+                            <div class="mode-option selected" data-mode="in-person">
+                                <div class="mode-icon"><i class="fas fa-user"></i></div>
+                                <div class="mode-title">In-Person</div>
+                            </div>
+                            <div class="mode-option" data-mode="video">
+                                <div class="mode-icon"><i class="fas fa-video"></i></div>
+                                <div class="mode-title">Video Call</div>
+                            </div>
+                            <div class="mode-option" data-mode="phone">
+                                <div class="mode-icon"><i class="fas fa-phone"></i></div>
+                                <div class="mode-title">Phone Call</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specificConcerns" class="form-label">Specific Concerns or Goals</label>
+                        <textarea id="specificConcerns" class="form-textarea" 
+                                  placeholder="What specific issues would you like to address? What are your goals for this session?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="previousCounseling" class="form-label">Previous Counseling Experience</label>
+                        <select id="previousCounseling" class="form-select">
+                            <option value="">Please select...</option>
+                            <option value="first-time">This is my first time seeking counseling</option>
+                            <option value="previous-positive">I've had positive experiences with counseling before</option>
+                            <option value="previous-mixed">I've had mixed experiences with counseling</option>
+                            <option value="previous-negative">I've had challenging experiences with counseling before</option>
+                            <option value="ongoing">I'm currently seeing another counselor</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalNotes" class="form-label">Additional Information</label>
+                        <textarea id="additionalNotes" class="form-textarea" 
+                                  placeholder="Any other information you'd like us to know? Special accommodations needed?"></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 4: Review and Submit -->
+                <div class="form-step" data-step="4">
+                    <h2 class="step-title">Review Your Appointment Request</h2>
+                    <p class="step-description">Please review your appointment details before submitting your request.</p>
+
+                    <div class="appointment-summary">
+                        <div class="summary-title">
+                            <i class="fas fa-clipboard-check"></i>
+                            Appointment Summary
+                        </div>
+                        <div id="appointmentSummary">
+                            <!-- Dynamic content populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div style="background: #e8f5e8; border: 1px solid #c3e6cb; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                        <h4 style="color: #155724; margin-bottom: 15px;">
+                            <i class="fas fa-info-circle"></i> What happens next?
+                        </h4>
+                        <ul style="color: #155724; line-height: 1.6; margin: 0; padding-left: 20px;">
+                            <li>Your appointment request will be reviewed within 24-48 hours</li>
+                            <li>A counselor will be assigned based on your needs and availability</li>
+                            <li>You'll receive an email confirmation with your counselor's details</li>
+                            <li>If we need to adjust the time, we'll contact you with alternatives</li>
+                            <li>You can view and manage your appointments in your dashboard</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                        <h4 style="color: #856404; margin-bottom: 15px;">
+                            <i class="fas fa-exclamation-triangle"></i> Important Notes
+                        </h4>
+                        <ul style="color: #856404; line-height: 1.6; margin: 0; padding-left: 20px;">
+                            <li>Please arrive 10 minutes early for in-person appointments</li>
+                            <li>For urgent mental health crises, call our 24/7 helpline: <strong>1199</strong></li>
+                            <li>You can cancel or reschedule up to 24 hours before your appointment</li>
+                            <li>All counseling sessions are strictly confidential</li>
+                        </ul>
+                    </div>
+
+                    <!-- Success State -->
+                    <div class="success-animation hidden" id="successState">
+                        <div class="success-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h3 style="color: #28a745; margin-bottom: 15px;">Appointment Request Submitted!</h3>
+                        <p style="color: #6c757d; margin-bottom: 25px;">
+                            Your appointment request has been successfully submitted. You'll receive a confirmation email shortly.
+                        </p>
+                        <div id="appointmentReference" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <!-- Reference details populated by JavaScript -->
+                        </div>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <a href="/student/appointments" class="btn btn-primary">
+                                <i class="fas fa-calendar-check"></i>
+                                View My Appointments
+                            </a>
+                            <a href="/dashboard" class="btn btn-outline">
+                                <i class="fas fa-home"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Navigation -->
+                <div class="form-navigation" id="formNavigation">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                        <i class="fas fa-chevron-left"></i>
+                        Previous
+                    </button>
+                    <div id="submitInfo" style="display: none; color: #6c757d; font-size: 0.9rem;">
+                        <i class="fas fa-lock"></i>
+                        Your information is secure and confidential
+                    </div>
+                    <button type="button" class="btn btn-primary" id="nextBtn">
+                        Next
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentStep = 1;
+        let formData = {
+            topic: '',
+            priority: 'normal',
+            date: '',
+            time: '',
+            duration: 60,
+            mode: 'in-person',
+            notes: '',
+            specificConcerns: '',
+            previousCounseling: '',
+            additionalNotes: '',
+            alternativeTimes: ''
+        };
+
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            updateNavigationButtons();
+            setMinDate();
+            loadFormData();
+        });
+
+        function setupEventListeners() {
+            // Topic selection
+            document.querySelectorAll('.topic-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.topic-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    formData.topic = this.dataset.topic;
+                    validateStep(1);
+                });
+            });
+
+            // Priority selection
+            document.querySelectorAll('.priority-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.priority-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    formData.priority = this.dataset.priority;
+                });
+            });
+
+            // Mode selection
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    formData.mode = this.dataset.mode;
+                });
+            });
+
+            // Date selection
+            document.getElementById('appointmentDate').addEventListener('change', function() {
+                formData.date = this.value;
+                if (this.value) {
+                    loadAvailableTimes(this.value);
+                }
+                validateStep(2);
+            });
+
+            // Duration selection
+            document.getElementById('appointmentDuration').addEventListener('change', function() {
+                formData.duration = parseInt(this.value);
+                if (formData.date) {
+                    loadAvailableTimes(formData.date);
+                }
+            });
+
+            // Text inputs
+            document.getElementById('initialNotes').addEventListener('input', function() {
+                formData.notes = this.value;
+            });
+
+            document.getElementById('specificConcerns').addEventListener('input', function() {
+                formData.specificConcerns = this.value;
+            });
+
+            document.getElementById('previousCounseling').addEventListener('change', function() {
+                formData.previousCounseling = this.value;
+            });
+
+            document.getElementById('additionalNotes').addEventListener('input', function() {
+                formData.additionalNotes = this.value;
+            });
+
+            document.getElementById('alternativeTimes').addEventListener('input', function() {
+                formData.alternativeTimes = this.value;
+            });
+
+            // Navigation buttons
+            document.getElementById('nextBtn').addEventListener('click', nextStep);
+            document.getElementById('prevBtn').addEventListener('click', prevStep);
+
+            // Form submission
+            document.getElementById('appointmentForm').addEventListener('submit', submitForm);
+        }
+
+        function setMinDate() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const minDate = tomorrow.toISOString().split('T')[0];
+            document.getElementById('appointmentDate').setAttribute('min', minDate);
+        }
+
+        async function loadAvailableTimes(date) {
+            const container = document.getElementById('timeSlots');
+            const loading = document.getElementById('timeSlotsLoading');
+            
+            loading.style.display = 'block';
+            container.innerHTML = '';
+            
+            try {
+                const response = await fetch(`/api/student/appointments/available-times?date=${date}&duration=${formData.duration}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    container.innerHTML = data.available_times.map(time => 
+                        `<div class="time-slot" data-time="${time}">${time}</div>`
+                    ).join('');
+                    
+                    // Add event listeners to time slots
+                    document.querySelectorAll('.time-slot').forEach(slot => {
+                        slot.addEventListener('click', function() {
+                            if (!this.classList.contains('unavailable')) {
+                                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                                this.classList.add('selected');
+                                formData.time = this.dataset.time;
+                                validateStep(2);
+                            }
+                        });
+                    });
+                } else {
+                    container.innerHTML = '<p style="text-align: center; color: #dc3545;">Unable to load available times. Please try a different date.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading times:', error);
+                container.innerHTML = '<p style="text-align: center; color: #dc3545;">Error loading available times. Please try again.</p>';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function validateStep(step) {
+            switch (step) {
+                case 1:
+                    return formData.topic !== '';
+                case 2:
+                    return formData.date !== '' && formData.time !== '';
+                case 3:
+                    return formData.mode !== '';
+                case 4:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < 4) {
+                if (!validateStep(currentStep)) {
+                    showAlert('Please complete all required fields before continuing.', 'error');
+                    return;
+                }
+                
+                currentStep++;
+                updateStepDisplay();
+                updateNavigationButtons();
+                
+                if (currentStep === 4) {
+                    generateSummary();
+                }
+            } else {
+                submitForm();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepDisplay();
+                updateNavigationButtons();
+            }
+        }
+
+        function updateStepDisplay() {
+            // Update form steps
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.add('active');
+            
+            // Update progress indicator
+            const progressContainer = document.getElementById('progressSteps');
+            progressContainer.className = `steps-container step-${currentStep}`;
+            
+            document.querySelectorAll('.step').forEach(step => {
+                const stepNum = parseInt(step.dataset.step);
+                step.classList.remove('active', 'completed');
+                
+                if (stepNum === currentStep) {
+                    step.classList.add('active');
+                } else if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                    step.querySelector('.step-circle').innerHTML = '<i class="fas fa-check"></i>';
+                } else {
+                    step.querySelector('.step-circle').innerHTML = stepNum;
+                }
+            });
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitInfo = document.getElementById('submitInfo');
+            
+            prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
+            
+            if (currentStep < 4) {
+                nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+                nextBtn.type = 'button';
+                submitInfo.style.display = 'none';
+            } else {
+                nextBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Request';
+                nextBtn.type = 'button';
+                submitInfo.style.display = 'block';
+            }
+        }
+
+        function generateSummary() {
+            const summaryContainer = document.getElementById('appointmentSummary');
+            
+            const topicText = getTopicText(formData.topic);
+            const priorityText = getPriorityText(formData.priority);
+            const modeText = getModeText(formData.mode);
+            const dateText = formatDate(new Date(formData.date));
+            
+            summaryContainer.innerHTML = `
+                <div class="summary-item">
+                    <span class="summary-label">Session Topic:</span>
+                    <span class="summary-value">${topicText}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Priority Level:</span>
+                    <span class="summary-value">${priorityText}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Preferred Date:</span>
+                    <span class="summary-value">${dateText}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Preferred Time:</span>
+                    <span class="summary-value">${formData.time}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Duration:</span>
+                    <span class="summary-value">${formData.duration} minutes</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Meeting Mode:</span>
+                    <span class="summary-value">${modeText}</span>
+                </div>
+                ${formData.notes ? `
+                <div class="summary-item">
+                    <span class="summary-label">Initial Notes:</span>
+                    <span class="summary-value">${formData.notes}</span>
+                </div>
+                ` : ''}
+                ${formData.specificConcerns ? `
+                <div class="summary-item">
+                    <span class="summary-label">Specific Concerns:</span>
+                    <span class="summary-value">${formData.specificConcerns}</span>
+                </div>
+                ` : ''}
+            `;
+        }
+
+        async function submitForm() {
+            const nextBtn = document.getElementById('nextBtn');
+            const originalContent = nextBtn.innerHTML;
+            
+            // Show loading state
+            nextBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            nextBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/student/appointments/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        topic: formData.topic,
+                        priority: formData.priority,
+                        date: formData.date,
+                        time: formData.time,
+                        duration: formData.duration,
+                        mode: formData.mode,
+                        reason: formData.notes,
+                        specific_concerns: formData.specificConcerns,
+                        previous_counseling: formData.previousCounseling,
+                        additional_notes: formData.additionalNotes,
+                        alternative_times: formData.alternativeTimes
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccessState(data);
+                    clearFormData();
+                    document.dispatchEvent(new Event('appointmentSubmitted'));
+                } else {
+                    showAlert('Error submitting appointment: ' + data.message, 'error');
+                    nextBtn.innerHTML = originalContent;
+                    nextBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error submitting appointment:', error);
+                showAlert('Failed to submit appointment request. Please try again.', 'error');
+                nextBtn.innerHTML = originalContent;
+                nextBtn.disabled = false;
+            }
+        }
+
+        function showSuccessState(data) {
+            // Hide form content
+            document.querySelector('.form-step[data-step="4"]').style.display = 'none';
+            document.getElementById('formNavigation').style.display = 'none';
+            
+            // Show success state
+            const successState = document.getElementById('successState');
+            successState.classList.remove('hidden');
+            
+            // Populate reference details
+            const referenceContainer = document.getElementById('appointmentReference');
+            referenceContainer.innerHTML = `
+                <div style="text-align: center;">
+                    <h4 style="color: #2c3e50; margin-bottom: 10px;">Reference Number</h4>
+                    <div style="font-family: monospace; font-size: 1.5rem; font-weight: 700; color: #667eea; margin-bottom: 15px;">
+                        ${data.reference_id}
+                    </div>
+                    <p style="color: #6c757d; font-size: 0.9rem;">
+                        Expected response time: ${data.estimated_response_time}
+                    </p>
+                </div>
+            `;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Utility functions
+        function getTopicText(topic) {
+            const topics = {
+                'stress-management': 'Stress Management',
+                'anxiety-depression': 'Anxiety & Depression',
+                'academic-performance': 'Academic Performance',
+                'relationships': 'Relationships',
+                'self-esteem': 'Self-Esteem & Identity',
+                'general-support': 'General Support'
+            };
+            return topics[topic] || topic;
+        }
+
+        function getPriorityText(priority) {
+            const priorities = {
+                'normal': 'Normal Priority',
+                'medium': 'Medium Priority',
+                'urgent': 'Urgent Priority'
+            };
+            return priorities[priority] || priority;
+        }
+
+        function getModeText(mode) {
+            const modes = {
+                'in-person': 'In-Person Meeting',
+                'video': 'Video Call',
+                'phone': 'Phone Call'
+            };
+            return modes[mode] || mode;
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+            
+            const alertHTML = `
+                <div id="${alertId}" class="alert alert-${type}" style="display: flex;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+            
+            alertContainer.innerHTML = alertHTML;
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                const alertElement = document.getElementById(alertId);
+                if (alertElement) {
+                    alertElement.style.display = 'none';
+                }
+            }, 5000);
+            
+            // Scroll to alert
+            alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Navigation function
+        function toggleNav() {
+            const navLinks = document.querySelector('.nav-links');
+            const navToggle = document.querySelector('.nav-toggle');
+            
+            navLinks.classList.toggle('active');
+            navToggle.classList.toggle('active');
+        }
+
+        // Close mobile nav when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const navLinks = document.querySelector('.nav-links');
+                const navToggle = document.querySelector('.nav-toggle');
+                
+                navLinks.classList.remove('active');
+                navToggle.classList.remove('active');
+            });
+        });
+
+        // Close mobile nav when clicking outside
+        document.addEventListener('click', (e) => {
+            const navLinks = document.querySelector('.nav-links');
+            const navToggle = document.querySelector('.nav-toggle');
+            const navbar = document.querySelector('.navbar');
+            
+            if (!navbar.contains(e.target)) {
+                navLinks.classList.remove('active');
+                navToggle.classList.remove('active');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                const activeElement = document.activeElement;
+                if (activeElement.tagName !== 'TEXTAREA') {
+                    if (currentStep < 4) {
+                        nextStep();
+                    } else {
+                        submitForm();
+                    }
+                }
+            }
+            
+            if (event.key === 'Escape') {
+                // Clear any alerts
+                document.getElementById('alertContainer').innerHTML = '';
+            }
+        });
+
+        // Auto-save form data to prevent loss
+        function saveFormData() {
+            try {
+                sessionStorage.setItem('appointmentFormData', JSON.stringify(formData));
+            } catch (error) {
+                console.log('Session storage not available');
+            }
+        }
+
+        function loadFormData() {
+            try {
+                const saved = sessionStorage.getItem('appointmentFormData');
+                if (saved) {
+                    const savedData = JSON.parse(saved);
+                    formData = { ...formData, ...savedData };
+                    
+                    // Restore form state
+                    if (formData.topic) {
+                        document.querySelector(`[data-topic="${formData.topic}"]`)?.classList.add('selected');
+                    }
+                    if (formData.priority) {
+                        document.querySelector(`[data-priority="${formData.priority}"]`)?.classList.add('selected');
+                    }
+                    if (formData.mode) {
+                        document.querySelector(`[data-mode="${formData.mode}"]`)?.classList.add('selected');
+                    }
+                    
+                    // Restore input values
+                    document.getElementById('appointmentDate').value = formData.date || '';
+                    document.getElementById('appointmentDuration').value = formData.duration || 60;
+                    document.getElementById('initialNotes').value = formData.notes || '';
+                    document.getElementById('specificConcerns').value = formData.specificConcerns || '';
+                    document.getElementById('previousCounseling').value = formData.previousCounseling || '';
+                    document.getElementById('additionalNotes').value = formData.additionalNotes || '';
+                    document.getElementById('alternativeTimes').value = formData.alternativeTimes || '';
+                }
+            } catch (error) {
+                console.log('Could not load saved form data');
+            }
+        }
+
+        function clearFormData() {
+            try {
+                sessionStorage.removeItem('appointmentFormData');
+            } catch (error) {
+                console.log('Session storage not available');
+            }
+        }
+
+        // Save form data periodically
+        setInterval(saveFormData, 30000); // Save every 30 seconds
+
+        // Save form data when user leaves the page
+        window.addEventListener('beforeunload', saveFormData);
+
+        // Clear form data when successfully submitted
+        document.addEventListener('appointmentSubmitted', clearFormData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }} - CUEA MindConnect Community</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+    /* Navigation Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f0f23;
+    min-height: 100vh;
+    color: #e2e8f0;
+    line-height: 1.6;
+    padding-top: 80px;
+}
+.navbar {
+    background: rgba(15, 15, 35, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+}
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.nav-logo h2 {
+    margin: 0;
+}
+.nav-logo a {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.nav-logo a:hover {
+    color: #667eea;
+}
+.nav-links {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+.nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+.nav-link:hover {
+    color: white;
+    background: rgba(102, 126, 234, 0.2);
+    text-decoration: none;
+}
+.nav-link.active {
+    color: white;
+    background: rgba(102, 126, 234, 0.3);
+    font-weight: 600;
+}
+.nav-link.logout {
+    color: #ef4444;
+}
+.nav-link.logout:hover {
+    color: white;
+    background: #ef4444;
+}
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 5px;
+}
+.nav-toggle span {
+    width: 25px;
+    height: 3px;
+    background: white;
+    margin: 3px 0;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+    .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: rgba(15, 15, 35, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 50px 20px;
+        transition: left 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .nav-links.active {
+        left: 0;
+    }
+    .nav-link {
+        font-size: 1.1rem;
+        padding: 15px 30px;
+        width: 100%;
+        text-align: center;
+        border-radius: 12px;
+        margin: 5px 0;
+        color: white;
+    }
+    .nav-toggle {
+        display: flex;
+    }
+    .nav-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px);
+    }
+    .nav-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    .nav-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+    }
+}
+
+/* Container */
+.post-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    margin-top: 20px;
+}
+
+/* Back Navigation */
+.back-nav {
+    margin-bottom: 25px;
+}
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.12);
+}
+.back-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    color: white;
+    text-decoration: none;
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+/* Post Detail */
+.post-detail {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+.post-header {
+    padding: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.post-author {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.3em;
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+}
+.anonymous-avatar {
+    background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
+    box-shadow: 0 4px 10px rgba(107, 114, 128, 0.3) !important;
+}
+.author-info h3 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #e2e8f0;
+    font-weight: 600;
+}
+.author-info p {
+    margin: 5px 0 0 0;
+    font-size: 0.9em;
+    color: #9ca3af;
+}
+.post-category {
+    background: rgba(102, 126, 234, 0.2);
+    color: #a5b4fc;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: capitalize;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+.post-category.mental-health { 
+    background: rgba(167, 139, 250, 0.3); 
+    color: #a78bfa; 
+    box-shadow: 0 2px 8px rgba(167, 139, 250, 0.3);
+}
+.post-category.study-tips { 
+    background: rgba(251, 191, 36, 0.3); 
+    color: #fbbf24; 
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+}
+.post-category.campus-life { 
+    background: rgba(34, 197, 94, 0.3); 
+    color: #22c55e; 
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+.post-category.support { 
+    background: rgba(248, 113, 113, 0.3); 
+    color: #f87171; 
+    box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
+}
+.post-category.academic { 
+    background: rgba(139, 92, 246, 0.3); 
+    color: #8b5cf6; 
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+.post-title {
+    margin: 0 0 15px 0;
+    font-size: 2em;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.3;
+}
+.post-actions-header {
+    display: flex;
+    gap: 10px;
+}
+.action-btn {
+    padding: 8px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: #d1d5db;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 0.85em;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+.action-btn:hover {
+    border-color: #667eea;
+    color: #a5b4fc;
+    text-decoration: none;
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateY(-1px);
+}
+.action-btn.danger {
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+.action-btn.danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    color: #fca5a5;
+}
+.post-content {
+    padding: 0 30px 30px 30px;
+}
+.post-text {
+    font-size: 1.1em;
+    line-height: 1.7;
+    color: #d1d5db;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Comments Section */
+.comments-section {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+.comments-header {
+    padding: 25px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(102, 126, 234, 0.15);
+}
+.comments-title {
+    margin: 0;
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.comment-form {
+    padding: 25px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.12);
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #e2e8f0;
+}
+.form-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    font-size: 1em;
+    font-family: inherit;
+    resize: vertical;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+}
+.form-textarea:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+}
+.form-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.form-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #667eea;
+}
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+.character-count {
+    font-size: 0.85em;
+    color: #9ca3af;
+}
+.character-count.warning {
+    color: #fbbf24;
+}
+.character-count.danger {
+    color: #ef4444;
+}
+.submit-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+.comments-list {
+    padding: 0;
+}
+.comment {
+    padding: 25px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    transition: background-color 0.3s ease;
+}
+.comment:last-child {
+    border-bottom: none;
+}
+.comment:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.comment-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981, #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1em;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+.comment-avatar.anonymous-avatar {
+    background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
+    box-shadow: 0 4px 10px rgba(107, 114, 128, 0.3) !important;
+}
+.comment-info h4 {
+    margin: 0;
+    font-size: 0.95em;
+    color: #e2e8f0;
+    font-weight: 600;
+}
+.comment-info p {
+    margin: 2px 0 0 0;
+    font-size: 0.8em;
+    color: #9ca3af;
+}
+.comment-actions {
+    display: flex;
+    gap: 8px;
+}
+.comment-action-btn {
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.12);
+    color: #d1d5db;
+    border-radius: 15px;
+    font-size: 0.75em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.comment-action-btn:hover {
+    border-color: #667eea;
+    color: #a5b4fc;
+    background: rgba(102, 126, 234, 0.15);
+}
+.comment-action-btn.danger:hover {
+    border-color: #ef4444;
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.15);
+}
+.comment-content {
+    color: #d1d5db;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.comment-edit-form {
+    margin-top: 15px;
+    display: none;
+}
+.comment-edit-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-family: inherit;
+    resize: vertical;
+    background: rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+}
+.comment-edit-textarea:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+.comment-edit-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+.edit-save-btn, .edit-cancel-btn {
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.edit-save-btn {
+    background: #10b981;
+    color: white;
+    border: 1px solid #10b981;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+.edit-save-btn:hover {
+    background: #059669;
+    border-color: #059669;
+    transform: translateY(-1px);
+}
+.edit-cancel-btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: #d1d5db;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.edit-cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+.no-comments {
+    padding: 60px 30px;
+    text-align: center;
+    color: #9ca3af;
+}
+.no-comments-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+.no-comments h3 {
+    margin: 0 0 10px 0;
+    color: #e2e8f0;
+    font-size: 1.3em;
+}
+.no-comments p {
+    margin: 0;
+    font-size: 1.1em;
+}
+.loading-message {
+    text-align: center;
+    padding: 20px;
+    color: #9ca3af;
+    display: none;
+}
+.alert {
+    padding: 15px 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    display: none;
+}
+.alert.success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border-left: 4px solid #10b981;
+}
+.alert.error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border-left: 4px solid #ef4444;
+}
+.alert.warning {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border-left: 4px solid #f59e0b;
+}
+
+/* Animations */
+.new-comment {
+    animation: slideInFromBottom 0.5s ease-out;
+}
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.fade-out {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+/* Custom scrollbar for textareas */
+.form-textarea::-webkit-scrollbar, .comment-edit-textarea::-webkit-scrollbar {
+    width: 6px;
+}
+.form-textarea::-webkit-scrollbar-track, .comment-edit-textarea::-webkit-scrollbar-track {
+    background: rgba(241, 245, 249, 0.15);
+    border-radius: 3px;
+}
+.form-textarea::-webkit-scrollbar-thumb, .comment-edit-textarea::-webkit-scrollbar-thumb {
+    background: rgba(203, 213, 225, 0.4);
+    border-radius: 3px;
+}
+.form-textarea::-webkit-scrollbar-thumb:hover, .comment-edit-textarea::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.6);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding-top: 70px;
+    }
+    
+    .post-detail-container {
+        padding: 15px;
+    }
+    
+    .post-header, .post-content, .comments-header, .comment-form, .comment {
+        padding: 20px;
+    }
+    
+    .post-title {
+        font-size: 1.6em;
+    }
+    
+    .post-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .comment-actions {
+        margin-top: 10px;
+    }
+    
+    .back-btn {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="{{ url_for('dashboard') }}">🧠 CUEA MindConnect</a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('assessment') }}" class="nav-link">Assessment</a>
+                <a href="{{ url_for('student_appointments') }}" class="nav-link">Appointments</a>
+                <a href="{{ url_for('community') }}" class="nav-link active">Community</a>
+                <a href="{{ url_for('resources') }}" class="nav-link">Resources</a>
+                <a href="{{ url_for('profile') }}" class="nav-link">Profile</a>
+                <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="post-detail-container">
+        <!-- Back Navigation -->
+        <div class="back-nav">
+            <a href="{{ url_for('community') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Community
+            </a>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Post Detail -->
+        <div class="post-detail">
+            <div class="post-header">
+                <div class="post-meta">
+                    <div class="post-author">
+                        <div class="author-avatar {{ 'anonymous-avatar' if post.is_anonymous else '' }}">
+                            {% if post.is_anonymous %}
+                                <i class="fas fa-user-secret"></i>
+                            {% else %}
+                                {{ author_name[0].upper() }}
+                            {% endif %}
+                        </div>
+                        <div class="author-info">
+                            <h3>{{ author_name }}</h3>
+                            <p>{{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                               {% if post.updated_at != post.created_at %}
+                                   • Edited {{ post.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                               {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="post-category {{ post.category }}">
+                            {{ post.category.replace('-', ' ').title() }}
+                        </span>
+                        {% if can_edit_post or can_delete_post %}
+                        <div class="post-actions-header">
+                            {% if can_edit_post %}
+                            <a href="{{ url_for('community_edit_post', post_id=post.id) }}" class="action-btn">
+                                <i class="fas fa-edit"></i>
+                                Edit
+                            </a>
+                            {% endif %}
+                            {% if can_delete_post %}
+                            <button onclick="deletePost()" class="action-btn danger">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <h1 class="post-title">{{ post.title }}</h1>
+            </div>
+
+            <div class="post-content">
+                <div class="post-text">{{ post.content }}</div>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <div class="comments-header">
+                <h2 class="comments-title">
+                    <i class="fas fa-comments"></i>
+                    {{ reply_count }} {{ 'Comment' if reply_count == 1 else 'Comments' }}
+                </h2>
+            </div>
+
+            <!-- Add Comment Form -->
+            <div class="comment-form">
+                <form id="commentForm">
+                    <div class="form-group">
+                        <label for="commentContent" class="form-label">Add a comment</label>
+                        <textarea 
+                            id="commentContent" 
+                            name="content" 
+                            class="form-textarea" 
+                            placeholder="Share your thoughts, ask questions, or offer support..."
+                            maxlength="2000"
+                            required></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <div>
+                            <div class="form-checkbox-group">
+                                <input type="checkbox" id="commentAnonymous" name="is_anonymous" class="form-checkbox">
+                                <label for="commentAnonymous">Post anonymously</label>
+                            </div>
+                            <div class="character-count" id="characterCount">0/2000 characters</div>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            Post Comment
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading Message -->
+            <div class="loading-message" id="loadingMessage">
+                <i class="fas fa-spinner fa-spin"></i> Posting your comment...
+            </div>
+
+            <!-- Comments List -->
+            <div class="comments-list" id="commentsList">
+                {% if replies_data %}
+                    {% for item in replies_data %}
+                    <div class="comment" data-comment-id="{{ item.reply.id }}">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <div class="comment-avatar {{ 'anonymous-avatar' if item.reply.is_anonymous else '' }}">
+                                    {% if item.reply.is_anonymous %}
+                                        <i class="fas fa-user-secret"></i>
+                                    {% else %}
+                                        {{ item.author_name[0].upper() }}
+                                    {% endif %}
+                                </div>
+                                <div class="comment-info">
+                                    <h4>{{ item.author_name }}</h4>
+                                    <p>{{ item.reply.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                                </div>
+                            </div>
+                            {% if item.can_edit or item.can_delete %}
+                            <div class="comment-actions">
+                                {% if item.can_edit %}
+                                <button onclick="editComment({{ item.reply.id }})" class="comment-action-btn">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                {% endif %}
+                                {% if item.can_delete %}
+                                <button onclick="deleteComment({{ item.reply.id }})" class="comment-action-btn danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="comment-content" id="commentContent{{ item.reply.id }}">{{ item.reply.content }}</div>
+                        
+                        <!-- Edit Form (Hidden by default) -->
+                        <div class="comment-edit-form" id="editForm{{ item.reply.id }}">
+                            <textarea class="comment-edit-textarea" id="editTextarea{{ item.reply.id }}">{{ item.reply.content }}</textarea>
+                            <div class="comment-edit-actions">
+                                <button onclick="saveCommentEdit({{ item.reply.id }})" class="edit-save-btn">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                                <button onclick="cancelCommentEdit({{ item.reply.id }})" class="edit-cancel-btn">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-comments" id="noCommentsMessage">
+                        <div class="no-comments-icon">💬</div>
+                        <h3>No comments yet</h3>
+                        <p>Be the first to share your thoughts on this post!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Character count for comment textarea
+        const commentContent = document.getElementById('commentContent');
+        const characterCount = document.getElementById('characterCount');
+        const submitBtn = document.getElementById('submitBtn');
+
+        commentContent.addEventListener('input', function() {
+            const length = this.value.length;
+            const maxLength = 2000;
+            
+            characterCount.textContent = `${length}/${maxLength} characters`;
+            
+            if (length > maxLength * 0.9) {
+                characterCount.className = 'character-count danger';
+            } else if (length > maxLength * 0.7) {
+                characterCount.className = 'character-count warning';
+            } else {
+                characterCount.className = 'character-count';
+            }
+            
+            submitBtn.disabled = length === 0 || length > maxLength;
+        });
+
+        // Submit comment form
+        document.getElementById('commentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const content = commentContent.value.trim();
+            const isAnonymous = document.getElementById('commentAnonymous').checked;
+            
+            if (!content) {
+                showAlert('Please enter a comment before posting.', 'warning');
+                return;
+            }
+            
+            if (content.length > 2000) {
+                showAlert('Comment is too long. Please keep it under 2000 characters.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const loadingMessage = document.getElementById('loadingMessage');
+            loadingMessage.style.display = 'block';
+            submitBtn.disabled = true;
+            
+            // Send comment to server
+            fetch(`/api/community/post/{{ post.id }}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: content,
+                    is_anonymous: isAnonymous
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingMessage.style.display = 'none';
+                
+                if (data.success) {
+                    // Add new comment to the list
+                    addNewComment(data.comment);
+                    
+                    // Clear form
+                    commentContent.value = '';
+                    document.getElementById('commentAnonymous').checked = false;
+                    characterCount.textContent = '0/2000 characters';
+                    characterCount.className = 'character-count';
+                    
+                    // Update comments count
+                    updateCommentsCount();
+                    
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                loadingMessage.style.display = 'none';
+                console.error('Error posting comment:', error);
+                showAlert('Failed to post comment. Please try again.', 'error');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+            });
+        });
+
+        // Add new comment to the DOM
+        function addNewComment(comment) {
+            const commentsList = document.getElementById('commentsList');
+            const noCommentsMessage = document.getElementById('noCommentsMessage');
+            
+            // Remove "no comments" message if it exists
+            if (noCommentsMessage) {
+                noCommentsMessage.remove();
+            }
+            
+            // Create new comment HTML
+            const commentHtml = `
+                <div class="comment new-comment" data-comment-id="${comment.id}">
+                    <div class="comment-header">
+                        <div class="comment-author">
+                            <div class="comment-avatar ${comment.author_name === 'Anonymous User' ? 'anonymous-avatar' : ''}">
+                                ${comment.author_name === 'Anonymous User' ? '<i class="fas fa-user-secret"></i>' : comment.author_name[0].toUpperCase()}
+                            </div>
+                            <div class="comment-info">
+                                <h4>${comment.author_name}</h4>
+                                <p>${comment.created_at}</p>
+                            </div>
+                        </div>
+                        ${comment.can_edit || comment.can_delete ? `
+                        <div class="comment-actions">
+                            ${comment.can_edit ? `<button onclick="editComment(${comment.id})" class="comment-action-btn"><i class="fas fa-edit"></i> Edit</button>` : ''}
+                            ${comment.can_delete ? `<button onclick="deleteComment(${comment.id})" class="comment-action-btn danger"><i class="fas fa-trash"></i> Delete</button>` : ''}
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="comment-content" id="commentContent${comment.id}">${comment.content}</div>
+                    <div class="comment-edit-form" id="editForm${comment.id}">
+                        <textarea class="comment-edit-textarea" id="editTextarea${comment.id}">${comment.content}</textarea>
+                        <div class="comment-edit-actions">
+                            <button onclick="saveCommentEdit(${comment.id})" class="edit-save-btn"><i class="fas fa-save"></i> Save</button>
+                            <button onclick="cancelCommentEdit(${comment.id})" class="edit-cancel-btn"><i class="fas fa-times"></i> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add to bottom of comments list
+            commentsList.insertAdjacentHTML('beforeend', commentHtml);
+            
+            // Scroll to new comment
+            const newComment = commentsList.lastElementChild;
+            newComment.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Edit comment
+        function editComment(commentId) {
+            const content = document.getElementById(`commentContent${commentId}`);
+            const editForm = document.getElementById(`editForm${commentId}`);
+            
+            content.style.display = 'none';
+            editForm.style.display = 'block';
+        }
+
+        // Cancel comment edit
+        function cancelCommentEdit(commentId) {
+            const content = document.getElementById(`commentContent${commentId}`);
+            const editForm = document.getElementById(`editForm${commentId}`);
+            const textarea = document.getElementById(`editTextarea${commentId}`);
+            
+            // Reset textarea to original content
+            textarea.value = content.textContent;
+            
+            content.style.display = 'block';
+            editForm.style.display = 'none';
+        }
+
+        // Save comment edit
+        function saveCommentEdit(commentId) {
+            const textarea = document.getElementById(`editTextarea${commentId}`);
+            const newContent = textarea.value.trim();
+            
+            if (!newContent) {
+                showAlert('Comment cannot be empty.', 'warning');
+                return;
+            }
+            
+            if (newContent.length > 2000) {
+                showAlert('Comment is too long. Please keep it under 2000 characters.', 'error');
+                return;
+            }
+            
+            fetch(`/api/community/reply/${commentId}/edit`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: newContent
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update comment content
+                    const content = document.getElementById(`commentContent${commentId}`);
+                    content.textContent = data.content;
+                    
+                    // Hide edit form
+                    cancelCommentEdit(commentId);
+                    
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error editing comment:', error);
+                showAlert('Failed to update comment. Please try again.', 'error');
+            });
+        }
+
+        // Delete comment
+        function deleteComment(commentId) {
+            if (!confirm('Are you sure you want to delete this comment? This action cannot be undone.')) {
+                return;
+            }
+            
+            fetch(`/api/community/reply/${commentId}/delete`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove comment from DOM with animation
+                    const comment = document.querySelector(`[data-comment-id="${commentId}"]`);
+                    comment.classList.add('fade-out');
+                    
+                    setTimeout(() => {
+                        comment.remove();
+                        updateCommentsCount();
+                        
+                        // Show "no comments" message if no comments left
+                        const commentsList = document.getElementById('commentsList');
+                        if (commentsList.children.length === 0) {
+                            commentsList.innerHTML = `
+                                <div class="no-comments" id="noCommentsMessage">
+                                    <div class="no-comments-icon">💬</div>
+                                    <h3>No comments yet</h3>
+                                    <p>Be the first to share your thoughts on this post!</p>
+                                </div>
+                            `;
+                        }
+                    }, 300);
+                    
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting comment:', error);
+                showAlert('Failed to delete comment. Please try again.', 'error');
+            });
+        }
+
+        // Delete post
+        function deletePost() {
+            if (!confirm('Are you sure you want to delete this post? This will also delete all comments. This action cannot be undone.')) {
+                return;
+            }
+            
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/community/post/{{ post.id }}/delete`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Update comments count in header
+        function updateCommentsCount() {
+            const commentsList = document.getElementById('commentsList');
+            const commentsTitle = document.querySelector('.comments-title');
+            const count = commentsList.querySelectorAll('.comment').length;
+            
+            commentsTitle.innerHTML = `
+                <i class="fas fa-comments"></i>
+                ${count} ${count === 1 ? 'Comment' : 'Comments'}
+            `;
+        }
+
+        // Show alert message
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+            
+            const alertHtml = `
+                <div id="${alertId}" class="alert ${type}" style="display: block;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'exclamation-triangle'}"></i>
+                    ${message}
+                </div>
+            `;
+            
+            alertContainer.insertAdjacentHTML('beforeend', alertHtml);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // Mobile navigation toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.querySelector('.nav-toggle');
+            const navLinks = document.querySelector('.nav-links');
+
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navToggle.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

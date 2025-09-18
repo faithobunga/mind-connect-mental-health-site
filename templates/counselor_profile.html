@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - CUEA MindConnect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #3b82f6;
+            --primary-purple: #8b5cf6;
+            --success-green: #10b981;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1rem;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            margin-bottom: 2rem;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem 0;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .profile-content {
+            display: none;
+        }
+        
+        .profile-content.show {
+            display: block;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .error-state {
+            display: none;
+            text-align: center;
+            padding: 3rem 0;
+            color: #dc3545;
+        }
+
+        .error-state.show {
+            display: block;
+        }
+
+        .retry-btn {
+            margin-top: 1rem;
+        }
+
+        .editable-field {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+
+        .editable-field:focus {
+            background-color: white;
+        }
+
+        .readonly-field {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .password-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .password-form {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .password-form.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Simple Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/counselor-dashboard">
+                <i class="fas fa-brain"></i> CUEA MindConnect
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/counselor-dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a class="nav-link active" href="/counselor/profile">
+                    <i class="fas fa-user"></i> My Profile
+                </a>
+                <a class="nav-link" href="/logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Alert Container for Dynamic Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h4 class="mt-3">Loading your profile...</h4>
+            <p class="text-muted">Please wait while we fetch your information</p>
+        </div>
+
+        <!-- Error State -->
+        <div class="error-state" id="errorState">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+            <h4>Unable to Load Profile</h4>
+            <p class="text-muted mb-3">There was an error loading your profile information.</p>
+            <button class="btn btn-primary retry-btn" onclick="retryLoad()">
+                <i class="fas fa-redo"></i> Try Again
+            </button>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-content" id="profileContent">
+            <!-- Profile Header -->
+            <div class="profile-header text-center">
+                <div class="profile-avatar" id="profileAvatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h1 id="profileName">Loading...</h1>
+                <p class="mb-1 opacity-90" id="profileTitle">Loading...</p>
+                <small id="profileMemberSince">Loading...</small>
+            </div>
+
+            <!-- Single Column Layout -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3>
+                                <i class="fas fa-user-circle text-primary"></i> Personal Information
+                            </h3>
+                            <button class="btn btn-outline-primary" id="editBtn" onclick="toggleEdit()">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
+                        </div>
+                        
+                        <form id="profileForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-control readonly-field" id="firstName" readonly>
+                                    <small class="form-text text-muted">Contact admin to change name</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-control readonly-field" id="lastName" readonly>
+                                    <small class="form-text text-muted">Contact admin to change name</small>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control readonly-field" id="username" readonly>
+                                    <small class="form-text text-muted">Contact admin to change username</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control readonly-field" id="email" readonly>
+                                    <small class="form-text text-muted">Contact admin to change email</small>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control editable-field" id="phone" readonly>
+                                    <small class="form-text text-muted">You can edit this field</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Account Status</label>
+                                    <div class="form-control-plaintext">
+                                        <span id="accountStatus" class="badge bg-success">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Specialization</label>
+                                    <input type="text" class="form-control editable-field" id="specialization" readonly>
+                                    <small class="form-text text-muted">You can edit this field</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">License Number</label>
+                                    <input type="text" class="form-control editable-field" id="licenseNumber" readonly>
+                                    <small class="form-text text-muted">You can edit this field</small>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Member Since</label>
+                                    <input type="text" class="form-control readonly-field" id="memberSince" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Last Login</label>
+                                    <input type="text" class="form-control readonly-field" id="lastLogin" readonly>
+                                </div>
+                            </div>
+
+                            <!-- Save/Cancel buttons (hidden by default) -->
+                            <div class="row mb-3" id="editButtons" style="display: none;">
+                                <div class="col-12 text-end">
+                                    <button type="button" class="btn btn-secondary me-2" onclick="cancelEdit()">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="saveProfile()">
+                                        <i class="fas fa-save"></i> Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Password Change Section -->
+                    <div class="form-section">
+                        <h3 class="mb-4">
+                            <i class="fas fa-shield-alt text-primary"></i> Account Security
+                        </h3>
+                        
+                        <div class="password-section">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">Password Management</h5>
+                                    <p class="text-muted mb-0">Change your account password for security</p>
+                                </div>
+                                <button class="btn btn-outline-primary" onclick="togglePasswordForm()">
+                                    <i class="fas fa-key"></i> Change Password
+                                </button>
+                            </div>
+
+                            <!-- Password Change Form -->
+                            <div class="password-form" id="passwordForm">
+                                <hr>
+                                <form id="passwordChangeForm">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Current Password</label>
+                                            <input type="password" class="form-control" id="currentPassword" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">New Password</label>
+                                            <input type="password" class="form-control" id="newPassword" required>
+                                            <small class="text-muted">At least 8 characters with uppercase, lowercase, number, and special character</small>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Confirm New Password</label>
+                                            <input type="password" class="form-control" id="confirmPassword" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 text-end">
+                                            <button type="button" class="btn btn-secondary me-2" onclick="cancelPasswordChange()">
+                                                <i class="fas fa-times"></i> Cancel
+                                            </button>
+                                            <button type="button" class="btn btn-primary" onclick="changePassword()">
+                                                <i class="fas fa-save"></i> Update Password
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="form-section">
+                        <h3 class="mb-4">
+                            <i class="fas fa-bolt text-primary"></i> Quick Actions
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <button class="btn btn-outline-primary w-100" onclick="refreshProfile()">
+                                    <i class="fas fa-sync-alt" id="refreshIcon"></i> Refresh Profile
+                                </button>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="/counselor-dashboard" class="btn btn-primary w-100">
+                                    <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let counselorData = null;
+        let isLoading = false;
+        let isEditing = false;
+        let originalData = {};
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Loading counselor profile...');
+            loadProfileData();
+        });
+
+        // Main function to load profile data
+        async function loadProfileData() {
+            if (isLoading) return;
+            isLoading = true;
+            
+            showState('loading');
+            
+            try {
+                console.log('📡 Fetching counselor profile data...');
+                
+                const profileResponse = await fetch('/api/counselor/profile', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                console.log('📡 Profile response status:', profileResponse.status);
+
+                if (!profileResponse.ok) {
+                    if (profileResponse.status === 403) {
+                        throw new Error('Access denied. Please log in as a counselor.');
+                    } else if (profileResponse.status === 404) {
+                        throw new Error('Profile endpoint not found.');
+                    } else {
+                        throw new Error(`HTTP ${profileResponse.status}: Failed to fetch profile`);
+                    }
+                }
+
+                const profileData = await profileResponse.json();
+                console.log('📊 Profile data received:', profileData);
+
+                if (profileData.success && profileData.counselor) {
+                    counselorData = profileData.counselor;
+                    populateProfileInfo(counselorData);
+                    console.log('✅ Profile data populated successfully');
+                } else {
+                    throw new Error(profileData.message || 'Invalid profile data received');
+                }
+
+                showState('content');
+                console.log('🎉 Profile loaded successfully');
+
+            } catch (error) {
+                console.error('❌ Critical error loading profile:', error);
+                showAlert(`Error: ${error.message}`, 'danger');
+                showState('error');
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // Show different states (loading, content, error)
+        function showState(state) {
+            const loading = document.getElementById('loadingState');
+            const content = document.getElementById('profileContent');
+            const error = document.getElementById('errorState');
+            
+            loading.classList.remove('show');
+            content.classList.remove('show');
+            error.classList.remove('show');
+            
+            switch (state) {
+                case 'loading':
+                    loading.classList.add('show');
+                    break;
+                case 'content':
+                    content.classList.add('show');
+                    break;
+                case 'error':
+                    error.classList.add('show');
+                    break;
+            }
+        }
+
+        // Populate profile information
+        function populateProfileInfo(counselor) {
+            try {
+                console.log('👤 Populating profile info for:', counselor.first_name, counselor.last_name);
+
+                const firstName = counselor.first_name || 'Unknown';
+                const lastName = counselor.last_name || 'User';
+                const fullName = `${firstName} ${lastName}`;
+                const specialization = counselor.specialization || 'Licensed Counselor';
+                const email = counselor.email || 'No email provided';
+                const username = counselor.username || 'No username';
+                const phone = counselor.phone || '';
+                const licenseNumber = counselor.license_number || '';
+
+                // Header
+                document.getElementById('profileName').textContent = fullName;
+                document.getElementById('profileTitle').textContent = specialization;
+                
+                // Avatar initials
+                const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`;
+                document.getElementById('profileAvatar').innerHTML = `<span style="font-size: 2.5rem;">${initials}</span>`;
+                
+                // Member since
+                if (counselor.created_at) {
+                    try {
+                        const date = new Date(counselor.created_at);
+                        const memberSince = date.toLocaleDateString('en-US', { 
+                            month: 'long', 
+                            year: 'numeric' 
+                        });
+                        document.getElementById('profileMemberSince').textContent = `Member since ${memberSince}`;
+                        document.getElementById('memberSince').value = memberSince;
+                    } catch (dateError) {
+                        document.getElementById('profileMemberSince').textContent = 'Member since unknown';
+                        document.getElementById('memberSince').value = 'Unknown';
+                    }
+                } else {
+                    document.getElementById('profileMemberSince').textContent = 'Member since unknown';
+                    document.getElementById('memberSince').value = 'Unknown';
+                }
+
+                // Form fields
+                document.getElementById('firstName').value = firstName;
+                document.getElementById('lastName').value = lastName;
+                document.getElementById('username').value = username;
+                document.getElementById('email').value = email;
+                document.getElementById('phone').value = phone;
+                document.getElementById('specialization').value = specialization;
+                document.getElementById('licenseNumber').value = licenseNumber;
+
+                // Store original data for cancel functionality
+                originalData = {
+                    phone: phone,
+                    specialization: specialization,
+                    licenseNumber: licenseNumber
+                };
+
+                // Account status
+                const statusBadge = document.getElementById('accountStatus');
+                if (counselor.is_active !== undefined) {
+                    if (counselor.is_active) {
+                        statusBadge.className = 'badge bg-success';
+                        statusBadge.textContent = 'Active';
+                    } else {
+                        statusBadge.className = 'badge bg-danger';
+                        statusBadge.textContent = 'Inactive';
+                    }
+                } else {
+                    statusBadge.className = 'badge bg-secondary';
+                    statusBadge.textContent = 'Unknown';
+                }
+
+                // Last login
+                if (counselor.last_login) {
+                    try {
+                        const lastLogin = new Date(counselor.last_login);
+                        const formattedLogin = lastLogin.toLocaleDateString() + ' ' + lastLogin.toLocaleTimeString();
+                        document.getElementById('lastLogin').value = formattedLogin;
+                    } catch (dateError) {
+                        document.getElementById('lastLogin').value = 'Date format error';
+                    }
+                } else {
+                    document.getElementById('lastLogin').value = 'Never';
+                }
+
+                console.log('✅ Profile info populated successfully');
+
+            } catch (error) {
+                console.error('❌ Error populating profile info:', error);
+                showAlert('Error displaying profile information', 'warning');
+            }
+        }
+
+        // Toggle edit mode
+        function toggleEdit() {
+            isEditing = !isEditing;
+            const editableFields = document.querySelectorAll('.editable-field');
+            const editBtn = document.getElementById('editBtn');
+            const editButtons = document.getElementById('editButtons');
+
+            if (isEditing) {
+                editableFields.forEach(field => {
+                    field.removeAttribute('readonly');
+                    field.style.backgroundColor = 'white';
+                });
+                editBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Edit';
+                editBtn.className = 'btn btn-outline-secondary';
+                editButtons.style.display = 'block';
+            } else {
+                editableFields.forEach(field => {
+                    field.setAttribute('readonly', true);
+                    field.style.backgroundColor = '#f8f9fa';
+                });
+                editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
+                editBtn.className = 'btn btn-outline-primary';
+                editButtons.style.display = 'none';
+                
+                // Restore original values
+                document.getElementById('phone').value = originalData.phone;
+                document.getElementById('specialization').value = originalData.specialization;
+                document.getElementById('licenseNumber').value = originalData.licenseNumber;
+            }
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            toggleEdit();
+        }
+
+        // Save profile changes
+        async function saveProfile() {
+            try {
+                const updateData = {
+                    phone: document.getElementById('phone').value,
+                    specialization: document.getElementById('specialization').value,
+                    license_number: document.getElementById('licenseNumber').value
+                };
+
+                showAlert('Saving profile changes...', 'info');
+
+                const response = await fetch('/api/counselor/profile/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('Profile updated successfully!', 'success');
+                    originalData = { ...updateData };
+                    toggleEdit();
+                    
+                    // Update header info
+                    const specialization = updateData.specialization || 'Licensed Counselor';
+                    document.getElementById('profileTitle').textContent = specialization;
+                } else {
+                    showAlert(result.message || 'Failed to update profile', 'danger');
+                }
+
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showAlert('Error saving profile. Please try again.', 'danger');
+            }
+        }
+
+        // Toggle password form
+        function togglePasswordForm() {
+            const passwordForm = document.getElementById('passwordForm');
+            passwordForm.classList.toggle('show');
+            
+            if (passwordForm.classList.contains('show')) {
+                document.getElementById('currentPassword').focus();
+            } else {
+                // Clear form when hiding
+                document.getElementById('passwordChangeForm').reset();
+            }
+        }
+
+        // Cancel password change
+        function cancelPasswordChange() {
+            document.getElementById('passwordForm').classList.remove('show');
+            document.getElementById('passwordChangeForm').reset();
+        }
+
+        // Change password
+        async function changePassword() {
+            try {
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                // Basic validation
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    showAlert('Please fill in all password fields', 'warning');
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    showAlert('New passwords do not match', 'warning');
+                    return;
+                }
+
+                if (newPassword.length < 8) {
+                    showAlert('New password must be at least 8 characters long', 'warning');
+                    return;
+                }
+
+                showAlert('Changing password...', 'info');
+
+                const response = await fetch('/counselor/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: new URLSearchParams({
+                        current_password: currentPassword,
+                        new_password: newPassword,
+                        confirm_password: confirmPassword
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('Password changed successfully!', 'success');
+                    cancelPasswordChange();
+                } else {
+                    showAlert(result.message || 'Failed to change password', 'danger');
+                }
+
+            } catch (error) {
+                console.error('Error changing password:', error);
+                showAlert('Error changing password. Please try again.', 'danger');
+            }
+        }
+
+        // Refresh profile data
+        async function refreshProfile() {
+            const refreshIcon = document.getElementById('refreshIcon');
+            refreshIcon.classList.add('fa-spin');
+            
+            showAlert('Refreshing profile data...', 'info');
+            
+            try {
+                await loadProfileData();
+                showAlert('Profile data refreshed successfully!', 'success');
+            } catch (error) {
+                showAlert('Error refreshing profile. Please try again.', 'danger');
+            } finally {
+                refreshIcon.classList.remove('fa-spin');
+            }
+        }
+
+        // Retry loading after error
+        function retryLoad() {
+            console.log('🔄 Retrying profile load...');
+            loadProfileData();
+        }
+
+        // Show alert messages
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            
+            const existingAlerts = alertContainer.querySelectorAll(`.alert-${type}`);
+            existingAlerts.forEach(alert => alert.remove());
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${getAlertIcon(type)}"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            alertContainer.appendChild(alertDiv);
+            
+            // Auto-dismiss after 5 seconds for non-danger alerts
+            if (type !== 'danger') {
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+        }
+
+        // Get appropriate icon for alert type
+        function getAlertIcon(type) {
+            const icons = {
+                'success': 'check-circle',
+                'danger': 'exclamation-triangle',
+                'warning': 'exclamation-triangle',
+                'info': 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        console.log('✅ Simple counselor profile script loaded successfully');
+    </script>
+</body>
+</html>

@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Forum - CUEA MindConnect</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .community-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .community-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-text h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .community-stats {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin: 5px 0 0 0;
+        }
+
+        .community-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 10px 15px 10px 40px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            font-size: 0.9em;
+            width: 200px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .create-post-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .create-post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .posts-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid #e5e7eb;
+        }
+
+        .post-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-card.mental-health { border-left-color: #10b981; }
+        .post-card.study-tips { border-left-color: #f59e0b; }
+        .post-card.campus-life { border-left-color: #3b82f6; }
+        .post-card.support { border-left-color: #ef4444; }
+        .post-card.academic { border-left-color: #8b5cf6; }
+        .post-card.general { border-left-color: #6b7280; }
+
+        .post-header {
+            padding: 20px 25px 15px 25px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .author-info h4 {
+            margin: 0;
+            font-size: 1em;
+            color: #1f2937;
+        }
+
+        .author-info p {
+            margin: 2px 0 0 0;
+            font-size: 0.8em;
+            color: #6b7280;
+        }
+
+        .post-category {
+            background: #f3f4f6;
+            color: #6b7280;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .post-category.mental-health { background: #d1fae5; color: #065f46; }
+        .post-category.study-tips { background: #fef3c7; color: #92400e; }
+        .post-category.campus-life { background: #dbeafe; color: #1e40af; }
+        .post-category.support { background: #fee2e2; color: #991b1b; }
+        .post-category.academic { background: #ede9fe; color: #5b21b6; }
+
+        .post-title {
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #1f2937;
+            line-height: 1.4;
+        }
+
+        .post-content {
+            padding: 0 25px 20px 25px;
+        }
+
+        .post-preview {
+            color: #6b7280;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .post-footer {
+            padding: 15px 25px;
+            background: #f9fafb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .action-btn.primary {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #5a67d8;
+            border-color: #5a67d8;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+            color: #1f2937;
+        }
+
+        .empty-state p {
+            margin: 0 0 25px 0;
+            font-size: 1.1em;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .pagination a, .pagination span {
+            padding: 10px 15px;
+            border: 1px solid #e5e7eb;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            border-color: #667eea;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .pagination .current {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .community-container {
+                padding: 15px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .community-stats {
+                justify-content: center;
+            }
+
+            .community-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-controls {
+                justify-content: center;
+            }
+
+            .category-filter {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .post-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .post-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .post-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        /* Anonymous user styling */
+        .anonymous-avatar {
+            background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
+        }
+
+        /* Post interaction animations */
+        .post-card.new-post {
+            animation: slideInFromTop 0.5s ease-out;
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Search highlight */
+        .search-highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="{{ url_for('dashboard') }}">🧠 CUEA MindConnect</a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('assessment') }}" class="nav-link">Assessment</a>
+                <a href="{{ url_for('student_appointments') }}" class="nav-link">Appointments</a>
+                <a href="{{ url_for('community') }}" class="nav-link active">Community</a>
+                <a href="{{ url_for('resources') }}" class="nav-link">Resources</a>
+                <a href="{{ url_for('profile') }}" class="nav-link">Profile</a>
+                <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="community-container">
+        <!-- Community Header -->
+        <div class="community-header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>Community Forum 💬</h1>
+                    <p>Connect, share experiences, and support each other in your wellness journey</p>
+                </div>
+                <div class="community-stats">
+                    <div class="stat-item">
+                        <p class="stat-number">{{ total_posts }}</p>
+                        <p class="stat-label">Total Posts</p>
+                    </div>
+                    <div class="stat-item">
+                        <p class="stat-number">{{ total_replies }}</p>
+                        <p class="stat-label">Total Replies</p>
+                    </div>
+                    <div class="stat-item">
+                        <p class="stat-number">{{ posts_data|length }}</p>
+                        <p class="stat-label">Active Discussions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls and Filters -->
+        <div class="community-controls">
+            <div class="filter-controls">
+                <!-- Category Filters -->
+                <div class="category-filter">
+                    <a href="{{ url_for('community', category='all') }}" 
+                       class="filter-btn {{ 'active' if current_category == 'all' else '' }}">
+                        All Posts
+                    </a>
+                    {% for category in categories %}
+                    <a href="{{ url_for('community', category=category.value) }}" 
+                       class="filter-btn {{ 'active' if current_category == category.value else '' }}">
+                        {{ category.label }}
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <!-- Search Box -->
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" 
+                           class="search-input" 
+                           placeholder="Search posts..." 
+                           id="searchInput"
+                           value="{{ request.args.get('search', '') }}">
+                </div>
+            </div>
+
+            <!-- Create Post Button -->
+            <a href="{{ url_for('community_create_post') }}" class="create-post-btn">
+                <i class="fas fa-plus"></i>
+                Create New Post
+            </a>
+        </div>
+
+        <!-- Posts Container -->
+        <div class="posts-container" id="postsContainer">
+            {% if posts_data %}
+                {% for item in posts_data %}
+                <div class="post-card {{ item.post.category }}" data-post-id="{{ item.post.id }}">
+                    <div class="post-header">
+                        <div class="post-meta">
+                            <div class="post-author">
+                                <div class="author-avatar {{ 'anonymous-avatar' if item.post.is_anonymous else '' }}">
+                                    {% if item.post.is_anonymous %}
+                                        <i class="fas fa-user-secret"></i>
+                                    {% else %}
+                                        {{ item.author_name[0].upper() }}
+                                    {% endif %}
+                                </div>
+                                <div class="author-info">
+                                    <h4>{{ item.author_name }}</h4>
+                                    <p>{{ item.post.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                                </div>
+                            </div>
+                            <span class="post-category {{ item.post.category }}">
+                                {{ item.post.category.replace('-', ' ').title() }}
+                            </span>
+                        </div>
+                        <h2 class="post-title">{{ item.post.title }}</h2>
+                    </div>
+
+                    <div class="post-content">
+                        <p class="post-preview">
+                            {{ item.post.content[:200] }}{% if item.post.content|length > 200 %}...{% endif %}
+                        </p>
+                    </div>
+
+                    <div class="post-footer">
+                        <div class="post-stats">
+                            <div class="stat">
+                                <i class="fas fa-comments"></i>
+                                <span>{{ item.reply_count }} {{ 'reply' if item.reply_count == 1 else 'replies' }}</span>
+                            </div>
+                            <div class="stat">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ item.post.created_at.strftime('%b %d') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="post-actions">
+                            {% if item.post.user_id == current_user.id %}
+                                <a href="{{ url_for('community_edit_post', post_id=item.post.id) }}" 
+                                   class="action-btn">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </a>
+                                <button onclick="deletePost({{ item.post.id }})" 
+                                        class="action-btn" 
+                                        style="border: 1px solid #ef4444; color: #ef4444;">
+                                    <i class="fas fa-trash"></i>
+                                    Delete
+                                </button>
+                            {% endif %}
+                            <a href="{{ url_for('community_post_detail', post_id=item.post.id) }}" 
+                               class="action-btn primary">
+                                <i class="fas fa-arrow-right"></i>
+                                Read More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">💬</div>
+                    <h3>No posts found</h3>
+                    <p>{% if current_category != 'all' %}
+                        No posts in this category yet. 
+                       {% else %}
+                        Be the first to start a conversation in our community!
+                       {% endif %}</p>
+                    <a href="{{ url_for('community_create_post') }}" class="create-post-btn">
+                        <i class="fas fa-plus"></i>
+                        Create the First Post
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p>Loading posts...</p>
+        </div>
+
+        <!-- Pagination -->
+        {% if posts.pages > 1 %}
+        <div class="pagination">
+            {% if posts.has_prev %}
+                <a href="{{ url_for('community', category=current_category, page=posts.prev_num) }}">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+            {% endif %}
+
+            {% for page_num in posts.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != posts.page %}
+                        <a href="{{ url_for('community', category=current_category, page=page_num) }}">{{ page_num }}</a>
+                    {% else %}
+                        <span class="current">{{ page_num }}</span>
+                    {% endif %}
+                {% else %}
+                    <span>...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if posts.has_next %}
+                <a href="{{ url_for('community', category=current_category, page=posts.next_num) }}">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Search functionality
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+        const postsContainer = document.getElementById('postsContainer');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(performSearch, 500);
+        });
+
+        function performSearch() {
+            const searchTerm = searchInput.value.trim();
+            const currentCategory = '{{ current_category }}';
+            
+            if (searchTerm.length < 3 && searchTerm.length > 0) {
+                return; // Don't search for very short terms
+            }
+
+            loadingSpinner.style.display = 'block';
+            postsContainer.style.opacity = '0.5';
+
+            const url = new URL('/api/community/posts', window.location.origin);
+            url.searchParams.append('category', currentCategory);
+            if (searchTerm) {
+                url.searchParams.append('search', searchTerm);
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updatePostsDisplay(data.posts, searchTerm);
+                    } else {
+                        showError('Failed to search posts');
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    showError('Search failed. Please try again.');
+                })
+                .finally(() => {
+                    loadingSpinner.style.display = 'none';
+                    postsContainer.style.opacity = '1';
+                });
+        }
+
+        function updatePostsDisplay(posts, searchTerm) {
+            if (posts.length === 0) {
+                postsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <h3>No posts found</h3>
+                        <p>No posts match your search criteria. Try different keywords or browse all posts.</p>
+                        <a href="${window.location.pathname}" class="create-post-btn">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to All Posts
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            const postsHtml = posts.map(post => {
+                const authorInitial = post.author_name === 'Anonymous User' ? 
+                    '<i class="fas fa-user-secret"></i>' : 
+                    post.author_name[0].toUpperCase();
+                
+                const anonymousClass = post.author_name === 'Anonymous User' ? 'anonymous-avatar' : '';
+                
+                // Highlight search terms
+                const highlightedTitle = searchTerm ? 
+                    post.title.replace(new RegExp(searchTerm, 'gi'), `<span class="search-highlight">        .pagination a, .pagination span {</span>`) : 
+                    post.title;
+                
+                const highlightedContent = searchTerm ? 
+                    post.content.replace(new RegExp(searchTerm, 'gi'), `<span class="search-highlight">        .pagination a, .pagination span {</span>`) : 
+                    post.content;
+
+                return `
+                    <div class="post-card ${post.category}" data-post-id="${post.id}">
+                        <div class="post-header">
+                            <div class="post-meta">
+                                <div class="post-author">
+                                    <div class="author-avatar ${anonymousClass}">
+                                        ${authorInitial}
+                                    </div>
+                                    <div class="author-info">
+                                        <h4>${post.author_name}</h4>
+                                        <p>${post.created_at}</p>
+                                    </div>
+                                </div>
+                                <span class="post-category ${post.category}">
+                                    ${post.category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                </span>
+                            </div>
+                            <h2 class="post-title">${highlightedTitle}</h2>
+                        </div>
+
+                        <div class="post-content">
+                            <p class="post-preview">${highlightedContent}</p>
+                        </div>
+
+                        <div class="post-footer">
+                            <div class="post-stats">
+                                <div class="stat">
+                                    <i class="fas fa-comments"></i>
+                                    <span>${post.reply_count} ${post.reply_count === 1 ? 'reply' : 'replies'}</span>
+                                </div>
+                            </div>
+
+                            <div class="post-actions">
+                                ${post.can_edit ? `
+                                    <a href="/community/post/${post.id}/edit" class="action-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <button onclick="deletePost(${post.id})" class="action-btn" style="border: 1px solid #ef4444; color: #ef4444;">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                ` : ''}
+                                <a href="/community/post/${post.id}" class="action-btn primary">
+                                    <i class="fas fa-arrow-right"></i> Read More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            postsContainer.innerHTML = postsHtml;
+        }
+
+        // Delete post functionality
+        function deletePost(postId) {
+            if (confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/community/post/${postId}/delete`;
+                
+                const csrfToken = document.querySelector('meta[name=csrf-token]');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrf_token';
+                    csrfInput.value = csrfToken.content;
+                    form.appendChild(csrfInput);
+                }
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #fee2e2;
+                color: #991b1b;
+                padding: 15px 20px;
+                border-radius: 8px;
+                border: 1px solid #fecaca;
+                z-index: 1000;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            `;
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // Auto-refresh posts every 5 minutes
+        setInterval(() => {
+            if (!searchInput.value.trim()) {
+                performSearch();
+            }
+        }, 300000);
+
+        // Mobile navigation toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.querySelector('.nav-toggle');
+            const navLinks = document.querySelector('.nav-links');
+
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navToggle.classList.toggle('active');
+                });
+            }
+
+            // Add smooth animations to posts
+            const posts = document.querySelectorAll('.post-card');
+            posts.forEach((post, index) => {
+                post.style.opacity = '0';
+                post.style.transform = 'translateY(20px)';
+                post.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                
+                setTimeout(() => {
+                    post.style.opacity = '1';
+                    post.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', function(event) {
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - CUEA MindConnect</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="auth-body">
+    <div class="auth-container register-container">
+        <div class="auth-card register-card">
+            <div class="auth-header">
+                <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
+                <div class="logo">
+                    <h2>🧠 CUEA MindConnect</h2>
+                </div>
+                <h1>Join Our Community</h1>
+                <p>Create your account to start your wellness journey</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                                <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="auth-form register-form" id="registerForm">
+                <!-- Personal Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">👤</span>
+                        Personal Information
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first_name">First Name *</label>
+                            <input 
+                                type="text" 
+                                id="first_name" 
+                                name="first_name" 
+                                required 
+                                placeholder="Enter your first name"
+                                value="{{ request.form.first_name if request.form.first_name }}"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">Last Name *</label>
+                            <input 
+                                type="text" 
+                                id="last_name" 
+                                name="last_name" 
+                                required 
+                                placeholder="Enter your last name"
+                                value="{{ request.form.last_name if request.form.last_name }}"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required 
+                            placeholder="your.email@cuea.edu"
+                            value="{{ request.form.email if request.form.email }}"
+                        >
+                        <small class="form-hint">Use your CUEA email address</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input 
+                            type="tel" 
+                            id="phone" 
+                            name="phone" 
+                            placeholder="+254 7XX XXX XXX"
+                            value="{{ request.form.phone if request.form.phone }}"
+                        >
+                    </div>
+                </div>
+
+                <!-- Account Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">🔐</span>
+                        Account Information
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="username">Username *</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required 
+                            placeholder="Choose a unique username"
+                            value="{{ request.form.username if request.form.username }}"
+                        >
+                        <div class="username-check">
+                            <span id="usernameStatus"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required 
+                            placeholder="Create a strong password"
+                        >
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                            <span id="passwordToggleIcon">👁️</span>
+                        </button>
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div id="strengthIndicator" class="strength-fill"></div>
+                            </div>
+                            <small id="strengthText">Password strength: <span>Weak</span></small>
+                        </div>
+                        <div class="password-requirements">
+                            <h4>Password Requirements:</h4>
+                            <ul>
+                                <li id="req-length">At least 8 characters</li>
+                                <li id="req-uppercase">One uppercase letter</li>
+                                <li id="req-lowercase">One lowercase letter</li>
+                                <li id="req-number">One number</li>
+                                <li id="req-special">One special character (!@#$%^&*)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password *</label>
+                        <input 
+                            type="password" 
+                            id="confirm_password" 
+                            name="confirm_password" 
+                            required 
+                            placeholder="Confirm your password"
+                        >
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
+                            <span id="confirmToggleIcon">👁️</span>
+                        </button>
+                        <div id="passwordMatch" class="password-match"></div>
+                    </div>
+                </div>
+
+                <!-- Academic Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">🎓</span>
+                        Academic Information
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="student_id">Student ID *</label>
+                        <input 
+                            type="text" 
+                            id="student_id" 
+                            name="student_id" 
+                            required 
+                            placeholder="e.g., 1048139"
+                            value="{{ request.form.student_id if request.form.student_id }}"
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="course">Course/Program *</label>
+                            <select id="course" name="course" required>
+                                <option value="">Select your course</option>
+                                <option value="Computer Science" {{ 'selected' if request.form.course == 'Computer Science' }}>Computer Science</option>
+                                <option value="Information Technology" {{ 'selected' if request.form.course == 'Information Technology' }}>Information Technology</option>
+                                <option value="Business Administration" {{ 'selected' if request.form.course == 'Business Administration' }}>Business Administration</option>
+                                <option value="Economics" {{ 'selected' if request.form.course == 'Economics' }}>Economics</option>
+                                <option value="Mass Communication" {{ 'selected' if request.form.course == 'Mass Communication' }}>Mass Communication</option>
+                                <option value="Education" {{ 'selected' if request.form.course == 'Education' }}>Education</option>
+                                <option value="Theology" {{ 'selected' if request.form.course == 'Theology' }}>Theology</option>
+                                <option value="Law" {{ 'selected' if request.form.course == 'Law' }}>Law</option>
+                                <option value="Medicine" {{ 'selected' if request.form.course == 'Medicine' }}>Medicine</option>
+                                <option value="Nursing" {{ 'selected' if request.form.course == 'Nursing' }}>Nursing</option>
+                                <option value="Other" {{ 'selected' if request.form.course == 'Other' }}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="year_of_study">Year of Study *</label>
+                            <select id="year_of_study" name="year_of_study" required>
+                                <option value="">Select year</option>
+                                <option value="1" {{ 'selected' if request.form.year_of_study == '1' }}>First Year</option>
+                                <option value="2" {{ 'selected' if request.form.year_of_study == '2' }}>Second Year</option>
+                                <option value="3" {{ 'selected' if request.form.year_of_study == '3' }}>Third Year</option>
+                                <option value="4" {{ 'selected' if request.form.year_of_study == '4' }}>Fourth Year</option>
+                                <option value="5" {{ 'selected' if request.form.year_of_study == '5' }}>Fifth Year</option>
+                                <option value="6" {{ 'selected' if request.form.year_of_study == '6' }}>Postgraduate</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Contact Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">🚨</span>
+                        Emergency Contact
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="emergency_contact">Emergency Contact Name *</label>
+                            <input 
+                                type="text" 
+                                id="emergency_contact" 
+                                name="emergency_contact" 
+                                required 
+                                placeholder="Full name of emergency contact"
+                                value="{{ request.form.emergency_contact if request.form.emergency_contact }}"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="emergency_phone">Emergency Contact Phone *</label>
+                            <input 
+                                type="tel" 
+                                id="emergency_phone" 
+                                name="emergency_phone" 
+                                required 
+                                placeholder="+254 7XX XXX XXX"
+                                value="{{ request.form.emergency_phone if request.form.emergency_phone }}"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="form-section">
+                    <div class="form-group">
+                        <label class="checkbox-label large">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <span class="checkmark"></span>
+                            <div class="checkbox-text">
+                                I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and 
+                                <a href="#" onclick="showPrivacy()">Privacy Policy</a> *
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label large">
+                            <input type="checkbox" id="newsletter" name="newsletter" {{ 'checked' if request.form.newsletter }}>
+                            <span class="checkmark"></span>
+                            <div class="checkbox-text">
+                                I would like to receive wellness tips and platform updates via email
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth-primary" id="submitBtn">
+                    <span class="btn-text">Create Account</span>
+                    <div class="btn-loader" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
+
+            <div class="auth-divider">
+                <span>or</span>
+            </div>
+
+            <div class="auth-alternatives">
+                <p>Already have an account? <a href="{{ url_for('login') }}" class="auth-link">Sign in here</a></p>
+            </div>
+
+            <div class="auth-help">
+                <h4>Need Help?</h4>
+                <div class="help-options">
+                    <a href="{{ url_for('help') }}" class="help-link">
+                        <span class="help-icon">❓</span>
+                        <div>
+                            <strong>Registration Help</strong>
+                            <small>Common questions and support</small>
+                        </div>
+                    </a>
+                    <a href="mailto:support@cuea.edu" class="help-link">
+                        <span class="help-icon">📧</span>
+                        <div>
+                            <strong>Email Support</strong>
+                            <small>Contact our support team</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-visual register-visual">
+            <div class="visual-content">
+                <h3>Join the CUEA Wellness Community</h3>
+                <div class="registration-steps">
+                    <div class="step-item active" data-step="1">
+                        <div class="step-icon">1</div>
+                        <div>
+                            <h4>Personal Info</h4>
+                            <p>Tell us about yourself</p>
+                        </div>
+                    </div>
+                    <div class="step-item" data-step="2">
+                        <div class="step-icon">2</div>
+                        <div>
+                            <h4>Account Setup</h4>
+                            <p>Create secure credentials</p>
+                        </div>
+                    </div>
+                    <div class="step-item" data-step="3">
+                        <div class="step-icon">3</div>
+                        <div>
+                            <h4>Academic Details</h4>
+                            <p>Your study information</p>
+                        </div>
+                    </div>
+                    <div class="step-item" data-step="4">
+                        <div class="step-icon">4</div>
+                        <div>
+                            <h4>Emergency Contact</h4>
+                            <p>For your safety</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="registration-benefits">
+                    <h4>What you'll get:</h4>
+                    <ul>
+                        <li>✅ Personalized wellness dashboard</li>
+                        <li>✅ Access to mental health resources</li>
+                        <li>✅ Peer support community</li>
+                        <li>✅ Counselor appointment booking</li>
+                        <li>✅ Progress tracking tools</li>
+                        <li>✅ 24/7 crisis support access</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Terms of Service</h3>
+                <button class="modal-close" onclick="closeModal('termsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="terms-content">
+                    <h4>1. Acceptance of Terms</h4>
+                    <p>By registering for CUEA MindConnect, you agree to these Terms of Service and our Privacy Policy.</p>
+                    
+                    <h4>2. Platform Purpose</h4>
+                    <p>CUEA MindConnect is a digital wellness platform designed to support student mental health and well-being at the Catholic University of Eastern Africa.</p>
+                    
+                    <h4>3. User Responsibilities</h4>
+                    <ul>
+                        <li>Provide accurate and honest information</li>
+                        <li>Maintain confidentiality of your account credentials</li>
+                        <li>Use the platform respectfully and appropriately</li>
+                        <li>Respect other users' privacy and well-being</li>
+                    </ul>
+                    
+                    <h4>4. Privacy and Confidentiality</h4>
+                    <p>We are committed to protecting your privacy. All personal information and wellness data are handled according to our Privacy Policy and applicable data protection laws.</p>
+                    
+                    <h4>5. Emergency Situations</h4>
+                    <p>If you are experiencing a mental health emergency, please contact emergency services immediately or call our crisis hotline at +254 722 178 177.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacyModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Privacy Policy</h3>
+                <button class="modal-close" onclick="closeModal('privacyModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="privacy-content">
+                    <h4>Information We Collect</h4>
+                    <ul>
+                        <li>Personal information (name, email, phone)</li>
+                        <li>Academic information (student ID, course, year)</li>
+                        <li>Wellness data (mood check-ins, assessments)</li>
+                        <li>Usage data (platform interactions)</li>
+                    </ul>
+                    
+                    <h4>How We Use Your Information</h4>
+                    <ul>
+                        <li>Provide personalized wellness support</li>
+                        <li>Connect you with appropriate resources</li>
+                        <li>Improve platform functionality</li>
+                        <li>Ensure user safety and security</li>
+                    </ul>
+                    
+                    <h4>Data Security</h4>
+                    <p>We use industry-standard security measures to protect your data, including encryption, secure servers, and access controls.</p>
+                    
+                    <h4>Your Rights</h4>
+                    <p>You have the right to access, update, or delete your personal information at any time through your account settings.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script>
+        // Password strength checking
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        const strengthIndicator = document.getElementById('strengthIndicator');
+        const strengthText = document.getElementById('strengthText');
+
+        password.addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+            checkPasswordMatch();
+        });
+
+        confirmPassword.addEventListener('input', checkPasswordMatch);
+
+        function checkPasswordStrength(password) {
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+
+            // Update requirement indicators
+            Object.keys(requirements).forEach(req => {
+                const element = document.getElementById(`req-${req}`);
+                if (element) {
+                    element.classList.toggle('met', requirements[req]);
+                }
+            });
+
+            // Calculate strength
+            const score = Object.values(requirements).filter(Boolean).length;
+            const strength = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'][Math.min(score, 4)];
+            const colors = ['#ff4757', '#ff6b7a', '#ffa502', '#2ed573', '#20bf6b'];
+            
+            strengthIndicator.style.width = `${(score / 5) * 100}%`;
+            strengthIndicator.style.backgroundColor = colors[score];
+            strengthText.querySelector('span').textContent = strength;
+        }
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const matchIndicator = document.getElementById('passwordMatch');
+
+            if (confirmPassword.length > 0) {
+                if (password === confirmPassword) {
+                    matchIndicator.textContent = '✅ Passwords match';
+                    matchIndicator.className = 'password-match success';
+                } else {
+                    matchIndicator.textContent = '❌ Passwords do not match';
+                    matchIndicator.className = 'password-match error';
+                }
+            } else {
+                matchIndicator.textContent = '';
+                matchIndicator.className = 'password-match';
+            }
+        }
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const iconId = fieldId === 'password' ? 'passwordToggleIcon' : 'confirmToggleIcon';
+            const icon = document.getElementById(iconId);
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        function showTerms() {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+
+        function showPrivacy() {
+            document.getElementById('privacyModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Form submission handling
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoader = submitBtn.querySelector('.btn-loader');
+            
+            // Validate passwords match
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Passwords do not match. Please check and try again.');
+                return;
+            }
+            
+            // Show loading state
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'block';
+            submitBtn.disabled = true;
+        });
+
+        // Username availability check
+        const username = document.getElementById('username');
+        const usernameStatus = document.getElementById('usernameStatus');
+        let usernameTimeout;
+
+        username.addEventListener('input', function() {
+            clearTimeout(usernameTimeout);
+            const value = this.value.trim();
+            
+            if (value.length >= 3) {
+                usernameTimeout = setTimeout(() => {
+                    // Make API call to check username availability
+                    fetch(`{{ url_for('check_username') }}?username=${encodeURIComponent(value)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.available) {
+                                usernameStatus.textContent = '✅ Username available';
+                                usernameStatus.className = 'success';
+                            } else {
+                                usernameStatus.textContent = '❌ Username not available';
+                                usernameStatus.className = 'error';
+                            }
+                        })
+                        .catch(() => {
+                            usernameStatus.textContent = '⚠️ Unable to check availability';
+                            usernameStatus.className = 'warning';
+                        });
+                }, 500);
+            } else {
+                usernameStatus.textContent = '';
+                usernameStatus.className = '';
+            }
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // Form progress tracking
+        const formSections = document.querySelectorAll('.form-section');
+        const stepItems = document.querySelectorAll('.step-item');
+        
+        function updateProgress() {
+            let currentSection = 0;
+            formSections.forEach((section, index) => {
+                const inputs = section.querySelectorAll('input[required], select[required]');
+                let filledInputs = 0;
+                
+                inputs.forEach(input => {
+                    if (input.type === 'checkbox') {
+                        if (input.checked) filledInputs++;
+                    } else if (input.value.trim() !== '') {
+                        filledInputs++;
+                    }
+                });
+                
+                if (filledInputs === inputs.length) {
+                    currentSection = index + 1;
+                }
+            });
+            
+            stepItems.forEach((step, index) => {
+                step.classList.toggle('active', index <= currentSection);
+            });
+        }
+
+        // Listen for input changes to update progress
+        document.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', updateProgress);
+            input.addEventListener('change', updateProgress);
+        });
+
+        // Auto-focus first input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('first_name').focus();
+        });
+    </script>
+</body>
+</html>

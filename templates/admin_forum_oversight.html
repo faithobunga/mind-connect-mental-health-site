@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum Oversight - CUEA MindConnect Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --card-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 20px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: var(--secondary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .forum-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .category-badge {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-color: #dee2e6;
+        }
+
+        .post-preview {
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .stats-row {
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid var(--secondary-color);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .flagged-post {
+            background-color: #fff3cd;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .post-content {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .reply-item {
+            background-color: #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .anonymous-badge {
+            background-color: #6c757d;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .no-posts-message {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .bulk-actions {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            display: none;
+        }
+
+        .bulk-actions.show {
+            display: block;
+        }
+
+        .selected-count {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .priority-high {
+            background-color: #ffebee;
+            border-left-color: var(--danger-color) !important;
+        }
+
+        .priority-medium {
+            background-color: #fff8e1;
+            border-left-color: var(--warning-color) !important;
+        }
+
+        .search-highlight {
+            background-color: yellow;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .post-status {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-flagged {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-deleted {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .refresh-indicator {
+            display: none;
+            color: var(--secondary-color);
+        }
+
+        .refresh-indicator.active {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .modal-body .table {
+            margin-bottom: 0;
+        }
+
+        .modal-body .reply-item:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Admin Panel</h4>
+                        <small class="text-muted">CUEA MindConnect</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_users') }}">
+                                <i class="fas fa-users"></i>
+                                User Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_counselors') }}">
+                                <i class="fas fa-user-md"></i>
+                                Counselor Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_appointments') }}">
+                                <i class="fas fa-calendar-check"></i>
+                                Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_content') }}">
+                                <i class="fas fa-file-alt"></i>
+                                Content Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('admin_forum_oversight') }}">
+                                <i class="fas fa-comments"></i>
+                                Forum Oversight
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_analytics') }}">
+                                <i class="fas fa-chart-bar"></i>
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_settings') }}">
+                                <i class="fas fa-cog"></i>
+                                Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_system_health') }}">
+                                <i class="fas fa-heartbeat"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-comments me-2"></i>
+                        Forum Oversight
+                        <i class="fas fa-sync refresh-indicator" id="refreshIndicator"></i>
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-outline-primary me-2" onclick="refreshPosts()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                        <button type="button" class="btn btn-outline-warning me-2" onclick="showFlaggedOnly()">
+                            <i class="fas fa-flag"></i> Flagged Posts
+                        </button>
+                        <button type="button" class="btn btn-outline-info me-2" onclick="showAllPosts()">
+                            <i class="fas fa-list"></i> All Posts
+                        </button>
+                        <button type="button" class="btn btn-outline-success" onclick="exportForumData()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Alert Container for JavaScript messages -->
+                <div id="alertContainer"></div>
+
+                <!-- Statistics Row -->
+                <div class="row stats-row">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalPostsCount">{{ total_posts or 0 }}</div>
+                            <div class="stat-label">Total Posts</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalRepliesCount">{{ total_replies or 0 }}</div>
+                            <div class="stat-label">Total Replies</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number text-warning" id="flaggedPostsCount">{{ flagged_posts or 0 }}</div>
+                            <div class="stat-label">Flagged Posts</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="activeUsersCount">{{ active_users or 0 }}</div>
+                            <div class="stat-label">Active Users</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-section">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" id="categoryFilter">
+                                <option value="">All Categories</option>
+                                <option value="general">General Discussion</option>
+                                <option value="mental-health">Mental Health</option>
+                                <option value="study-tips">Study Tips</option>
+                                <option value="campus-life">Campus Life</option>
+                                <option value="support">Support & Encouragement</option>
+                                <option value="academic">Academic Help</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter">
+                                <option value="">All Posts</option>
+                                <option value="flagged">Flagged Posts</option>
+                                <option value="active">Active Posts</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date Range</label>
+                            <select class="form-select" id="dateFilter">
+                                <option value="">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="searchPosts" placeholder="Search posts...">
+                                <button class="btn btn-outline-secondary" type="button" onclick="applyFilters()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="bulk-actions" id="bulkActions">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="selected-count" id="selectedCount">0</span> posts selected
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-warning me-2" onclick="bulkFlag()">
+                                <i class="fas fa-flag"></i> Flag Selected
+                            </button>
+                            <button class="btn btn-sm btn-success me-2" onclick="bulkUnflag()">
+                                <i class="fas fa-flag-checkered"></i> Unflag Selected
+                            </button>
+                            <button class="btn btn-sm btn-danger me-2" onclick="bulkDelete()">
+                                <i class="fas fa-trash"></i> Delete Selected
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="clearSelection()">
+                                Clear Selection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forum Posts Table -->
+                <div class="forum-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            Forum Posts
+                        </h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="autoRefreshToggle()">
+                                <i class="fas fa-clock"></i> Auto Refresh: <span id="autoRefreshStatus">Off</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                        </div>
+                                    </th>
+                                    <th>Post Details</th>
+                                    <th>Author</th>
+                                    <th>Category</th>
+                                    <th>Replies</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th style="width: 200px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forumTableBody">
+                                <!-- Posts will be loaded here via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Posts pagination" id="paginationContainer" style="display: none;">
+                        <ul class="pagination justify-content-center" id="paginationList">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+
+                    <!-- No Posts Message -->
+                    <div class="no-posts-message" id="noPostsMessage" style="display: none;">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h4>No Forum Posts Found</h4>
+                        <p class="text-muted">No forum posts match your current filters, or there's an issue loading the data.</p>
+                        <button class="btn btn-primary" onclick="refreshPosts()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+
+                    <!-- Loading indicator -->
+                    <div id="loadingIndicator" class="loading-spinner" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading forum data...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- View Post Modal -->
+    <div class="modal fade" id="viewPostModal" tabindex="-1" aria-labelledby="viewPostModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewPostModalLabel">Post Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="viewPostBody">
+                    <!-- Content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning" id="modalFlagBtn" onclick="flagPostFromModal()">
+                        <i class="fas fa-flag"></i> Flag Post
+                    </button>
+                    <button type="button" class="btn btn-danger" id="modalDeleteBtn" onclick="deletePostFromModal()">
+                        <i class="fas fa-trash"></i> Delete Post
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flag/Report Modal -->
+    <div class="modal fade" id="flagModal" tabindex="-1" aria-labelledby="flagModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="flagModalLabel">Flag/Report Content</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="flagForm">
+                        <input type="hidden" id="flagPostId">
+                        <input type="hidden" id="flagReplyId">
+                        
+                        <div class="mb-3">
+                            <label for="flagReason" class="form-label">Reason for flagging *</label>
+                            <select class="form-select" id="flagReason" required>
+                                <option value="">Select a reason</option>
+                                <option value="inappropriate_content">Inappropriate Content</option>
+                                <option value="harassment">Harassment/Bullying</option>
+                                <option value="spam">Spam/Promotional Content</option>
+                                <option value="misinformation">Misinformation</option>
+                                <option value="personal_info">Personal Information Shared</option>
+                                <option value="off_topic">Off Topic</option>
+                                <option value="hate_speech">Hate Speech</option>
+                                <option value="self_harm">Self-Harm Content</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="flagNotes" class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="flagNotes" rows="3" 
+                                      placeholder="Provide additional details about the issue..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="flagAction" class="form-label">Action Priority</label>
+                            <select class="form-select" id="flagAction">
+                                <option value="review">Review Later</option>
+                                <option value="immediate">Immediate Action Required</option>
+                                <option value="urgent">Urgent - Crisis Content</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" onclick="submitFlag()">
+                        <i class="fas fa-flag"></i> Submit Flag
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Action Confirmation Modal -->
+    <div class="modal fade" id="bulkActionModal" tabindex="-1" aria-labelledby="bulkActionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bulkActionModalLabel">Confirm Bulk Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="bulkActionMessage">Are you sure you want to perform this action?</p>
+                    <div class="mb-3" id="bulkReasonContainer" style="display: none;">
+                        <label for="bulkReason" class="form-label">Reason</label>
+                        <textarea class="form-control" id="bulkReason" rows="2" 
+                                  placeholder="Enter reason for this action..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmBulkAction">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentPostId = null;
+        let selectedPosts = new Set();
+        let currentPage = 1;
+        let totalPages = 1;
+        let autoRefresh = false;
+        let autoRefreshInterval = null;
+        let currentFilters = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadForumData();
+            console.log('Forum oversight page loaded');
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Filter event listeners
+            document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
+            document.getElementById('dateFilter').addEventListener('change', applyFilters);
+            
+            // Search with debounce
+            let searchTimeout;
+            document.getElementById('searchPosts').addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(applyFilters, 300);
+            });
+            
+            // Reset flag form when modal closes
+            document.getElementById('flagModal').addEventListener('hidden.bs.modal', function () {
+                document.getElementById('flagForm').reset();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    refreshPosts();
+                }
+                if (e.key === 'Escape') {
+                    clearSelection();
+                }
+            });
+        }
+
+        // Load forum data
+        function loadForumData(page = 1) {
+            showLoading();
+            
+            const params = new URLSearchParams({
+                page: page,
+                per_page: 20,
+                ...currentFilters
+            });
+
+            fetch(`/api/admin/forum/posts?${params}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        displayPosts(data.posts);
+                        updateStatistics(data.stats);
+                        updatePagination(data.pagination);
+                        currentPage = page;
+                        totalPages = data.pagination?.pages || 1;
+                    } else {
+                        showAlert('Failed to load forum data: ' + (data.message || 'Unknown error'), 'danger');
+                        showNoPostsMessage();
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error('Error:', error);
+                    showAlert('Failed to load forum data. Please check your connection and try again.', 'danger');
+                    showNoPostsMessage();
+                });
+        }
+
+        // Display posts in table
+        function displayPosts(posts) {
+            const tbody = document.getElementById('forumTableBody');
+            const noPostsMessage = document.getElementById('noPostsMessage');
+            
+            if (!posts || posts.length === 0) {
+                tbody.innerHTML = '';
+                showNoPostsMessage();
+                return;
+            }
+
+            noPostsMessage.style.display = 'none';
+            
+            tbody.innerHTML = posts.map(post => `
+                <tr class="${post.is_flagged ? 'flagged-post' : ''}" data-post-id="${post.id}">
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input post-checkbox" type="checkbox" 
+                                   value="${post.id}" onchange="updateSelection()">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold">${escapeHtml(post.title.substring(0, 100))}${post.title.length > 100 ? '...' : ''}</div>
+                        <div class="text-muted post-preview">${escapeHtml(post.content.substring(0, 150))}${post.content.length > 150 ? '...' : ''}</div>
+                        ${post.is_anonymous ? '<span class="anonymous-badge">Anonymous</span>' : ''}
+                        ${post.is_flagged ? `<span class="badge bg-warning ms-2"><i class="fas fa-flag"></i> Flagged</span>` : ''}
+                    </td>
+                    <td>
+                        <div class="fw-bold">${escapeHtml(post.author_name || 'Unknown User')}</div>
+                        ${post.author_id ? `<div class="text-muted">${escapeHtml(post.author_id)}</div>` : ''}
+                    </td>
+                    <td>
+                        <span class="badge category-badge bg-primary">
+                            ${post.category ? post.category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'General'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">${post.replies_count || 0}</span>
+                    </td>
+                    <td>
+                        <span class="post-status ${post.is_flagged ? 'status-flagged' : 'status-active'}">
+                            ${post.is_flagged ? 'Flagged' : 'Active'}
+                        </span>
+                        ${post.flag_reason ? `<br><small class="text-muted">${escapeHtml(post.flag_reason.replace('_', ' '))}</small>` : ''}
+                    </td>
+                    <td>
+                        <div>${formatDate(post.created_at)}</div>
+                        <small class="text-muted">${formatTime(post.created_at)}</small>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    onclick="viewPost(${post.id})" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-${post.is_flagged ? 'success' : 'warning'}" 
+                                    onclick="toggleFlag(${post.id})" title="${post.is_flagged ? 'Unflag' : 'Flag'} Post">
+                                <i class="fas fa-flag"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" 
+                                    onclick="deletePost(${post.id})" title="Delete Post">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" 
+                                    onclick="viewUserProfile(${post.author_id})" title="View Author Profile"
+                                    ${!post.author_id ? 'disabled' : ''}>
+                                <i class="fas fa-user"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update statistics
+        function updateStatistics(stats) {
+            if (stats) {
+                document.getElementById('totalPostsCount').textContent = stats.total_posts || 0;
+                document.getElementById('totalRepliesCount').textContent = stats.total_replies || 0;
+                document.getElementById('flaggedPostsCount').textContent = stats.flagged_posts || 0;
+                document.getElementById('activeUsersCount').textContent = stats.active_users || 0;
+            }
+        }
+
+        // Update pagination
+        function updatePagination(pagination) {
+            const container = document.getElementById('paginationContainer');
+            const list = document.getElementById('paginationList');
+            
+            if (!pagination || pagination.pages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `
+                <li class="page-item ${pagination.page <= 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadForumData(${pagination.page - 1})">Previous</a>
+                </li>
+            `;
+            
+            // Page numbers
+            for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.pages, pagination.page + 2); i++) {
+                paginationHTML += `
+                    <li class="page-item ${i === pagination.page ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadForumData(${i})">${i}</a>
+                    </li>
+                `;
+            }
+            
+            // Next button
+            paginationHTML += `
+                <li class="page-item ${pagination.page >= pagination.pages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadForumData(${pagination.page + 1})">Next</a>
+                </li>
+            `;
+            
+            list.innerHTML = paginationHTML;
+        }
+
+        // Show/hide loading indicator
+        function showLoading() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('refreshIndicator').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('refreshIndicator').classList.remove('active');
+        }
+
+        // Show no posts message
+        function showNoPostsMessage() {
+            document.getElementById('noPostsMessage').style.display = 'block';
+            document.getElementById('forumTableBody').innerHTML = '';
+            document.getElementById('paginationContainer').style.display = 'none';
+        }
+
+        // Show alert messages
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert_' + Date.now();
+            const alertHtml = `
+                <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            alertContainer.insertAdjacentHTML('beforeend', alertHtml);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        }
+
+        // Apply filters
+        function applyFilters() {
+            currentFilters = {
+                category: document.getElementById('categoryFilter').value,
+                status: document.getElementById('statusFilter').value,
+                date_filter: document.getElementById('dateFilter').value,
+                search: document.getElementById('searchPosts').value.trim()
+            };
+            
+            // Remove empty filters
+            Object.keys(currentFilters).forEach(key => {
+                if (!currentFilters[key]) {
+                    delete currentFilters[key];
+                }
+            });
+            
+            currentPage = 1;
+            loadForumData(1);
+        }
+
+        // Refresh posts from server
+        function refreshPosts() {
+            loadForumData(currentPage);
+        }
+
+        // Show flagged posts only
+        function showFlaggedOnly() {
+            document.getElementById('statusFilter').value = 'flagged';
+            applyFilters();
+        }
+
+        // Show all posts
+        function showAllPosts() {
+            document.getElementById('statusFilter').value = '';
+            applyFilters();
+        }
+
+        // View post details with replies
+        function viewPost(postId) {
+            currentPostId = postId;
+            showLoading();
+            
+            fetch(`/api/admin/forum/post/${postId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        displayPostDetails(data.post, data.replies);
+                    } else {
+                        showAlert('Failed to load post details: ' + (data.message || 'Unknown error'), 'danger');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error('Error:', error);
+                    showAlert('Failed to load post details. Please try again.', 'danger');
+                });
+        }
+
+        // Display post details in modal
+        function displayPostDetails(post, replies) {
+            document.getElementById('viewPostModalLabel').textContent = post.title;
+            
+            let bodyHtml = `
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Author:</strong> ${escapeHtml(post.author_name)}
+                        ${post.is_anonymous ? ' <span class="anonymous-badge">Anonymous</span>' : ''}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Category:</strong> 
+                        <span class="badge bg-primary">${post.category ? post.category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'General'}</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Posted:</strong> ${formatDateTime(post.created_at)}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Status:</strong> 
+                        <span class="badge bg-${post.is_flagged ? 'warning' : 'success'}">
+                            ${post.is_flagged ? 'Flagged' : 'Active'}
+                        </span>
+                        ${post.flag_reason ? `<br><small class="text-muted">Reason: ${escapeHtml(post.flag_reason.replace('_', ' '))}</small>` : ''}
+                    </div>
+                </div>
+                
+                <div class="post-content">
+                    <h6>Post Content:</h6>
+                    <div class="p-3 bg-light rounded">${escapeHtml(post.content).replace(/\n/g, '<br>')}</div>
+                </div>
+                
+                <hr>
+                
+                <h6>Replies (${replies.length}):</h6>
+                <div style="max-height: 400px; overflow-y: auto;">
+            `;
+            
+            if (replies.length > 0) {
+                replies.forEach(reply => {
+                    bodyHtml += `
+                        <div class="reply-item ${reply.is_flagged ? 'border-warning' : ''}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>${escapeHtml(reply.author_name)}</strong>
+                                    ${reply.is_anonymous ? ' <span class="anonymous-badge">Anonymous</span>' : ''}
+                                    <small class="text-muted ms-2">${formatDateTime(reply.created_at)}</small>
+                                    ${reply.is_flagged ? '<span class="badge bg-warning ms-2">Flagged</span>' : ''}
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-warning" 
+                                            onclick="flagReply(${reply.id})" title="Flag Reply">
+                                        <i class="fas fa-flag"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteReply(${reply.id})" title="Delete Reply">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-2">${escapeHtml(reply.content).replace(/\n/g, '<br>')}</div>
+                            ${reply.flag_reason ? `<div class="mt-1"><small class="text-muted">Flag reason: ${escapeHtml(reply.flag_reason.replace('_', ' '))}</small></div>` : ''}
+                        </div>
+                    `;
+                });
+            } else {
+                bodyHtml += '<p class="text-muted">No replies yet.</p>';
+            }
+            
+            bodyHtml += '</div>';
+            
+            document.getElementById('viewPostBody').innerHTML = bodyHtml;
+            
+            // Update modal buttons
+            const flagBtn = document.getElementById('modalFlagBtn');
+            if (post.is_flagged) {
+                flagBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Unflag Post';
+                flagBtn.className = 'btn btn-success';
+            } else {
+                flagBtn.innerHTML = '<i class="fas fa-flag"></i> Flag Post';
+                flagBtn.className = 'btn btn-warning';
+            }
+            
+            new bootstrap.Modal(document.getElementById('viewPostModal')).show();
+        }
+
+        // Toggle flag status
+        function toggleFlag(postId) {
+            if (!confirm('Are you sure you want to toggle the flag status of this post?')) {
+                return;
+            }
+            
+            fetch(`/api/admin/forum/post/${postId}/toggle-flag`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    refreshPosts();
+                } else {
+                    showAlert('Failed to update flag status: ' + (data.message || 'Unknown error'), 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Failed to update flag status. Please try again.', 'danger');
+            });
+        }
+
+        // Delete post
+        function deletePost(postId) {
+            if (!confirm('Are you sure you want to delete this post? This will also delete all replies. This action cannot be undone.')) {
+                return;
+            }
+            
+            fetch(`/api/admin/forum/post/${postId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Post deleted successfully!', 'success');
+                    refreshPosts();
+                } else {
+                    showAlert('Failed to delete post: ' + (data.message || 'Unknown error'), 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Failed to delete post. Please try again.', 'danger');
+            });
+        }
+
+        // Flag post from modal
+        function flagPostFromModal() {
+            if (currentPostId) {
+                document.getElementById('flagPostId').value = currentPostId;
+                document.getElementById('flagReplyId').value = '';
+                new bootstrap.Modal(document.getElementById('flagModal')).show();
+                bootstrap.Modal.getInstance(document.getElementById('viewPostModal')).hide();
+            }
+        }
+
+        // Delete post from modal
+        function deletePostFromModal() {
+            if (currentPostId) {
+                deletePost(currentPostId);
+                bootstrap.Modal.getInstance(document.getElementById('viewPostModal')).hide();
+            }
+        }
+
+        // Flag reply
+        function flagReply(replyId) {
+            document.getElementById('flagPostId').value = '';
+            document.getElementById('flagReplyId').value = replyId;
+            new bootstrap.Modal(document.getElementById('flagModal')).show();
+        }
+
+        // Delete reply
+        function deleteReply(replyId) {
+            if (!confirm('Are you sure you want to delete this reply? This action cannot be undone.')) {
+                return;
+            }
+            
+            fetch(`/api/admin/forum/reply/${replyId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Reply deleted successfully!', 'success');
+                    // Refresh the post view
+                    if (currentPostId) {
+                        viewPost(currentPostId);
+                    }
+                } else {
+                    showAlert('Failed to delete reply: ' + (data.message || 'Unknown error'), 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Failed to delete reply. Please try again.', 'danger');
+            });
+        }
+
+        // Submit flag
+        function submitFlag() {
+            const postId = document.getElementById('flagPostId').value;
+            const replyId = document.getElementById('flagReplyId').value;
+            const reason = document.getElementById('flagReason').value;
+            const notes = document.getElementById('flagNotes').value;
+            const action = document.getElementById('flagAction').value;
+            
+            if (!reason) {
+                showAlert('Please select a reason for flagging', 'warning');
+                return;
+            }
+            
+            const url = postId ? `/api/admin/forum/post/${postId}/flag` : `/api/admin/forum/reply/${replyId}/flag`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    reason: reason,
+                    notes: notes,
+                    action: action
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Content flagged successfully!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('flagModal')).hide();
+                    refreshPosts();
+                } else {
+                    showAlert('Failed to flag content: ' + (data.message || 'Unknown error'), 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Failed to flag content. Please try again.', 'danger');
+            });
+        }
+
+        // Selection management
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.post-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+                if (selectAll.checked) {
+                    selectedPosts.add(parseInt(checkbox.value));
+                } else {
+                    selectedPosts.delete(parseInt(checkbox.value));
+                }
+            });
+            
+            updateSelectionUI();
+        }
+
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('.post-checkbox:checked');
+            selectedPosts.clear();
+            
+            checkboxes.forEach(checkbox => {
+                selectedPosts.add(parseInt(checkbox.value));
+            });
+            
+            // Update select all checkbox
+            const selectAll = document.getElementById('selectAll');
+            const allCheckboxes = document.querySelectorAll('.post-checkbox');
+            selectAll.checked = checkboxes.length === allCheckboxes.length && allCheckboxes.length > 0;
+            selectAll.indeterminate = checkboxes.length > 0 && checkboxes.length < allCheckboxes.length;
+            
+            updateSelectionUI();
+        }
+
+        function updateSelectionUI() {
+            const count = selectedPosts.size;
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            selectedCount.textContent = count;
+            
+            if (count > 0) {
+                bulkActions.classList.add('show');
+            } else {
+                bulkActions.classList.remove('show');
+            }
+        }
+
+        function clearSelection() {
+            selectedPosts.clear();
+            document.querySelectorAll('.post-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAll').checked = false;
+            document.getElementById('selectAll').indeterminate = false;
+            updateSelectionUI();
+        }
+
+        // Bulk actions
+        function bulkFlag() {
+            if (selectedPosts.size === 0) return;
+            
+            showBulkActionModal(
+                'Flag Posts',
+                `Are you sure you want to flag ${selectedPosts.size} selected post(s)?`,
+                'flag',
+                true
+            );
+        }
+
+        function bulkUnflag() {
+            if (selectedPosts.size === 0) return;
+            
+            showBulkActionModal(
+                'Unflag Posts',
+                `Are you sure you want to unflag ${selectedPosts.size} selected post(s)?`,
+                'unflag',
+                false
+            );
+        }
+
+        function bulkDelete() {
+            if (selectedPosts.size === 0) return;
+            
+            showBulkActionModal(
+                'Delete Posts',
+                `Are you sure you want to delete ${selectedPosts.size} selected post(s)? This action cannot be undone.`,
+                'delete',
+                true
+            );
+        }
+
+        function showBulkActionModal(title, message, action, requireReason) {
+            document.getElementById('bulkActionModalLabel').textContent = title;
+            document.getElementById('bulkActionMessage').textContent = message;
+            
+            const reasonContainer = document.getElementById('bulkReasonContainer');
+            const confirmBtn = document.getElementById('confirmBulkAction');
+            
+            if (requireReason) {
+                reasonContainer.style.display = 'block';
+                document.getElementById('bulkReason').required = true;
+            } else {
+                reasonContainer.style.display = 'none';
+                document.getElementById('bulkReason').required = false;
+            }
+            
+            confirmBtn.onclick = () => executeBulkAction(action);
+            
+            new bootstrap.Modal(document.getElementById('bulkActionModal')).show();
+        }
+
+        function executeBulkAction(action) {
+            const reason = document.getElementById('bulkReason').value;
+            const postIds = Array.from(selectedPosts);
+            
+            if (!postIds.length) {
+                showAlert('No posts selected', 'warning');
+                return;
+            }
+            
+            fetch('/api/admin/forum/bulk-action', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: action,
+                    post_ids: postIds,
+                    reason: reason
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('bulkActionModal')).hide();
+                    clearSelection();
+                    refreshPosts();
+                } else {
+                    showAlert('Failed to perform bulk action: ' + (data.message || 'Unknown error'), 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Failed to perform bulk action. Please try again.', 'danger');
+            });
+        }
+
+        // Auto refresh functionality
+        function autoRefreshToggle() {
+            autoRefresh = !autoRefresh;
+            const status = document.getElementById('autoRefreshStatus');
+            
+            if (autoRefresh) {
+                status.textContent = 'On';
+                autoRefreshInterval = setInterval(() => {
+                    console.log('Auto-refreshing forum data...');
+                    loadForumData(currentPage);
+                }, 30000); // Refresh every 30 seconds
+                showAlert('Auto-refresh enabled (30 seconds interval)', 'info');
+            } else {
+                status.textContent = 'Off';
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+                showAlert('Auto-refresh disabled', 'info');
+            }
+        }
+
+        // Export forum data
+        function exportForumData() {
+            const params = new URLSearchParams(currentFilters);
+            params.append('type', 'posts');
+            
+            window.open(`/api/admin/forum/export?${params}`, '_blank');
+        }
+
+        // View user profile
+        function viewUserProfile(userId) {
+            if (!userId) return;
+            
+            // Navigate to user management page with user selected
+            window.open(`/admin/users?user_id=${userId}`, '_blank');
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleTimeString();
+        }
+
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+
+        // Initialize tooltips
+        function initializeTooltips() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+
+        // Call initialize tooltips on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTooltips();
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', function() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

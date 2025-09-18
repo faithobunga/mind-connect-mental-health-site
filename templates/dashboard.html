@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CUEA MindConnect</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        }
+
+        .welcome-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .welcome-text h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .welcome-text p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .profile-snippet {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            min-width: 200px;
+        }
+
+        .profile-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+        }
+
+        .profile-info p {
+            margin: 2px 0;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card.next-appointment {
+            border-left-color: #10b981;
+        }
+
+        .stat-card.mood-score {
+            border-left-color: #f59e0b;
+        }
+
+        .stat-card.forum-activity {
+            border-left-color: #8b5cf6;
+        }
+
+        .stat-card.new-resources {
+            border-left-color: #ef4444;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .stat-icon.appointment { background: #10b981; }
+        .stat-icon.mood { background: #f59e0b; }
+        .stat-icon.forum { background: #8b5cf6; }
+        .stat-icon.resources { background: #ef4444; }
+
+        .stat-title {
+            font-size: 0.9em;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 5px 0;
+        }
+
+        .stat-subtitle {
+            font-size: 0.9em;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .action-shortcuts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .shortcut-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .shortcut-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .shortcut-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .shortcut-icon.book-appointment { background: linear-gradient(135deg, #10b981, #059669); }
+        .shortcut-icon.take-assessment { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .shortcut-icon.visit-forum { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .shortcut-icon.browse-resources { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+        .shortcut-content h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2em;
+            color: #1f2937;
+        }
+
+        .shortcut-content p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .dashboard-sections {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .main-content, .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .section-content {
+            padding: 25px;
+        }
+
+        .recent-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1em;
+            flex-shrink: 0;
+        }
+
+        .recent-content h4 {
+            margin: 0 0 5px 0;
+            font-size: 1em;
+            color: #1f2937;
+        }
+
+        .recent-content p {
+            margin: 0;
+            font-size: 0.85em;
+            color: #6b7280;
+        }
+
+        .recent-meta {
+            font-size: 0.8em;
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+
+        .notification-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .notification-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .notification-content h5 {
+            margin: 0 0 5px 0;
+            font-size: 0.9em;
+            color: #1f2937;
+        }
+
+        .notification-content p {
+            margin: 0;
+            font-size: 0.8em;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .view-all-btn {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9em;
+            margin-top: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .view-all-btn:hover {
+            color: #5a67d8;
+            text-decoration: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .today-highlight {
+            background: linear-gradient(135deg, #fef3c7, #fcd34d);
+            border: 2px solid #f59e0b;
+            color: #92400e;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .highlight-icon {
+            font-size: 1.5em;
+        }
+
+        .highlight-content h4 {
+            margin: 0 0 5px 0;
+            color: #92400e;
+        }
+
+        .highlight-content p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 15px;
+            }
+
+            .dashboard-sections {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .action-shortcuts {
+                grid-template-columns: 1fr;
+            }
+
+            .shortcut-card {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        .mood-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        .mood-excellent { background: #10b981; }
+        .mood-good { background: #3b82f6; }
+        .mood-okay { background: #f59e0b; }
+        .mood-needs-support { background: #ef4444; }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .priority-normal {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="{{ url_for('dashboard') }}">🧠 CUEA MindConnect</a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link active">Dashboard</a>
+                <a href="{{ url_for('assessment') }}" class="nav-link">Assessment</a>
+                <a href="{{url_for('student_appointments')}}" class="nav-link">Appointments</a>
+                <a href="{{ url_for('community') }}" class="nav-link">Community</a>
+                <a href="{{ url_for('resources') }}" class="nav-link">Resources</a>
+                <a href="{{ url_for('profile') }}" class="nav-link">Profile</a>
+                <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Welcome Header -->
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h1>Welcome back, {{ current_user.first_name }}! 👋</h1>
+                    <p>Your mental wellness journey continues. We're here to support you every step of the way.</p>
+                </div>
+                <div class="profile-snippet">
+                    <div class="profile-info">
+                        <h3>{{ current_user.get_full_name() }}</h3>
+                        <p><i class="fas fa-id-card"></i> {{ current_user.student_id }}</p>
+                        <p><i class="fas fa-graduation-cap"></i> {{ current_user.course }}</p>
+                        <p><i class="fas fa-calendar-alt"></i> Year {{ current_user.year_of_study }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Highlights -->
+        {% if today_appointments %}
+        <div class="today-highlight">
+            <div class="highlight-icon">📅</div>
+            <div class="highlight-content">
+                <h4>Today's Appointment</h4>
+                <p>You have {{ today_appointments|length }} appointment(s) scheduled for today. Don't forget!</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Quick Stats Cards -->
+        <div class="quick-stats">
+            <div class="stat-card next-appointment">
+                <div class="stat-header">
+                    <div class="stat-icon appointment">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 class="stat-title">Next Appointment</h3>
+                </div>
+                {% if upcoming_appointments %}
+                <div class="stat-value">{{ upcoming_appointments[0].scheduled_date.strftime('%b %d') if upcoming_appointments[0].scheduled_date else upcoming_appointments[0].requested_date.strftime('%b %d') }}</div>
+                <p class="stat-subtitle">{{ upcoming_appointments[0].scheduled_date.strftime('%I:%M %p') if upcoming_appointments[0].scheduled_date else 'Time TBD' }}</p>
+                {% else %}
+                <div class="stat-value">None</div>
+                <p class="stat-subtitle">No appointments scheduled</p>
+                {% endif %}
+            </div>
+
+            <div class="stat-card mood-score">
+                <div class="stat-header">
+                    <div class="stat-icon mood">
+                        <i class="fas fa-smile"></i>
+                    </div>
+                    <h3 class="stat-title">Latest Mood Check</h3>
+                </div>
+                {% if latest_mood_score %}
+                <div class="stat-value">
+                    {{ latest_mood_score }}/10
+                    <span class="mood-indicator {% if latest_mood_score >= 8 %}mood-excellent{% elif latest_mood_score >= 6 %}mood-good{% elif latest_mood_score >= 4 %}mood-okay{% else %}mood-needs-support{% endif %}"></span>
+                </div>
+                <p class="stat-subtitle">
+                    {% if latest_mood_score >= 8 %}Excellent mood!
+                    {% elif latest_mood_score >= 6 %}Good mood
+                    {% elif latest_mood_score >= 4 %}Okay mood
+                    {% else %}Needs support
+                    {% endif %}
+                </p>
+                {% else %}
+                <div class="stat-value">--</div>
+                <p class="stat-subtitle">Take your first assessment</p>
+                {% endif %}
+            </div>
+
+            <div class="stat-card forum-activity">
+                <div class="stat-header">
+                    <div class="stat-icon forum">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="stat-title">Forum Activity</h3>
+                </div>
+                <div class="stat-value">{{ recent_forum_posts|length }}</div>
+                <p class="stat-subtitle">New posts this week</p>
+            </div>
+
+            <div class="stat-card new-resources">
+                <div class="stat-header">
+                    <div class="stat-icon resources">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3 class="stat-title">New Resources</h3>
+                </div>
+                <div class="stat-value">{{ featured_resources|length }}</div>
+                <p class="stat-subtitle">Featured wellness resources</p>
+            </div>
+        </div>
+
+        <!-- Action Shortcuts -->
+        <div class="action-shortcuts">
+            <a href="{{ url_for('student_appointments') }}" class="shortcut-card">
+                <div class="shortcut-icon book-appointment">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <div class="shortcut-content">
+                    <h3>Book Appointment</h3>
+                    <p>Schedule a session with one of our professional counselors for personalized support</p>
+                </div>
+            </a>
+
+            <a href="{{ url_for('assessment') }}" class="shortcut-card">
+                <div class="shortcut-icon take-assessment">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <div class="shortcut-content">
+                    <h3>Take Assessment</h3>
+                    <p>Complete a self-guided wellness assessment to track your mental health progress</p>
+                </div>
+            </a>
+
+            <a href="{{ url_for('community') }}" class="shortcut-card">
+                <div class="shortcut-icon visit-forum">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="shortcut-content">
+                    <h3>Visit Community</h3>
+                    <p>Connect with fellow students in our supportive peer forum and share experiences</p>
+                </div>
+            </a>
+
+            <a href="{{ url_for('resources') }}" class="shortcut-card">
+                <div class="shortcut-icon browse-resources">
+                    <i class="fas fa-library"></i>
+                </div>
+                <div class="shortcut-content">
+                    <h3>Browse Resources</h3>
+                    <p>Explore articles, guides, and tools designed to support your mental wellness journey</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Main Dashboard Content -->
+        <div class="dashboard-sections">
+            <div class="main-content">
+                <!-- Recent Assessments -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Assessments</h2>
+                        <a href="{{ url_for('assessment') }}" class="view-all-btn">Take New Assessment →</a>
+                    </div>
+                    <div class="section-content">
+                        {% if recent_assessments %}
+                            {% for assessment in recent_assessments %}
+                            <div class="recent-item">
+                                <div class="recent-icon" style="background: 
+                                    {% if assessment.assessment_type == 'mood' %}#f59e0b
+                                    {% elif assessment.assessment_type == 'stress' %}#ef4444
+                                    {% elif assessment.assessment_type == 'anxiety' %}#8b5cf6
+                                    {% else %}#3b82f6{% endif %};">
+                                    <i class="fas fa-
+                                        {% if assessment.assessment_type == 'mood' %}smile
+                                        {% elif assessment.assessment_type == 'stress' %}fire
+                                        {% elif assessment.assessment_type == 'anxiety' %}heart
+                                        {% else %}brain{% endif %}"></i>
+                                </div>
+                                <div class="recent-content">
+                                    <h4>{{ assessment.assessment_type.title() }} Assessment</h4>
+                                    <p>Score: {{ assessment.score }}/10
+                                        <span class="mood-indicator {% if assessment.score >= 8 %}mood-excellent{% elif assessment.score >= 6 %}mood-good{% elif assessment.score >= 4 %}mood-okay{% else %}mood-needs-support{% endif %}"></span>
+                                    </p>
+                                    <div class="recent-meta">{{ assessment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">📊</div>
+                            <h3>No assessments yet</h3>
+                            <p>Take your first wellness assessment to start tracking your mental health journey.</p>
+                            <a href="{{ url_for('assessment') }}" class="view-all-btn">Take Assessment →</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Forum Activity -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Community Discussions</h2>
+                        <a href="{{ url_for('community') }}" class="view-all-btn">View All Posts →</a>
+                    </div>
+                    <div class="section-content">
+                        {% if recent_forum_posts %}
+                            {% for post in recent_forum_posts %}
+                            <div class="recent-item">
+                                <div class="recent-icon" style="background: 
+                                    {% if post.category == 'general' %}#3b82f6
+                                    {% elif post.category == 'support' %}#10b981
+                                    {% elif post.category == 'study-tips' %}#f59e0b
+                                    {% else %}#8b5cf6{% endif %};">
+                                    <i class="fas fa-
+                                        {% if post.category == 'general' %}comment
+                                        {% elif post.category == 'support' %}heart
+                                        {% elif post.category == 'study-tips' %}lightbulb
+                                        {% else %}users{% endif %}"></i>
+                                </div>
+                                <div class="recent-content">
+                                    <h4>{{ post.title }}</h4>
+                                    <p>{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+                                    <div class="recent-meta">
+                                        by {{ post.author.first_name if not post.is_anonymous else 'Anonymous' }} • 
+                                        {{ post.created_at.strftime('%B %d, %Y') }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">💬</div>
+                            <h3>No recent discussions</h3>
+                            <p>Start a conversation or browse existing topics in the community forum.</p>
+                            <a href="{{ url_for('community') }}" class="view-all-btn">Visit Community →</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <!-- Notifications -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Notifications</h2>
+                    </div>
+                    <div class="section-content">
+                        <div id="notifications-container">
+                            <!-- Appointment notifications -->
+                            {% if upcoming_appointments %}
+                                {% for appointment in upcoming_appointments[:3] %}
+                                <div class="notification-item">
+                                    <div class="notification-icon" style="background: #10b981;">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <h5>Appointment {{ 'Scheduled' if appointment.status == 'scheduled' else 'Requested' }}</h5>
+                                        <p>
+                                            {% if appointment.scheduled_date %}
+                                                {{ appointment.scheduled_date.strftime('%B %d at %I:%M %p') }}
+                                            {% else %}
+                                                {{ appointment.requested_date.strftime('%B %d at %I:%M %p') }} (pending confirmation)
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+
+                            <!-- New resources notification -->
+                            {% if featured_resources %}
+                            <div class="notification-item">
+                                <div class="notification-icon" style="background: #f59e0b;">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <h5>New Featured Resources</h5>
+                                    <p>{{ featured_resources|length }} new wellness resources have been added to help support your journey.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Forum activity notification -->
+                            {% if recent_forum_posts %}
+                            <div class="notification-item">
+                                <div class="notification-icon" style="background: #8b5cf6;">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <h5>Active Community Discussions</h5>
+                                    <p>{{ recent_forum_posts|length }} new posts in the community forum this week.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Default notification if none exist -->
+                            {% if not upcoming_appointments and not featured_resources and not recent_forum_posts %}
+                            <div class="notification-item">
+                                <div class="notification-icon" style="background: #6b7280;">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <h5>Welcome to CUEA MindConnect</h5>
+                                    <p>Start your wellness journey by taking an assessment or booking your first appointment.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Resources -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Featured Resources</h2>
+                        <a href="{{ url_for('resources') }}" class="view-all-btn">View All →</a>
+                    </div>
+                    <div class="section-content">
+                        {% if featured_resources %}
+                            {% for resource in featured_resources[:4] %}
+                            <div class="recent-item">
+                                <div class="recent-icon" style="background: 
+                                    {% if resource.category == 'article' %}#3b82f6
+                                    {% elif resource.category == 'video' %}#ef4444
+                                    {% elif resource.category == 'meditation' %}#10b981
+                                    {% else %}#f59e0b{% endif %};">
+                                    <i class="fas fa-
+                                        {% if resource.category == 'article' %}newspaper
+                                        {% elif resource.category == 'video' %}play
+                                        {% elif resource.category == 'meditation' %}leaf
+                                        {% else %}dumbbell{% endif %}"></i>
+                                </div>
+                                <div class="recent-content">
+                                    <h4>{{ resource.title }}</h4>
+                                    <p>{{ resource.content[:60] }}{% if resource.content|length > 60 %}...{% endif %}</p>
+                                    <div class="recent-meta">{{ resource.category.title() }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">📚</div>
+                            <h3>No resources yet</h3>
+                            <p>Check back soon for wellness resources and guides.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Progress Summary -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Your Progress</h2>
+                    </div>
+                    <div class="section-content">
+                        <div class="recent-item">
+                            <div class="recent-icon" style="background: #10b981;">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="recent-content">
+                                <h4>Total Assessments</h4>
+                                <p>{{ total_assessments }} completed</p>
+                            </div>
+                        </div>
+                        
+                        <div class="recent-item">
+                            <div class="recent-icon" style="background: #3b82f6;">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="recent-content">
+                                <h4>Counseling Sessions</h4>
+                                <p>{{ completed_appointments }} completed</p>
+                            </div>
+                        </div>
+                        
+                        <div class="recent-item">
+                            <div class="recent-icon" style="background: #8b5cf6;">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="recent-content">
+                                <h4>Member Since</h4>
+                                <p>{{ current_user.created_at.strftime('%B %Y') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Resources (Always Visible) -->
+        <div class="section-card" style="border-left: 4px solid #ef4444; margin-top: 30px;">
+            <div class="section-header">
+                <h2 class="section-title" style="color: #dc2626;">
+                    <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+                    Crisis Support Resources
+                </h2>
+            </div>
+            <div class="section-content">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div class="notification-item" style="background: #fef2f2; border: 1px solid #fecaca;">
+                        <div class="notification-icon" style="background: #dc2626;">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h5>CUEA Counseling Center</h5>
+                            <p><strong>+254 719 887 000</strong><br>Available 24/7 for crisis support</p>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item" style="background: #f0f9ff; border: 1px solid #bae6fd;">
+                        <div class="notification-icon" style="background: #0369a1;">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h5>Kenya Mental Health Helpline</h5>
+                            <p><strong>1199</strong><br>Free national mental health support</p>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-item" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+                        <div class="notification-icon" style="background: #059669;">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h5>Text Support</h5>
+                            <p><strong>SMS "HELP" to 40606</strong><br>Anonymous text-based counseling</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: #fffbeb; border-radius: 8px; border: 1px solid #fed7aa;">
+                    <p style="margin: 0; font-size: 0.9em; color: #92400e;">
+                        <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                        <strong>Remember:</strong> If you're experiencing a mental health emergency, don't hesitate to reach out immediately. Your wellbeing is our top priority.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Dynamic Updates -->
+    <script>
+        // Update notifications periodically
+        function updateNotifications() {
+            fetch('/api/dashboard/notifications')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.notifications.length > 0) {
+                        const container = document.getElementById('notifications-container');
+                        container.innerHTML = data.notifications.map(notification => `
+                            <div class="notification-item">
+                                <div class="notification-icon" style="background: ${notification.color};">
+                                    <i class="fas fa-${notification.icon}"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <h5>${notification.title}</h5>
+                                    <p>${notification.message}</p>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => console.log('Notification update failed:', error));
+        }
+
+        // Auto-refresh notifications every 5 minutes
+        setInterval(updateNotifications, 300000);
+
+        // Mobile navigation toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.querySelector('.nav-toggle');
+            const navLinks = document.querySelector('.nav-links');
+
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navToggle.classList.toggle('active');
+                });
+            }
+
+            // Welcome message based on time of day
+            const welcomeText = document.querySelector('.welcome-text h1');
+            const hour = new Date().getHours();
+            let greeting = 'Welcome back';
+            
+            if (hour < 12) {
+                greeting = 'Good morning';
+            } else if (hour < 17) {
+                greeting = 'Good afternoon';
+            } else {
+                greeting = 'Good evening';
+            }
+            
+            welcomeText.innerHTML = `${greeting}, {{ current_user.first_name }}! 👋`;
+
+            // Add smooth scroll to shortcut cards
+            document.querySelectorAll('.shortcut-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Add loading state
+                    this.style.opacity = '0.7';
+                    setTimeout(() => {
+                        this.style.opacity = '1';
+                    }, 200);
+                });
+            });
+
+            // Add animations to stats cards
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.stat-card, .shortcut-card, .section-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Add click tracking for analytics (optional)
+            document.querySelectorAll('.shortcut-card, .view-all-btn').forEach(element => {
+                element.addEventListener('click', function() {
+                    const action = this.querySelector('h3')?.textContent || this.textContent;
+                    console.log('Dashboard action:', action);
+                    // You can send this to your analytics endpoint
+                });
+            });
+
+            // Show welcome tooltip for first-time users
+            if ({{ 'true' if total_assessments == 0 and completed_appointments == 0 else 'false' }}) {
+                setTimeout(() => {
+                    showWelcomeTooltip();
+                }, 2000);
+            }
+        });
+
+        function showWelcomeTooltip() {
+            const tooltip = document.createElement('div');
+            tooltip.innerHTML = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                           background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                           z-index: 1000; max-width: 400px; text-align: center;">
+                    <h3 style="margin: 0 0 15px 0; color: #1f2937;">Welcome to CUEA MindConnect! 🎉</h3>
+                    <p style="margin: 0 0 20px 0; color: #6b7280; line-height: 1.5;">
+                        Start your wellness journey by taking your first assessment or booking an appointment with one of our counselors.
+                    </p>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: #667eea; color: white; border: none; padding: 10px 20px; 
+                                   border-radius: 8px; cursor: pointer; font-weight: 500;">
+                        Got it!
+                    </button>
+                </div>
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999;"></div>
+            `;
+            document.body.appendChild(tooltip);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (tooltip.parentElement) {
+                    tooltip.remove();
+                }
+            }, 10000);
+        }
+
+        // Add mood indicator animation
+        document.querySelectorAll('.mood-indicator').forEach(indicator => {
+            indicator.style.animation = 'pulse 2s infinite';
+        });
+
+        // CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.7; }
+                100% { opacity: 1; }
+            }
+            
+            .nav-links.active {
+                display: flex !important;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                padding: 20px;
+                border-radius: 0 0 15px 15px;
+            }
+            
+            .nav-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+            
+            .nav-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+            
+            .nav-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -6px);
+            }
+            
+            @media (max-width: 768px) {
+                .nav-links {
+                    display: none;
+                }
+                
+                .nav-toggle {
+                    display: flex;
+                    flex-direction: column;
+                    cursor: pointer;
+                    gap: 4px;
+                }
+                
+                .nav-toggle span {
+                    width: 25px;
+                    height: 3px;
+                    background: #667eea;
+                    transition: 0.3s;
+                    border-radius: 3px;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

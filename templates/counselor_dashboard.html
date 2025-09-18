@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counselor Dashboard - CUEA MindConnect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ============= CSS RESET & BASE STYLES ============= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8fafc;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+
+        input, select, textarea {
+            font-family: inherit;
+            border: none;
+            outline: none;
+        }
+
+        /* ============= COLOR VARIABLES ============= */
+        :root {
+            --primary-blue: #3b82f6;
+            --primary-blue-dark: #2563eb;
+            --primary-blue-light: #93c5fd;
+            --secondary-purple: #8b5cf6;
+            --secondary-green: #10b981;
+            --secondary-orange: #f59e0b;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
+            --gradient-success: linear-gradient(135deg, var(--secondary-green) 0%, #059669 100%);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        /* ============= NAVIGATION ============= */
+        .navbar {
+            background: var(--gradient-primary);
+            padding: 1rem 0;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            color: var(--white);
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--white);
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            transition: var(--transition-normal);
+            cursor: pointer;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .refresh-btn.spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ============= DROPDOWN NAVIGATION ============= */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            transition: var(--transition-normal);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .user-dropdown-btn:hover,
+        .user-dropdown-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.2;
+        }
+
+        .user-title {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+
+        .dropdown-arrow {
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .user-dropdown-btn.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 0.5rem 0;
+            min-width: 220px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 1rem 1.25rem 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 0.5rem;
+        }
+
+        .dropdown-user-name {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .dropdown-user-title {
+            color: var(--gray-500);
+            font-size: 0.8rem;
+        }
+
+        .dropdown-user-email {
+            color: var(--gray-400);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            color: var(--gray-700);
+            text-decoration: none;
+            transition: var(--transition-normal);
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: var(--gray-50);
+            color: var(--primary-blue);
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 0.5rem 0;
+        }
+
+        .dropdown-item.logout {
+            color: var(--error);
+        }
+
+        .dropdown-item.logout:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+
+        /* ============= MOBILE DROPDOWN ============= */
+        @media (max-width: 768px) {
+            .dropdown-menu {
+                position: fixed;
+                top: 80px;
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+        }
+
+        /* ============= DASHBOARD LAYOUT ============= */
+        .dashboard {
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        /* ============= SIDEBAR ============= */
+        .sidebar {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--gray-600);
+            transition: var(--transition-normal);
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--gradient-primary);
+            color: var(--white);
+            transform: translateX(5px);
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* ============= MAIN CONTENT ============= */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* ============= WELCOME HEADER ============= */
+        .welcome-header {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: 2rem;
+            border-radius: var(--radius-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-time {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* ============= STATS GRID ============= */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--error);
+        }
+
+        /* Individual stat colors */
+        .stat-today .stat-icon {
+            background: var(--gradient-primary);
+        }
+        .stat-today .stat-number {
+            color: var(--primary-blue);
+        }
+
+        .stat-students .stat-icon {
+            background: var(--gradient-success);
+        }
+        .stat-students .stat-number {
+            color: var(--success);
+        }
+
+        .stat-pending .stat-icon {
+            background: linear-gradient(135deg, var(--secondary-orange) 0%, #d97706 100%);
+        }
+        .stat-pending .stat-number {
+            color: var(--secondary-orange);
+        }
+
+        .stat-completed .stat-icon {
+            background: linear-gradient(135deg, var(--secondary-purple) 0%, #7c3aed 100%);
+        }
+        .stat-completed .stat-number {
+            color: var(--secondary-purple);
+        }
+
+        /* ============= APPOINTMENTS SECTION ============= */
+        .appointments-section {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-badge {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .appointments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .appointment-card {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary-blue);
+            transition: var(--transition-normal);
+            position: relative;
+        }
+
+        .appointment-card:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .appointment-time {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .student-name {
+            font-weight: 500;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .student-details {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .appointment-topic {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-blue);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .status-assigned {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-scheduled {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-completed {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            transition: var(--transition-normal);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--secondary-orange) 0%, #d97706 100%);
+            color: var(--white);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        /* ============= EMPTY STATE ============= */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--gray-500);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        .empty-state p {
+            margin-bottom: 1.5rem;
+        }
+
+        /* ============= LOADING STATES ============= */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* ============= NOTIFICATIONS ============= */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-xl);
+            z-index: 1100;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            max-width: 400px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--error);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .notification.info {
+            border-left: 4px solid var(--info);
+        }
+
+        /* ============= RESPONSIVE DESIGN ============= */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .sidebar {
+                position: relative;
+                top: 0;
+                order: 2;
+            }
+
+            .sidebar-nav {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            .nav-item {
+                flex-shrink: 0;
+                min-width: 120px;
+                justify-content: center;
+                text-align: center;
+                flex-direction: column;
+                gap: 0.25rem;
+                padding: 0.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .welcome-title {
+                font-size: 1.5rem;
+            }
+
+            .appointment-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .appointment-actions {
+                flex-direction: column;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0 10px;
+            }
+        }
+
+        .quick-actions {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            transition: var(--transition-normal);
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: var(--gradient-primary);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .action-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition-normal);
+        }
+
+        .action-btn:hover .action-icon {
+            background: var(--white);
+            color: var(--primary-blue);
+            transform: rotate(5deg);
+        }
+
+        .action-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-content p {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+        }
+
+        .action-btn:hover .action-content p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-brain"></i>
+                CUEA MindConnect - Counselor Portal
+            </div>
+            <div class="nav-user">
+                <button class="refresh-btn" onclick="refreshDashboard()" title="Refresh Dashboard">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <div class="user-dropdown">
+                    <div class="user-dropdown-btn" onclick="toggleUserDropdown()">
+                        <div class="user-avatar">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name" id="navCounselorName">Loading...</div>
+                            <div class="user-title" id="navCounselorTitle">Counselor</div>
+                        </div>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </div>
+                    <div class="dropdown-menu" id="userDropdownMenu">
+                        <div class="dropdown-header">
+                            <div class="dropdown-user-name" id="dropdownCounselorName">Loading...</div>
+                            <div class="dropdown-user-title" id="dropdownCounselorTitle">Loading...</div>
+                            <div class="dropdown-user-email" id="dropdownCounselorEmail">Loading...</div>
+                        </div>
+                        <a href="/counselor/profile" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a href="/logout" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard -->
+    <main class="dashboard">
+        <div class="container">
+            <div class="dashboard-grid">
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <nav class="sidebar-nav">
+                        <div class="nav-item active" data-tab="dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </div>
+                        <div class="nav-item" data-tab="appointments">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>My Appointments</span>
+                        </div>
+                        <div class="nav-item" data-tab="students">
+                            <i class="fas fa-users"></i>
+                            <span>My Students</span>
+                        </div>
+                        <div class="nav-item" data-tab="resources">
+                            <i class="fas fa-book"></i>
+                            <span>Resources</span>
+                        </div>
+                    </nav>
+                </aside>
+
+                <!-- Main Content -->
+                <div class="main-content">
+                    <!-- Welcome Header -->
+                    <header class="welcome-header">
+                        <div class="welcome-content">
+                            <div class="welcome-time">
+                                <i class="fas fa-clock"></i>
+                                <span id="currentTime"></span>
+                            </div>
+                            <h1 class="welcome-title">
+                                <i class="fas fa-sun" id="greetingIcon"></i>
+                                <span id="greeting">Good morning</span>, <span id="welcomeName">Loading...</span>!
+                            </h1>
+                            <p class="welcome-subtitle">
+                                Ready to make a difference in students' lives today? Here's your session overview.
+                            </p>
+                        </div>
+                    </header>
+
+                    <!-- Statistics -->
+                    <section class="stats-grid">
+                        <div class="stat-card stat-today">
+                            <div class="stat-header">
+                                <div class="stat-icon">
+                                    <i class="fas fa-calendar-day"></i>
+                                </div>
+                            </div>
+                            <div class="stat-number" id="todayAppointments">0</div>
+                            <div class="stat-label">Today's Sessions</div>
+                            <div class="stat-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="todayTrend">Loading...</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card stat-students">
+                            <div class="stat-header">
+                                <div class="stat-icon">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                            </div>
+                            <div class="stat-number" id="totalStudents">0</div>
+                            <div class="stat-label">Active Students</div>
+                            <div class="stat-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="studentsTrend">Loading...</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card stat-pending">
+                            <div class="stat-header">
+                                <div class="stat-icon">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                            </div>
+                            <div class="stat-number" id="pendingAppointments">0</div>
+                            <div class="stat-label">Pending Requests</div>
+                            <div class="stat-trend">
+                                <i class="fas fa-clock"></i>
+                                <span id="pendingTrend">Loading...</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card stat-completed">
+                            <div class="stat-header">
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            <div class="stat-number" id="completedSessions">0</div>
+                            <div class="stat-label">Completed This Week</div>
+                            <div class="stat-trend trend-up">
+                                <i class="fas fa-trophy"></i>
+                                <span id="completedTrend">Loading...</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Quick Actions -->
+                    <section class="quick-actions">
+                        <h2 class="section-title">
+                            <i class="fas fa-bolt"></i>
+                            Quick Actions
+                        </h2>
+                        <div class="action-grid">
+                            <div class="action-btn" onclick="navigateToPage('/counselor/appointments')">
+                                <div class="action-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>View All Appointments</h4>
+                                    <p>Manage your sessions and schedule</p>
+                                </div>
+                            </div>
+                            <div class="action-btn" onclick="showPendingRequests()">
+                                <div class="action-icon">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>Review Pending Requests</h4>
+                                    <p><span id="pendingCount">0</span> requests waiting for your attention</p>
+                                </div>
+                            </div>
+                            <div class="action-btn" onclick="navigateToPage('/counselor/students')">
+                                <div class="action-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>Student Directory</h4>
+                                    <p>View profiles and session history</p>
+                                </div>
+                            </div>
+                            <div class="action-btn" onclick="navigateToPage('/counselor/resources')">
+                                <div class="action-icon">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>Resource Library</h4>
+                                    <p>Tools and materials for sessions</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Today's Appointments -->
+                    <section class="appointments-section">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-calendar-day"></i>
+                                Today's Schedule
+                                <span class="section-badge" id="todayCount">0 sessions</span>
+                            </h2>
+                        </div>
+                        <div id="todayAppointmentsList" class="appointments-list">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Upcoming This Week -->
+                    <section class="appointments-section">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                Upcoming This Week
+                                <span class="section-badge" id="upcomingCount">0 sessions</span>
+                            </h2>
+                        </div>
+                        <div id="upcomingAppointmentsList" class="appointments-list">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript for Real-time Data -->
+    <script>
+        // Global variables
+        let currentCounselor = null;
+        let refreshInterval;
+        let isOnline = navigator.onLine;
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing Real-time Counselor Dashboard...');
+            initializeDashboard();
+        });
+
+        async function initializeDashboard() {
+            try {
+                // Update time display
+                updateTimeDisplay();
+                setInterval(updateTimeDisplay, 60000); // Update every minute
+
+                // Load counselor info and dashboard data
+                await loadCounselorInfo();
+                await loadDashboardData();
+
+                // Start auto-refresh
+                startAutoRefresh();
+
+                // Initialize event listeners
+                setupEventListeners();
+
+                console.log('✅ Dashboard initialized successfully');
+            } catch (error) {
+                console.error('❌ Error initializing dashboard:', error);
+                showNotification('Error loading dashboard. Please refresh the page.', 'error');
+            }
+        }
+
+        async function loadCounselorInfo() {
+            try {
+                console.log('👤 Loading counselor information...');
+                
+                const response = await fetch('/api/counselor/profile');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: Failed to fetch counselor info`);
+                }
+                
+                const data = await response.json();
+                if (data.success && data.counselor) {
+                    currentCounselor = data.counselor;
+                    updateCounselorDisplay(data.counselor);
+                    console.log('✅ Counselor info loaded successfully:', data.counselor.first_name, data.counselor.last_name);
+                } else {
+                    throw new Error(data.message || 'Invalid counselor data received');
+                }
+            } catch (error) {
+                console.error('❌ Error loading counselor info:', error);
+                
+                // Show fallback display with error indication
+                document.getElementById('navCounselorName').textContent = 'Counselor';
+                document.getElementById('navCounselorTitle').textContent = 'Please refresh';
+                document.getElementById('welcomeName').textContent = 'Doctor';
+                document.getElementById('dropdownCounselorName').textContent = 'Profile Error';
+                document.getElementById('dropdownCounselorTitle').textContent = 'Please refresh page';
+                document.getElementById('dropdownCounselorEmail').textContent = 'Error loading';
+                
+                showNotification('Error loading profile. Please refresh the page.', 'error');
+            }
+        }
+
+        function updateCounselorDisplay(counselor) {
+            try {
+                const fullName = `${counselor.first_name} ${counselor.last_name}`;
+                const firstName = counselor.first_name;
+                const title = counselor.specialization || 'Counselor';
+                
+                console.log(`👋 Updating display for: ${fullName}`);
+                
+                // Update navbar display
+                document.getElementById('navCounselorName').textContent = fullName;
+                document.getElementById('navCounselorTitle').textContent = title;
+                
+                // Update dropdown display
+                document.getElementById('dropdownCounselorName').textContent = fullName;
+                document.getElementById('dropdownCounselorTitle').textContent = title;
+                document.getElementById('dropdownCounselorEmail').textContent = counselor.email;
+                
+                // Update welcome message with proper formatting
+                const welcomeText = `Dr. ${firstName}`;
+                document.getElementById('welcomeName').textContent = welcomeText;
+                
+                console.log(`✅ Display updated successfully for ${fullName}`);
+            } catch (error) {
+                console.error('❌ Error updating counselor display:', error);
+                showNotification('Error updating display. Please refresh.', 'error');
+            }
+        }
+
+        // Dropdown functionality
+        function toggleUserDropdown() {
+            const dropdownBtn = document.querySelector('.user-dropdown-btn');
+            const dropdownMenu = document.getElementById('userDropdownMenu');
+            
+            dropdownBtn.classList.toggle('active');
+            dropdownMenu.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.user-dropdown');
+            if (!dropdown.contains(event.target)) {
+                document.querySelector('.user-dropdown-btn').classList.remove('active');
+                document.getElementById('userDropdownMenu').classList.remove('show');
+            }
+        });
+
+        // Prevent dropdown from closing when clicking inside menu
+         // FIXED: Prevent dropdown from closing when clicking inside menu
+         document.getElementById('userDropdownMenu').addEventListener('click', function(event) {
+    // Check if clicked element is a navigation link
+            const clickedLink = event.target.closest('a');
+            if (clickedLink) {
+             const href = clickedLink.getAttribute('href');
+        
+        // If it's a relative URL (starts with /), allow normal navigation
+        if (href && href.startsWith('/')) {
+            // Close dropdown first
+            document.querySelector('.user-dropdown-btn').classList.remove('active');
+            document.getElementById('userDropdownMenu').classList.remove('show');
+            
+            // Don't prevent default - allow normal navigation
+            return true;
+        }
+    }
+    
+    // For non-navigation clicks, prevent dropdown from closing
+    event.stopPropagation();
+});
+
+        async function loadDashboardData() {
+            try {
+                console.log('📊 Loading real-time dashboard data...');
+                
+                // Load statistics
+                await loadStatistics();
+                
+                // Load today's appointments
+                await loadTodayAppointments();
+                
+                // Load upcoming appointments
+                await loadUpcomingAppointments();
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showNotification('Error loading data. Some information may be outdated.', 'warning');
+            }
+        }
+
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/counselor/dashboard-stats');
+                if (!response.ok) throw new Error('Failed to fetch statistics');
+                
+                const data = await response.json();
+                if (data.success) {
+                    updateStatistics(data.stats);
+                } else {
+                    throw new Error(data.message || 'Failed to load statistics');
+                }
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+                // Show error state but don't break the dashboard
+                updateStatistics({
+                    today_appointments: 0,
+                    total_students: 0,
+                    pending_appointments: 0,
+                    completed_this_week: 0
+                });
+            }
+        }
+
+        function updateStatistics(stats) {
+            // Update stat numbers
+            document.getElementById('todayAppointments').textContent = stats.today_appointments || 0;
+            document.getElementById('totalStudents').textContent = stats.total_students || 0;
+            document.getElementById('pendingAppointments').textContent = stats.pending_appointments || 0;
+            document.getElementById('completedSessions').textContent = stats.completed_this_week || 0;
+            document.getElementById('pendingCount').textContent = stats.pending_appointments || 0;
+            
+            // Update trends
+            updateTrends(stats);
+            
+            console.log('📈 Statistics updated:', stats);
+        }
+
+        function updateTrends(stats) {
+            const todayTrend = document.getElementById('todayTrend');
+            const studentsTrend = document.getElementById('studentsTrend');
+            const pendingTrend = document.getElementById('pendingTrend');
+            const completedTrend = document.getElementById('completedTrend');
+            
+            // Today's trend
+            if (stats.today_appointments > 0) {
+                todayTrend.textContent = stats.today_appointments === 1 ? '1 session today' : `${stats.today_appointments} sessions today`;
+                todayTrend.parentElement.className = 'stat-trend trend-up';
+            } else {
+                todayTrend.textContent = 'No sessions today';
+                todayTrend.parentElement.className = 'stat-trend';
+            }
+            
+            // Students trend
+            const monthlyGrowth = Math.floor((stats.total_students || 0) / 8);
+            studentsTrend.textContent = `+${monthlyGrowth} this month`;
+            
+            // Pending trend
+            if (stats.pending_appointments > 0) {
+                pendingTrend.textContent = 'Need attention';
+                pendingTrend.parentElement.className = 'stat-trend trend-down';
+            } else {
+                pendingTrend.textContent = 'All caught up';
+                pendingTrend.parentElement.className = 'stat-trend trend-up';
+            }
+            
+            // Completed trend
+            if (stats.completed_this_week > 0) {
+                completedTrend.textContent = 'Great progress!';
+            } else {
+                completedTrend.textContent = 'Start your week';
+            }
+        }
+
+        async function loadTodayAppointments() {
+            try {
+                const response = await fetch('/api/counselor/appointments/today');
+                if (!response.ok) throw new Error('Failed to fetch today\'s appointments');
+                
+                const data = await response.json();
+                if (data.success) {
+                    renderTodayAppointments(data.appointments);
+                    document.getElementById('todayCount').textContent = `${data.appointments.length} sessions`;
+                } else {
+                    throw new Error(data.message || 'Failed to load today\'s appointments');
+                }
+            } catch (error) {
+                console.error('Error loading today\'s appointments:', error);
+                renderTodayAppointments([]);
+                document.getElementById('todayCount').textContent = '0 sessions';
+            }
+        }
+        function viewStudentReport(studentId, appointmentId = null) {
+    console.log('Opening student report for:', studentId);
+    
+    // Build the URL with parameters
+    let reportUrl = `/counselor/student-report?student_id=${studentId}`;
+    if (appointmentId) {
+        reportUrl += `&appointment_id=${appointmentId}`;
+    }
+    
+    console.log('Navigating to:', reportUrl);
+    showNotification('Loading student report...', 'info');
+    
+    // Navigate to the report
+    window.location.href = reportUrl;
+}
+function renderTodayAppointments(appointments) {
+    const container = document.getElementById('todayAppointmentsList');
+    
+    if (appointments.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <h3>No appointments scheduled for today</h3>
+                <p>Enjoy your free day! You can use this time to prepare for upcoming sessions or review student files.</p>
+                <button class="btn btn-primary" onclick="navigateToPage('/counselor/appointments')">
+                    <i class="fas fa-calendar-plus"></i>
+                    View All Appointments
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = appointments.map(appointment => `
+        <div class="appointment-card">
+            <div class="appointment-header">
+                <div style="flex: 1;">
+                    <div class="appointment-time">
+                        <i class="fas fa-clock"></i>
+                        ${formatTime(appointment.scheduled_date)} 
+                        <span style="color: var(--gray-500); font-weight: normal;">
+                            (${appointment.duration}m)
+                        </span>
+                    </div>
+                    <div class="student-name">
+                        <i class="fas fa-user"></i>
+                        ${appointment.student.name}
+                    </div>
+                    <div class="student-details">
+                        <i class="fas fa-graduation-cap"></i>
+                        ${appointment.student.course} - Year ${appointment.student.year}
+                        <span style="margin: 0 8px;">•</span>
+                        <i class="fas fa-id-badge"></i>
+                        ${appointment.student.student_id}
+                    </div>
+                    ${appointment.topic ? `
+                        <div class="appointment-topic">
+                            <i class="fas fa-comment"></i>
+                            ${appointment.topic}
+                        </div>
+                    ` : ''}
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem;">
+                    <span class="status-badge status-${appointment.status}">
+                        ${getStatusIcon(appointment.status)}
+                        ${appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                    </span>
+                </div>
+            </div>
+            <div class="appointment-actions">
+                <!-- ADD THIS NEW BUTTON FOR STUDENT REPORTS -->
+                <button class="btn btn-primary" onclick="viewStudentReport('${appointment.student.id}', ${appointment.id})">
+                    <i class="fas fa-file-medical-alt"></i>
+                    Student Report
+                </button>
+                
+                <button class="btn btn-secondary" onclick="viewAppointmentDetails(${appointment.id})">
+                    <i class="fas fa-eye"></i>
+                    View Details
+                </button>
+                ${getAppointmentActionButtons(appointment)}
+            </div>
+        </div>
+    `).join('');
+}
+
+
+        async function loadUpcomingAppointments() {
+            try {
+                const response = await fetch('/api/counselor/appointments/upcoming');
+                if (!response.ok) throw new Error('Failed to fetch upcoming appointments');
+                
+                const data = await response.json();
+                if (data.success) {
+                    renderUpcomingAppointments(data.appointments);
+                    document.getElementById('upcomingCount').textContent = `${data.appointments.length} sessions`;
+                } else {
+                    throw new Error(data.message || 'Failed to load upcoming appointments');
+                }
+            } catch (error) {
+                console.error('Error loading upcoming appointments:', error);
+                renderUpcomingAppointments([]);
+                document.getElementById('upcomingCount').textContent = '0 sessions';
+            }
+        }
+
+        function renderUpcomingAppointments(appointments) {
+            const container = document.getElementById('upcomingAppointmentsList');
+            
+            if (appointments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>No upcoming appointments this week</h3>
+                        <p>Your schedule is clear for the rest of the week.</p>
+                        <button class="btn btn-primary" onclick="navigateToPage('/counselor/appointments')">
+                            <i class="fas fa-calendar-alt"></i>
+                            View Full Schedule
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group appointments by date
+            const groupedAppointments = groupAppointmentsByDate(appointments);
+            
+            container.innerHTML = Object.entries(groupedAppointments).map(([date, dayAppointments]) => `
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem; font-weight: 600;">
+                        <i class="fas fa-calendar-day"></i>
+                        ${formatDateHeader(date)}
+                    </h4>
+                    ${dayAppointments.map(appointment => `
+                        <div class="appointment-card" style="margin-bottom: 1rem;">
+                            <div class="appointment-header">
+                                <div style="flex: 1;">
+                                    <div class="appointment-time">
+                                        <i class="fas fa-clock"></i>
+                                        ${formatTime(appointment.scheduled_date)}
+                                    </div>
+                                    <div class="student-name">
+                                        <i class="fas fa-user"></i>
+                                        ${appointment.student.name}
+                                    </div>
+                                    <div class="student-details">
+                                        ${appointment.student.course}
+                                    </div>
+                                    ${appointment.topic ? `
+                                        <div class="appointment-topic" style="margin-top: 0.5rem;">
+                                            ${truncateText(appointment.topic, 40)}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div>
+                                    <span class="status-badge status-${appointment.status}">
+                                        ${appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="appointment-actions">
+                                <button class="btn btn-secondary" onclick="viewAppointmentDetails(${appointment.id})">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </button>
+                                ${appointment.status === 'assigned' ? `
+                                    <button class="btn btn-success" onclick="acceptAppointment(${appointment.id})">
+                                        <i class="fas fa-check"></i>
+                                        Accept
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        // Utility functions
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        }
+
+        function formatDateHeader(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            if (date.toDateString() === today.toDateString()) {
+                return 'Today';
+            } else if (date.toDateString() === tomorrow.toDateString()) {
+                return 'Tomorrow';
+            } else {
+                return date.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+            }
+        }
+
+        function groupAppointmentsByDate(appointments) {
+            return appointments.reduce((groups, appointment) => {
+                const date = new Date(appointment.scheduled_date).toDateString();
+                if (!groups[date]) {
+                    groups[date] = [];
+                }
+                groups[date].push(appointment);
+                return groups;
+            }, {});
+        }
+
+        function truncateText(text, maxLength) {
+            if (!text) return '';
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'assigned':
+                    return '<i class="fas fa-hourglass-half"></i>';
+                case 'scheduled':
+                    return '<i class="fas fa-calendar-check"></i>';
+                case 'completed':
+                    return '<i class="fas fa-check-circle"></i>';
+                case 'pending':
+                    return '<i class="fas fa-clock"></i>';
+                default:
+                    return '<i class="fas fa-circle"></i>';
+            }
+        }
+
+        function getAppointmentActionButtons(appointment) {
+            const now = new Date();
+            const appointmentTime = new Date(appointment.scheduled_date);
+            const timeDiff = (appointmentTime - now) / (1000 * 60); // difference in minutes
+            
+            if (appointment.status === 'scheduled') {
+                // Show start button if appointment is within 15 minutes or already started (up to 30 minutes past)
+                if (timeDiff <= 15 && timeDiff >= -30) {
+                    return `
+                        <button class="btn btn-success" onclick="startSession(${appointment.id})">
+                            <i class="fas fa-play"></i>
+                            Start Session
+                        </button>
+                    `;
+                }
+            } else if (appointment.status === 'assigned') {
+                return `
+                    <button class="btn btn-success" onclick="acceptAppointment(${appointment.id})">
+                        <i class="fas fa-check"></i>
+                        Accept
+                    </button>
+                    <button class="btn btn-warning" onclick="rescheduleAppointment(${appointment.id})">
+                        <i class="fas fa-calendar-alt"></i>
+                        Reschedule
+                    </button>
+                `;
+            }
+            return '';
+        }
+
+        function updateTimeDisplay() {
+            const now = new Date();
+            const timeString = now.toLocaleString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            document.getElementById('currentTime').textContent = timeString;
+            updateGreeting();
+        }
+
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const greetingElement = document.getElementById('greeting');
+            const iconElement = document.getElementById('greetingIcon');
+            
+            if (hour < 12) {
+                greetingElement.textContent = 'Good morning';
+                iconElement.className = 'fas fa-sun';
+            } else if (hour < 18) {
+                greetingElement.textContent = 'Good afternoon';
+                iconElement.className = 'fas fa-sun';
+            } else {
+                greetingElement.textContent = 'Good evening';
+                iconElement.className = 'fas fa-moon';
+            }
+        }
+
+        // Action functions
+        async function viewAppointmentDetails(appointmentId) {
+            showNotification('Loading appointment details...', 'info');
+            // Navigate to appointment details page
+            window.location.href = `/counselor/appointments/${appointmentId}/details`;
+        }
+
+        async function startSession(appointmentId) {
+            if (confirm('Are you ready to start this counseling session?')) {
+                try {
+                    showNotification('Starting session...', 'info');
+                    
+                    const response = await fetch(`/api/counselor/appointments/${appointmentId}/start`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showNotification('Session started successfully!', 'success');
+                        // Navigate to session page
+                        setTimeout(() => {
+                            window.location.href = `/counselor/session/${appointmentId}`;
+                        }, 1000);
+                    } else {
+                        showNotification(data.message || 'Error starting session', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error starting session:', error);
+                    showNotification('Error starting session. Please try again.', 'error');
+                }
+            }
+        }
+
+        async function acceptAppointment(appointmentId) {
+            if (confirm('Accept this appointment request?')) {
+                try {
+                    showNotification('Accepting appointment...', 'info');
+                    
+                    const response = await fetch(`/api/counselor/appointments/${appointmentId}/accept`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showNotification('Appointment accepted successfully!', 'success');
+                        // Refresh dashboard data
+                        setTimeout(() => {
+                            loadDashboardData();
+                        }, 1000);
+                    } else {
+                        showNotification(data.message || 'Error accepting appointment', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error accepting appointment:', error);
+                    showNotification('Error accepting appointment. Please try again.', 'error');
+                }
+            }
+        }
+
+        async function rescheduleAppointment(appointmentId) {
+            showNotification('Opening reschedule options...', 'info');
+            // This would open a modal or navigate to reschedule page
+            // For now, just navigate to the appointment details
+            window.location.href = `/counselor/appointments/${appointmentId}/details`;
+        }
+
+        function navigateToPage(url) {
+            showNotification('Navigating...', 'info');
+            window.location.href = url;
+        }
+
+        function showPendingRequests() {
+            const pendingCount = parseInt(document.getElementById('pendingCount').textContent);
+            if (pendingCount > 0) {
+                navigateToPage('/counselor/appointments?filter=pending');
+            } else {
+                showNotification('No pending requests at the moment!', 'info');
+            }
+        }
+
+        async function refreshDashboard() {
+            console.log('🔄 Refreshing dashboard...');
+            
+            const refreshBtn = document.querySelector('.refresh-btn');
+            refreshBtn.classList.add('spinning');
+            
+            showNotification('Refreshing dashboard...', 'info');
+            
+            try {
+                await loadDashboardData();
+                showNotification('Dashboard refreshed successfully!', 'success');
+            } catch (error) {
+                console.error('Error refreshing dashboard:', error);
+                showNotification('Error refreshing dashboard. Please try again.', 'error');
+            } finally {
+                refreshBtn.classList.remove('spinning');
+            }
+        }
+
+        function startAutoRefresh() {
+            // Refresh dashboard data every 2 minutes
+            refreshInterval = setInterval(async () => {
+                if (isOnline) {
+                    console.log('🔄 Auto-refreshing dashboard data...');
+                    try {
+                        await loadDashboardData();
+                    } catch (error) {
+                        console.error('Auto-refresh error:', error);
+                    }
+                }
+            }, 120000); // 2 minutes
+        }
+
+        function setupEventListeners() {
+            // Navigation items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    const tab = this.dataset.tab;
+                    if (tab && tab !== 'dashboard') {
+                        navigateToPage(`/counselor/${tab}`);
+                    }
+                });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + R for refresh
+                if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                    e.preventDefault();
+                    refreshDashboard();
+                }
+                
+                // Ctrl/Cmd + A for appointments
+                if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+                    e.preventDefault();
+                    navigateToPage('/counselor/appointments');
+                }
+            });
+
+            // Network status monitoring
+            window.addEventListener('online', function() {
+                isOnline = true;
+                showNotification('Connection restored', 'success');
+                loadDashboardData();
+            });
+
+            window.addEventListener('offline', function() {
+                isOnline = false;
+                showNotification('You are offline. Data may not be current.', 'warning');
+            });
+
+            // Page visibility change
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden && isOnline) {
+                    // Page became visible, refresh data
+                    loadDashboardData();
+                }
+            });
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icon = getNotificationIcon(type);
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="${icon}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Hide notification after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        function getNotificationIcon(type) {
+            switch (type) {
+                case 'success':
+                    return 'fas fa-check-circle';
+                case 'error':
+                    return 'fas fa-exclamation-circle';
+                case 'warning':
+                    return 'fas fa-exclamation-triangle';
+                case 'info':
+                default:
+                    return 'fas fa-info-circle';
+            }
+        }
+
+        // Cleanup
+        window.addEventListener('beforeunload', function() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            if (window.performance) {
+                const navTiming = performance.getEntriesByType('navigation')[0];
+                const loadTime = navTiming.loadEventEnd - navTiming.loadEventStart;
+                console.log(`✅ Real-time Dashboard loaded in ${loadTime}ms`);
+            }
+        });
+
+        console.log('🎯 Real-time Counselor Dashboard Script Loaded Successfully');
+    </script>
+</body>
+</html>

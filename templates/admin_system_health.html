@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Health - CUEA MindConnect Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --card-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 20px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: var(--secondary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .health-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+
+        .health-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .status-healthy {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+            border: 2px solid var(--success-color);
+        }
+
+        .status-warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+            border: 2px solid var(--warning-color);
+        }
+
+        .status-critical {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+            border: 2px solid var(--danger-color);
+        }
+
+        .status-offline {
+            background-color: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+            border: 2px solid #95a5a6;
+        }
+
+        .metric-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+
+        .metric-circle.healthy {
+            background: linear-gradient(135deg, var(--success-color), #2ecc71);
+            color: white;
+        }
+
+        .metric-circle.warning {
+            background: linear-gradient(135deg, var(--warning-color), #e67e22);
+            color: white;
+        }
+
+        .metric-circle.critical {
+            background: linear-gradient(135deg, var(--danger-color), #c0392b);
+            color: white;
+        }
+
+        .progress-ring {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+
+        .progress-ring__circle {
+            stroke: #e6e6e6;
+            stroke-width: 8;
+            fill: transparent;
+            transition: stroke-dasharray 0.5s ease-in-out;
+        }
+
+        .progress-ring__circle.healthy {
+            stroke: var(--success-color);
+        }
+
+        .progress-ring__circle.warning {
+            stroke: var(--warning-color);
+        }
+
+        .progress-ring__circle.critical {
+            stroke: var(--danger-color);
+        }
+
+        .system-overview {
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .overview-metric {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .overview-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .overview-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: #888;
+        }
+
+        .log-level-info {
+            color: #00ff00;
+        }
+
+        .log-level-warning {
+            color: #ffaa00;
+        }
+
+        .log-level-error {
+            color: #ff4444;
+        }
+
+        .health-check-btn {
+            background: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .health-check-btn:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .maintenance-controls {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .alert-banner {
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-banner i {
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .alert-critical {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .alert-warning {
+            background: rgba(243, 156, 18, 0.1);
+            border: 1px solid var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .resource-chart {
+            height: 200px;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .overview-metric {
+                padding: 10px;
+            }
+            
+            .overview-number {
+                font-size: 2rem;
+            }
+            
+            .service-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Admin Panel</h4>
+                        <small class="text-muted">CUEA MindConnect</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_users') }}">
+                                <i class="fas fa-users"></i>
+                                User Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_counselors') }}">
+                                <i class="fas fa-user-md"></i>
+                                Counselor Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_appointments') }}">
+                                <i class="fas fa-calendar-check"></i>
+                                Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_content') }}">
+                                <i class="fas fa-file-alt"></i>
+                                Content Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_forum_oversight') }}">
+                                <i class="fas fa-comments"></i>
+                                Forum Oversight
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_analytics') }}">
+                                <i class="fas fa-chart-bar"></i>
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_settings') }}">
+                                <i class="fas fa-cog"></i>
+                                Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('admin_system_health') }}">
+                                <i class="fas fa-heartbeat"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">System Health Monitor</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="exportHealthReport">
+                                <i class="fas fa-download"></i> Export Report
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-sm health-check-btn" id="runHealthCheck">
+                            <i class="fas fa-stethoscope"></i> Run Health Check
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Critical Alerts -->
+                {% if health_data.critical_alerts %}
+                    {% for alert in health_data.critical_alerts %}
+                    <div class="alert-banner alert-critical">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Critical Alert:</strong> {{ alert.message }}
+                            <br><small>{{ alert.timestamp }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if health_data.warnings %}
+                    {% for warning in health_data.warnings %}
+                    <div class="alert-banner alert-warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>
+                            <strong>Warning:</strong> {{ warning.message }}
+                            <br><small>{{ warning.timestamp }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- System Overview -->
+                <div class="system-overview">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="overview-metric">
+                                <div class="overview-number text-success">{{ health_data.overall_status }}</div>
+                                <div class="overview-label">Overall Status</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="overview-metric">
+                                <div class="overview-number">{{ health_data.uptime }}</div>
+                                <div class="overview-label">System Uptime</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="overview-metric">
+                                <div class="overview-number">{{ health_data.active_connections }}</div>
+                                <div class="overview-label">Active Connections</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="overview-metric">
+                                <div class="overview-number">{{ health_data.last_check }}</div>
+                                <div class="overview-label">Last Health Check</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Status Grid -->
+                <div class="service-grid">
+                    <!-- Database Health -->
+                    <div class="health-card">
+                        <div class="text-center">
+                            <div class="metric-circle {{ health_data.database.status_class }}">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h5>Database</h5>
+                            <div class="status-indicator status-{{ health_data.database.status_class }}">
+                                <i class="fas fa-circle me-2"></i>
+                                {{ health_data.database.status }}
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">Connection Time: {{ health_data.database.response_time }}ms</small><br>
+                                <small class="text-muted">Records: {{ health_data.database.total_records }}</small><br>
+                                <small class="text-muted">Size: {{ health_data.database.size }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Server Performance -->
+                    <div class="health-card">
+                        <div class="text-center">
+                            <div class="progress-ring">
+                                <svg class="progress-ring" width="100" height="100">
+                                    <circle class="progress-ring__circle {{ health_data.server.cpu_status_class }}"
+                                            stroke-width="8" fill="transparent" r="40" cx="50" cy="50"
+                                            stroke-dasharray="{{ health_data.server.cpu_circumference }}"
+                                            stroke-dashoffset="{{ health_data.server.cpu_offset }}"/>
+                                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="14" font-weight="bold">
+                                        {{ health_data.server.cpu_usage }}%
+                                    </text>
+                                </svg>
+                            </div>
+                            <h5>CPU Usage</h5>
+                            <div class="status-indicator status-{{ health_data.server.status_class }}">
+                                <i class="fas fa-microchip me-2"></i>
+                                {{ health_data.server.status }}
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">Load Average: {{ health_data.server.load_average }}</small><br>
+                                <small class="text-muted">Processes: {{ health_data.server.processes }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory Usage -->
+                    <div class="health-card">
+                        <div class="text-center">
+                            <div class="progress-ring">
+                                <svg class="progress-ring" width="100" height="100">
+                                    <circle class="progress-ring__circle {{ health_data.memory.status_class }}"
+                                            stroke-width="8" fill="transparent" r="40" cx="50" cy="50"
+                                            stroke-dasharray="{{ health_data.memory.circumference }}"
+                                            stroke-dashoffset="{{ health_data.memory.offset }}"/>
+                                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="14" font-weight="bold">
+                                        {{ health_data.memory.usage_percent }}%
+                                    </text>
+                                </svg>
+                            </div>
+                            <h5>Memory Usage</h5>
+                            <div class="status-indicator status-{{ health_data.memory.status_class }}">
+                                <i class="fas fa-memory me-2"></i>
+                                {{ health_data.memory.status }}
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">Used: {{ health_data.memory.used }} / {{ health_data.memory.total }}</small><br>
+                                <small class="text-muted">Available: {{ health_data.memory.available }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Disk Storage -->
+                    <div class="health-card">
+                        <div class="text-center">
+                            <div class="progress-ring">
+                                <svg class="progress-ring" width="100" height="100">
+                                    <circle class="progress-ring__circle {{ health_data.disk.status_class }}"
+                                            stroke-width="8" fill="transparent" r="40" cx="50" cy="50"
+                                            stroke-dasharray="{{ health_data.disk.circumference }}"
+                                            stroke-dashoffset="{{ health_data.disk.offset }}"/>
+                                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="14" font-weight="bold">
+                                        {{ health_data.disk.usage_percent }}%
+                                    </text>
+                                </svg>
+                            </div>
+                            <h5>Disk Storage</h5>
+                            <div class="status-indicator status-{{ health_data.disk.status_class }}">
+                                <i class="fas fa-hdd me-2"></i>
+                                {{ health_data.disk.status }}
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">Used: {{ health_data.disk.used }} / {{ health_data.disk.total }}</small><br>
+                                <small class="text-muted">Free: {{ health_data.disk.free }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Network Status -->
+                    <div class="health-card">
+                        <div class="text-center">
+                            <div class="metric-circle {{ health_data.network.status_class }}">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <h5>Network</h5>
+                            <div class="status-indicator status-{{ health_data.network.status_class }}">
+                                <i class="fas fa-wifi me-2"></i>
+                                {{ health_data.network.status }}
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">Latency: {{ health_data.network.latency }}ms</small><br>
+                                <small class="text-muted">Bandwidth: {{ health_data.network.bandwidth }}</small><br>
+                                <small class="text-muted">Packets Lost: {{ health_data.network.packet_loss }}%</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backup Status -->
+                    <div class="health-card">
+                        <div class="text-center">
+                            <div class="metric-circle {{ health_data.backup.status_class }}">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h5>Backup System</h5>
+                            <div class="status-indicator status-{{ health_data.backup.status_class }}">
+                                <i class="fas fa-check-circle me-2"></i>
+                                {{ health_data.backup.status }}
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">Last Backup: {{ health_data.backup.last_backup }}</small><br>
+                                <small class="text-muted">Next Scheduled: {{ health_data.backup.next_backup }}</small><br>
+                                <small class="text-muted">Total Backups: {{ health_data.backup.total_backups }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Information -->
+                <div class="row">
+                    <!-- System Logs -->
+                    <div class="col-lg-8">
+                        <div class="health-card">
+                            <h5 class="mb-3"><i class="fas fa-file-alt text-info"></i> Recent System Logs</h5>
+                            <div class="log-container" id="systemLogs">
+                                {% for log in health_data.recent_logs %}
+                                <div class="log-entry">
+                                    <span class="log-timestamp">{{ log.timestamp }}</span>
+                                    <span class="log-level-{{ log.level }}"> [{{ log.level.upper() }}]</span>
+                                    {{ log.message }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-sm btn-outline-primary" id="refreshLogs">
+                                    <i class="fas fa-sync"></i> Refresh Logs
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" id="clearLogs">
+                                    <i class="fas fa-trash"></i> Clear Logs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Controls -->
+                    <div class="col-lg-4">
+                        <div class="health-card">
+                            <h5 class="mb-3"><i class="fas fa-tools text-warning"></i> Maintenance Controls</h5>
+                            
+                            <div class="maintenance-controls">
+                                <div class="mb-3">
+                                    <h6>Quick Actions</h6>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary btn-sm" id="restartServices">
+                                            <i class="fas fa-redo"></i> Restart Services
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" id="clearCache">
+                                            <i class="fas fa-broom"></i> Clear Cache
+                                        </button>
+                                        <button class="btn btn-outline-success btn-sm" id="optimizeDb">
+                                            <i class="fas fa-database"></i> Optimize Database
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6>Maintenance Mode</h6>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="maintenanceMode" 
+                                               {{ 'checked' if health_data.maintenance_mode else '' }}>
+                                        <label class="form-check-label" for="maintenanceMode">
+                                            Enable Maintenance Mode
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">Temporarily disable access for maintenance</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6>System Information</h6>
+                                    <div class="small">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Platform Version:</span>
+                                            <span class="badge bg-primary">{{ health_data.version }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Python Version:</span>
+                                            <span>{{ health_data.python_version }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Database Version:</span>
+                                            <span>{{ health_data.db_version }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Server Time:</span>
+                                            <span id="serverTime">{{ health_data.server_time }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Metrics -->
+                        <div class="health-card">
+                            <h5 class="mb-3"><i class="fas fa-chart-line text-success"></i> Performance Metrics</h5>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Response Time</small>
+                                    <small>{{ health_data.metrics.avg_response_time }}ms</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" style="width: {{ health_data.metrics.response_time_percent }}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Error Rate</small>
+                                    <small>{{ health_data.metrics.error_rate }}%</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-{{ 'success' if health_data.metrics.error_rate < 1 else 'warning' if health_data.metrics.error_rate < 5 else 'danger' }}" 
+                                         style="width: {{ health_data.metrics.error_rate }}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Throughput</small>
+                                    <small>{{ health_data.metrics.requests_per_minute }} req/min</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-primary" style="width: {{ health_data.metrics.throughput_percent }}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-3">
+                                <button class="btn btn-sm btn-outline-info" id="viewDetailedMetrics">
+                                    <i class="fas fa-chart-bar"></i> Detailed Metrics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update server time every second
+        function updateServerTime() {
+            const now = new Date();
+            document.getElementById('serverTime').textContent = now.toLocaleString();
+        }
+        setInterval(updateServerTime, 1000);
+
+        // Run health check
+        document.getElementById('runHealthCheck').addEventListener('click', function() {
+            const btn = this;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            btn.disabled = true;
+
+            fetch('/admin/system-health/check', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Health check completed successfully!');
+                    location.reload();
+                } else {
+                    alert('Health check failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error running health check: ' + error);
+            })
+            .finally(() => {
+                btn.innerHTML = '<i class="fas fa-stethoscope"></i> Run Health Check';
+                btn.disabled = false;
+            });
+        });
+
+        // Refresh logs
+        document.getElementById('refreshLogs').addEventListener('click', function() {
+            fetch('/admin/system-health/logs')
+            .then(response => response.json())
+            .then(data => {
+                const logsContainer = document.getElementById('systemLogs');
+                logsContainer.innerHTML = '';
+                
+                data.logs.forEach(log => {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-entry';
+                    logEntry.innerHTML = `
+                        <span class="log-timestamp">${log.timestamp}</span>
+                        <span class="log-level-${log.level}"> [${log.level.toUpperCase()}]</span>
+                        ${log.message}
+                    `;
+                    logsContainer.appendChild(logEntry);
+                });
+            });
+        });
+
+        // Clear logs
+        document.getElementById('clearLogs').addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all logs?')) {
+                fetch('/admin/system-health/clear-logs', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('systemLogs').innerHTML = '<div class="log-entry">Logs cleared.</div>';
+                    }
+                });
+            }
+        });
+
+        // Maintenance actions
+        document.getElementById('restartServices').addEventListener('click', function() {
+            if (confirm('Are you sure you want to restart services? This may cause brief downtime.')) {
+                const btn = this;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Restarting...';
+                btn.disabled = true;
+                
+                fetch('/admin/system-health/restart-services', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.success) {
+                        location.reload();
+                    }
+                })
+                .finally(() => {
+                    btn.innerHTML = '<i class="fas fa-redo"></i> Restart Services';
+                    btn.disabled = false;
+                });
+            }
+        });
+
+        document.getElementById('clearCache').addEventListener('click', function() {
+            const btn = this;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Clearing...';
+            btn.disabled = true;
+            
+            fetch('/admin/system-health/clear-cache', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .finally(() => {
+                btn.innerHTML = '<i class="fas fa-broom"></i> Clear Cache';
+                btn.disabled = false;
+            });
+        });
+
+        document.getElementById('optimizeDb').addEventListener('click', function() {
+            const btn = this;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Optimizing...';
+            btn.disabled = true;
+            
+            fetch('/admin/system-health/optimize-db', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .finally(() => {
+                btn.innerHTML = '<i class="fas fa-database"></i> Optimize Database';
+                btn.disabled = false;
+            });
+        });
+
+        // Maintenance mode toggle
+        document.getElementById('maintenanceMode').addEventListener('change', function() {
+            const isEnabled = this.checked;
+            
+            if (confirm(`Are you sure you want to ${isEnabled ? 'enable' : 'disable'} maintenance mode?`)) {
+                fetch('/admin/system-health/toggle-maintenance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ enable: isEnabled })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        this.checked = !isEnabled; // Revert if failed
+                        alert('Failed to toggle maintenance mode: ' + data.message);
+                    }
+                });
+            } else {
+                this.checked = !isEnabled; // Revert if cancelled
+            }
+        });
+
+        // Export health report
+        document.getElementById('exportHealthReport').addEventListener('click', function() {
+            window.open('/admin/system-health/export', '_blank');
+        });
+
+        // View detailed metrics
+        document.getElementById('viewDetailedMetrics').addEventListener('click', function() {
+            window.open('/admin/analytics', '_blank');
+        });
+
+        // Auto-refresh health data every 30 seconds
+        setInterval(function() {
+            fetch('/admin/system-health/refresh')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update key metrics without full page reload
+                        updateHealthMetrics(data.health_data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Health refresh failed:', error);
+                });
+        }, 30000);
+
+        function updateHealthMetrics(healthData) {
+            // Update CPU usage
+            const cpuCircle = document.querySelector('.progress-ring__circle.healthy, .progress-ring__circle.warning, .progress-ring__circle.critical');
+            if (cpuCircle) {
+                const circumference = 2 * Math.PI * 40;
+                const offset = circumference - (healthData.server.cpu_usage / 100) * circumference;
+                cpuCircle.style.strokeDashoffset = offset;
+            }
+
+            // Update memory usage
+            const memoryCircle = document.querySelector('.progress-ring__circle');
+            if (memoryCircle) {
+                const circumference = 2 * Math.PI * 40;
+                const offset = circumference - (healthData.memory.usage_percent / 100) * circumference;
+                memoryCircle.style.strokeDashoffset = offset;
+            }
+
+            // Update status indicators
+            document.querySelectorAll('.status-indicator').forEach(indicator => {
+                // Update based on new health data
+                // This would require more detailed implementation based on your data structure
+            });
+        }
+
+        // Initialize tooltips and other UI enhancements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to health cards
+            document.querySelectorAll('.health-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Initialize progress rings
+            const rings = document.querySelectorAll('.progress-ring__circle');
+            rings.forEach(ring => {
+                const radius = ring.r.baseVal.value;
+                const circumference = radius * 2 * Math.PI;
+                ring.style.strokeDasharray = `${circumference} ${circumference}`;
+                ring.style.strokeDashoffset = circumference;
+            });
+        });
+
+        // Real-time log streaming (if WebSocket is available)
+        if (typeof WebSocket !== 'undefined') {
+            const logSocket = new WebSocket(`ws://${window.location.host}/admin/system-health/logs/stream`);
+            
+            logSocket.onmessage = function(event) {
+                const logData = JSON.parse(event.data);
+                const logsContainer = document.getElementById('systemLogs');
+                
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `
+                    <span class="log-timestamp">${logData.timestamp}</span>
+                    <span class="log-level-${logData.level}"> [${logData.level.toUpperCase()}]</span>
+                    ${logData.message}
+                `;
+                
+                logsContainer.insertBefore(logEntry, logsContainer.firstChild);
+                
+                // Keep only last 50 entries
+                while (logsContainer.children.length > 50) {
+                    logsContainer.removeChild(logsContainer.lastChild);
+                }
+            };
+        }
+    </script>
+</body>
+</html>

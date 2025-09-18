@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Students - CUEA MindConnect</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #3b82f6;
+            --primary-purple: #8b5cf6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border-left: 4px solid var(--primary-blue);
+            transition: transform 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            line-height: 1;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+        }
+        
+        .students-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            overflow: hidden;
+        }
+        
+        .student-card {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .student-card:hover {
+            background-color: #f9fafb;
+        }
+        
+        .student-card:last-child {
+            border-bottom: none;
+        }
+        
+        .student-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .student-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .student-details {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-green) 0%, #059669 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .next-session {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .search-box {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-tabs {
+            background: white;
+            border-radius: 12px;
+            padding: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-tab {
+            border: none;
+            background: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            color: #6b7280;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-tab.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .error-state i {
+            font-size: 4rem;
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('counselor_dashboard') }}">
+                <i class="fas fa-brain"></i> CUEA MindConnect
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('counselor_dashboard') }}">Dashboard</a>
+                <a class="nav-link" href="{{ url_for('counselor_appointments_page') }}">Appointments</a>
+                <a class="nav-link" href="{{ url_for('counselor_profile') }}">Profile</a>
+                <a class="nav-link" href="{{ url_for('counselor_logout') }}">Logout</a>
+                <a class="nav-link active" href="{{ url_for('counselor_students') }}">My Students</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2">
+                        <i class="fas fa-users"></i> My Students
+                    </h1>
+                    <p class="mb-0 opacity-90">
+                        Manage and track your students' counseling progress
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-light" onclick="exportStudentData()">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                    <button class="btn btn-outline-light ms-2" onclick="refreshData()">
+                        <i class="fas fa-refresh"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Statistics Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalStudents">{{ stats.total_students if stats else 0 }}</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="activeStudents">{{ stats.active_students if stats else 0 }}</div>
+                    <div class="stat-label">Active Students</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSessions">{{ stats.total_sessions if stats else 0 }}</div>
+                    <div class="stat-label">Total Sessions</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="avgSessions">{{ stats.avg_sessions_per_student if stats else 0 }}</div>
+                    <div class="stat-label">Avg per Student</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="search-box">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="studentSearch" 
+                               placeholder="Search students by name, ID, or course...">
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <select class="form-select d-inline" style="width: auto;" id="sortBy">
+                        <option value="name">Sort by Name</option>
+                        <option value="sessions">Sort by Sessions</option>
+                        <option value="recent">Sort by Recent Activity</option>
+                        <option value="course">Sort by Course</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">All Students</button>
+            <button class="filter-tab" data-filter="active">Active</button>
+            <button class="filter-tab" data-filter="completed">Completed</button>
+            <button class="filter-tab" data-filter="upcoming">Has Upcoming</button>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading students...</p>
+        </div>
+
+        <!-- Students List -->
+        <div class="students-container" id="studentsContainer">
+            {% if students %}
+                {% for student_data in students %}
+                    <div class="student-card" onclick="viewStudentDetails({{ student_data.student.id }})"
+                         data-student-name="{{ student_data.student.get_full_name().lower() }}"
+                         data-student-course="{{ student_data.student.course.lower() if student_data.student.course else '' }}"
+                         data-student-id="{{ student_data.student.student_id.lower() if student_data.student.student_id else '' }}"
+                         data-filter-status="{% if student_data.upcoming_appointment %}active{% else %}inactive{% endif %}">
+                        
+                        <div class="row align-items-center">
+                            <!-- Student Avatar & Info -->
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="student-avatar me-3">
+                                        {{ student_data.student.first_name[0] if student_data.student.first_name else 'U' }}{{ student_data.student.last_name[0] if student_data.student.last_name else 'N' }}
+                                    </div>
+                                    <div>
+                                        <div class="student-name">
+                                            {{ student_data.student.get_full_name() }}
+                                        </div>
+                                        <div class="student-details">
+                                            <i class="fas fa-id-badge"></i> {{ student_data.student.student_id or 'N/A' }} &bull;
+                                            <i class="fas fa-graduation-cap"></i> {{ student_data.student.course or 'N/A' }} &bull;
+                                            Year {{ student_data.student.year_of_study or 'N/A' }}
+                                        </div>
+                                        <div class="student-details">
+                                            <i class="fas fa-envelope"></i> {{ student_data.student.email }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Session Stats -->
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h5 class="mb-1">{{ student_data.total_sessions }}</h5>
+                                    <small class="text-muted">Total Sessions</small>
+                                    
+                                    <div class="progress-bar-custom mt-2">
+                                        <div class="progress-fill" style="width: {{ student_data.completion_rate }}%"></div>
+                                    </div>
+                                    <small class="text-muted">{{ student_data.completion_rate }}% completed</small>
+                                </div>
+                            </div>
+
+                            <!-- Status & Next Session -->
+                            <div class="col-md-3">
+                                <div class="text-end">
+                                    {% if student_data.upcoming_appointment %}
+                                        <span class="status-badge status-active">
+                                            <i class="fas fa-calendar-check"></i> Active
+                                        </span>
+                                        <div class="next-session">
+                                            <small><strong>Next Session:</strong></small><br>
+                                            <small>
+                                                <i class="fas fa-clock"></i>
+                                                {{ student_data.upcoming_appointment.scheduled_date.strftime('%b %d, %Y at %I:%M %p') }}
+                                            </small>
+                                        </div>
+                                    {% else %}
+                                        <span class="status-badge status-inactive">
+                                            <i class="fas fa-pause"></i> No Upcoming
+                                        </span>
+                                        {% if student_data.last_session %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    Last session: {{ student_data.last_session.strftime('%b %d, %Y') }}
+                                                </small>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- Empty State -->
+                <div class="error-state" id="emptyState">
+                    <i class="fas fa-users"></i>
+                    <h4>No Students Yet</h4>
+                    <p>Students will appear here once you're assigned appointments.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Student Details Modal -->
+    <div class="modal fade" id="studentDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Student Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="studentDetailsContent">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let allStudents = [];
+        let currentFilter = 'all';
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Initializing students page...');
+            loadInitialData();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('studentSearch').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                filterStudents(searchTerm, currentFilter);
+            });
+
+            // Filter functionality
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active tab
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentFilter = this.dataset.filter;
+                    const searchTerm = document.getElementById('studentSearch').value.toLowerCase();
+                    filterStudents(searchTerm, currentFilter);
+                });
+            });
+
+            // Sort functionality
+            document.getElementById('sortBy').addEventListener('change', function() {
+                sortStudents(this.value);
+            });
+        }
+
+        function loadInitialData() {
+            // Store initial student data for filtering
+            const studentCards = document.querySelectorAll('.student-card');
+            allStudents = Array.from(studentCards).map(card => ({
+                element: card,
+                name: card.dataset.studentName || '',
+                course: card.dataset.studentCourse || '',
+                studentId: card.dataset.studentId || '',
+                filterStatus: card.dataset.filterStatus || 'inactive'
+            }));
+            
+            console.log(`📊 Loaded ${allStudents.length} students`);
+        }
+
+        function filterStudents(searchTerm, filter) {
+            let visibleCount = 0;
+            
+            allStudents.forEach(student => {
+                let showStudent = true;
+                
+                // Apply search filter
+                if (searchTerm) {
+                    const matchesSearch = 
+                        student.name.includes(searchTerm) ||
+                        student.course.includes(searchTerm) ||
+                        student.studentId.includes(searchTerm);
+                    
+                    if (!matchesSearch) {
+                        showStudent = false;
+                    }
+                }
+                
+                // Apply status filter
+                if (showStudent && filter !== 'all') {
+                    if (filter === 'active' && student.filterStatus !== 'active') {
+                        showStudent = false;
+                    } else if (filter === 'completed' && student.filterStatus !== 'inactive') {
+                        showStudent = false;
+                    } else if (filter === 'upcoming' && student.filterStatus !== 'active') {
+                        showStudent = false;
+                    }
+                }
+                
+                // Show/hide student
+                if (showStudent) {
+                    student.element.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    student.element.style.display = 'none';
+                }
+            });
+            
+            // Show empty state if no students visible
+            const emptyState = document.getElementById('emptyState');
+            if (visibleCount === 0 && allStudents.length > 0) {
+                if (!emptyState) {
+                    showNoResultsMessage();
+                }
+            }
+            
+            console.log(`🔍 Filtered: ${visibleCount}/${allStudents.length} students visible`);
+        }
+
+        function showNoResultsMessage() {
+            const container = document.getElementById('studentsContainer');
+            const existingCards = container.querySelectorAll('.student-card');
+            const allHidden = Array.from(existingCards).every(card => card.style.display === 'none');
+            
+            if (allHidden && !container.querySelector('.no-results')) {
+                const noResults = document.createElement('div');
+                noResults.className = 'error-state no-results';
+                noResults.innerHTML = `
+                    <i class="fas fa-search"></i>
+                    <h4>No Students Found</h4>
+                    <p>Try adjusting your search criteria or filters.</p>
+                `;
+                container.appendChild(noResults);
+            }
+        }
+
+        function sortStudents(sortBy) {
+            console.log(`📊 Sorting by: ${sortBy}`);
+            
+            const container = document.getElementById('studentsContainer');
+            const studentCards = Array.from(container.querySelectorAll('.student-card'));
+            
+            studentCards.sort((a, b) => {
+                switch(sortBy) {
+                    case 'name':
+                        const nameA = a.dataset.studentName || '';
+                        const nameB = b.dataset.studentName || '';
+                        return nameA.localeCompare(nameB);
+                    
+                    case 'sessions':
+                        const sessionsA = parseInt(a.querySelector('h5').textContent) || 0;
+                        const sessionsB = parseInt(b.querySelector('h5').textContent) || 0;
+                        return sessionsB - sessionsA; // Descending
+                    
+                    case 'course':
+                        const courseA = a.dataset.studentCourse || '';
+                        const courseB = b.dataset.studentCourse || '';
+                        return courseA.localeCompare(courseB);
+                    
+                    case 'recent':
+                        // Sort by active status first, then by name
+                        const statusA = a.dataset.filterStatus === 'active' ? 1 : 0;
+                        const statusB = b.dataset.filterStatus === 'active' ? 1 : 0;
+                        if (statusA !== statusB) {
+                            return statusB - statusA;
+                        }
+                        return (a.dataset.studentName || '').localeCompare(b.dataset.studentName || '');
+                    
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Re-append sorted cards
+            studentCards.forEach(card => container.appendChild(card));
+        }
+
+        // View student details
+        async function viewStudentDetails(studentId) {
+            console.log(`🔍 Loading details for student ${studentId}`);
+            
+            const modal = new bootstrap.Modal(document.getElementById('studentDetailsModal'));
+            modal.show();
+            
+            // Reset modal content
+            document.getElementById('studentDetailsContent').innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(`/counselor/students/${studentId}/details`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayStudentDetails(data);
+                } else {
+                    throw new Error(data.message || 'Failed to load student details');
+                }
+            } catch (error) {
+                console.error('❌ Error loading student details:', error);
+                document.getElementById('studentDetailsContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Error loading student details: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function displayStudentDetails(data) {
+            const student = data.student;
+            const stats = data.statistics;
+            const appointments = data.appointments;
+            
+            const content = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="student-avatar mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                                ${student.name.split(' ').map(n => n[0] || '').join('')}
+                            </div>
+                            <h5>${student.name}</h5>
+                            <p class="text-muted">${student.course || 'N/A'}</p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6>Contact Information</h6>
+                            <p><i class="fas fa-envelope"></i> ${student.email}</p>
+                            <p><i class="fas fa-id-badge"></i> ${student.student_id || 'N/A'}</p>
+                            ${student.phone ? `<p><i class="fas fa-phone"></i> ${student.phone}</p>` : ''}
+                            <p><i class="fas fa-graduation-cap"></i> Year ${student.year || 'N/A'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <h6>Session Statistics</h6>
+                        <div class="row mb-4">
+                            <div class="col-4 text-center">
+                                <h4 class="text-primary">${stats.total_appointments}</h4>
+                                <small>Total</small>
+                            </div>
+                            <div class="col-4 text-center">
+                                <h4 class="text-success">${stats.completed_sessions}</h4>
+                                <small>Completed</small>
+                            </div>
+                            <div class="col-4 text-center">
+                                <h4 class="text-info">${stats.completion_rate}%</h4>
+                                <small>Rate</small>
+                            </div>
+                        </div>
+                        
+                        <h6>Recent Appointments</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Topic</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${appointments.slice(0, 5).map(apt => `
+                                        <tr>
+                                            <td>${apt.date}</td>
+                                            <td><span class="badge bg-${getStatusColor(apt.status)}">${apt.status}</span></td>
+                                            <td>${apt.topic}</td>
+                                            <td>${apt.has_notes ? '<i class="fas fa-sticky-note text-info"></i>' : '-'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        ${appointments.length === 0 ? '<p class="text-muted">No appointments found.</p>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('studentDetailsContent').innerHTML = content;
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'completed': 'success',
+                'scheduled': 'primary',
+                'assigned': 'warning',
+                'cancelled': 'danger',
+                'pending': 'secondary'
+            };
+            return colors[status.toLowerCase()] || 'secondary';
+        }
+
+        // Export functionality
+        function exportStudentData() {
+            console.log('📤 Exporting student data...');
+            
+            try {
+                // Create a form and submit it to trigger download
+                const form = document.createElement('form');
+                form.method = 'GET';
+                form.action = '/counselor/students/export';
+                form.style.display = 'none';
+                
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+                
+                // Show success message
+                showToast('Export started! Your download should begin shortly.', 'success');
+                
+            } catch (error) {
+                console.error('❌ Export error:', error);
+                showToast('Export failed. Please try again.', 'error');
+            }
+        }
+
+        // Refresh data
+        async function refreshData() {
+            console.log('🔄 Refreshing student data...');
+            
+            try {
+                // Show loading state
+                const refreshBtn = document.querySelector('button[onclick="refreshData()"]');
+                const originalText = refreshBtn.innerHTML;
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+                refreshBtn.disabled = true;
+                
+                // Refresh the page
+                window.location.reload();
+                
+            } catch (error) {
+                console.error('❌ Refresh error:', error);
+                showToast('Refresh failed. Please try again.', 'error');
+            }
+        }
+
+        // Utility function to show toast messages
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'primary'} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check' : 'info-circle'}"></i>
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        // Error handling for failed requests
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('❌ Unhandled promise rejection:', event.reason);
+            showToast('An unexpected error occurred. Please refresh the page.', 'error');
+        });
+
+        // Debug function
+        function debugStudentsPage() {
+            console.log('🔍 Debug Info:');
+            console.log('All students:', allStudents.length);
+            console.log('Current filter:', currentFilter);
+            console.log('Visible students:', document.querySelectorAll('.student-card[style*="block"]').length);
+        }
+
+        // Make debug function available globally
+        window.debugStudentsPage = debugStudentsPage;
+    </script>
+</body>
+</html>

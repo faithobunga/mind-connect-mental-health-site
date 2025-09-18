@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - CUEA MindConnect Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --card-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 20px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: var(--secondary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            border: none;
+        }
+
+        .settings-section {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            flex: 1;
+        }
+
+        .setting-label h6 {
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .setting-label small {
+            color: #6c757d;
+        }
+
+        .setting-control {
+            flex: 0 0 200px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background-color: #ccc;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-switch.active {
+            background-color: var(--success-color);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::before {
+            transform: translateX(30px);
+        }
+
+        .logo-preview {
+            max-width: 200px;
+            max-height: 100px;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .logo-preview img {
+            max-width: 100%;
+            max-height: 80px;
+        }
+
+        .backup-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .maintenance-banner {
+            background: linear-gradient(135deg, var(--warning-color), #e67e22);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background-color: var(--success-color);
+        }
+
+        .status-offline {
+            background-color: var(--danger-color);
+        }
+
+        .status-warning {
+            background-color: var(--warning-color);
+        }
+
+        .save-btn {
+            background: var(--success-color);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #229954;
+            transform: translateY(-1px);
+        }
+
+        .danger-btn {
+            background: var(--danger-color);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .danger-btn:hover {
+            background: #c0392b;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .setting-control {
+                flex: none;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Admin Panel</h4>
+                        <small class="text-muted">CUEA MindConnect</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_users') }}">
+                                <i class="fas fa-users"></i>
+                                User Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_counselors') }}">
+                                <i class="fas fa-user-md"></i>
+                                Counselor Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_appointments') }}">
+                                <i class="fas fa-calendar-check"></i>
+                                Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_content') }}">
+                                <i class="fas fa-file-alt"></i>
+                                Content Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_forum_oversight') }}">
+                                <i class="fas fa-comments"></i>
+                                Forum Oversight
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_analytics') }}">
+                                <i class="fas fa-chart-bar"></i>
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('admin_settings') }}">
+                                <i class="fas fa-cog"></i>
+                                Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin_system_health') }}">
+                                <i class="fas fa-heartbeat"></i>
+                                System Health
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">System Settings</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn save-btn" id="saveAllSettings">
+                            <i class="fas fa-save"></i> Save All Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Maintenance Mode Banner -->
+                {% if settings.maintenance_mode %}
+                <div class="maintenance-banner">
+                    <i class="fas fa-tools"></i>
+                    <strong>Maintenance Mode Active</strong> - Only administrators can access the system
+                </div>
+                {% endif %}
+
+                <!-- Platform Branding -->
+                <div class="settings-card">
+                    <h4 class="mb-4"><i class="fas fa-palette text-primary"></i> Platform Branding</h4>
+                    
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Platform Logo</h6>
+                            <small>Upload your organization's logo (recommended: 200x60px, PNG/JPG)</small>
+                        </div>
+                        <div class="setting-control">
+                            <div class="logo-preview mb-2" id="logoPreview">
+                                {% if settings.platform_logo %}
+                                    <img src="{{ settings.platform_logo }}" alt="Current Logo">
+                                {% else %}
+                                    <i class="fas fa-image fa-2x text-muted"></i>
+                                    <div>No logo uploaded</div>
+                                {% endif %}
+                            </div>
+                            <input type="file" class="form-control" id="logoUpload" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Platform Name</h6>
+                            <small>The name displayed in the header and login pages</small>
+                        </div>
+                        <div class="setting-control">
+                            <input type="text" class="form-control" id="platformName" 
+                                   value="{{ settings.platform_name or 'CUEA MindConnect' }}">
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Primary Color</h6>
+                            <small>Main theme color for buttons and accents</small>
+                        </div>
+                        <div class="setting-control">
+                            <input type="color" class="form-control form-control-color" id="primaryColor" 
+                                   value="{{ settings.primary_color or '#2c3e50' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="settings-card">
+                    <h4 class="mb-4"><i class="fas fa-bell text-warning"></i> Notification Settings</h4>
+                    
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>System Email Address</h6>
+                            <small>Email address used for sending system notifications</small>
+                        </div>
+                        <div class="setting-control">
+                            <input type="email" class="form-control" id="systemEmail" 
+                                   value="{{ settings.system_email or 'admin@cuea.edu' }}">
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Email Notifications</h6>
+                            <small>Send email alerts for system events</small>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch {{ 'active' if settings.email_notifications else '' }}" 
+                                 onclick="toggleSetting(this, 'email_notifications')"></div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>New User Registration Alerts</h6>
+                            <small>Notify admins when new students register</small>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch {{ 'active' if settings.registration_alerts else '' }}" 
+                                 onclick="toggleSetting(this, 'registration_alerts')"></div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Appointment Reminders</h6>
+                            <small>Send reminder emails 24 hours before appointments</small>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch {{ 'active' if settings.appointment_reminders else '' }}" 
+                                 onclick="toggleSetting(this, 'appointment_reminders')"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="settings-card">
+                    <h4 class="mb-4"><i class="fas fa-shield-alt text-danger"></i> Security Settings</h4>
+                    
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Minimum Password Length</h6>
+                            <small>Required minimum characters for user passwords</small>
+                        </div>
+                        <div class="setting-control">
+                            <input type="number" class="form-control" id="minPasswordLength" 
+                                   value="{{ settings.min_password_length or 8 }}" min="6" max="20">
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Require Special Characters</h6>
+                            <small>Passwords must contain special characters (!@#$%^&*)</small>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch {{ 'active' if settings.require_special_chars else '' }}" 
+                                 onclick="toggleSetting(this, 'require_special_chars')"></div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Session Timeout (minutes)</h6>
+                            <small>Automatically log out users after inactivity</small>
+                        </div>
+                        <div class="setting-control">
+                            <input type="number" class="form-control" id="sessionTimeout" 
+                                   value="{{ settings.session_timeout or 60 }}" min="15" max="480">
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Two-Factor Authentication</h6>
+                            <small>Require 2FA for admin accounts</small>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch {{ 'active' if settings.require_2fa else '' }}" 
+                                 onclick="toggleSetting(this, 'require_2fa')"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Settings -->
+                <div class="settings-card">
+                    <h4 class="mb-4"><i class="fas fa-toggle-on text-success"></i> Feature Settings</h4>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Peer Support Forum</h6>
+                                    <small>Enable community discussions</small>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="toggle-switch {{ 'active' if settings.enable_forum else '' }}" 
+                                         onclick="toggleSetting(this, 'enable_forum')"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Mood Assessments</h6>
+                                    <small>Enable psychological assessments</small>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="toggle-switch {{ 'active' if settings.enable_assessments else '' }}" 
+                                         onclick="toggleSetting(this, 'enable_assessments')"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Online Appointments</h6>
+                                    <small>Allow booking counseling sessions</small>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="toggle-switch {{ 'active' if settings.enable_appointments else '' }}" 
+                                         onclick="toggleSetting(this, 'enable_appointments')"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Anonymous Posting</h6>
+                                    <small>Allow anonymous forum posts</small>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="toggle-switch {{ 'active' if settings.allow_anonymous else '' }}" 
+                                         onclick="toggleSetting(this, 'allow_anonymous')"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>User Registration</h6>
+                                    <small>Allow new student registrations</small>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="toggle-switch {{ 'active' if settings.allow_registration else '' }}" 
+                                         onclick="toggleSetting(this, 'allow_registration')"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Crisis Resources</h6>
+                                    <small>Show emergency contact links</small>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="toggle-switch {{ 'active' if settings.show_crisis_resources else '' }}" 
+                                         onclick="toggleSetting(this, 'show_crisis_resources')"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup & Maintenance -->
+                <div class="settings-card">
+                    <h4 class="mb-4"><i class="fas fa-database text-info"></i> Backup & Maintenance</h4>
+                    
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Automatic Backups</h6>
+                            <small>Automatically backup database daily</small>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch {{ 'active' if settings.auto_backup else '' }}" 
+                                 onclick="toggleSetting(this, 'auto_backup')"></div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Manual Backup</h6>
+                            <small>Download a backup of the current database</small>
+                        </div>
+                        <div class="setting-control">
+                            <button class="btn btn-outline-primary" id="createBackup">
+                                <i class="fas fa-download"></i> Create Backup
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h6>Recent Backups</h6>
+                        <div id="backupsList">
+                            {% for backup in recent_backups %}
+                            <div class="backup-item">
+                                <div>
+                                    <strong>{{ backup.filename }}</strong>
+                                    <br><small class="text-muted">{{ backup.created_at.strftime('%Y-%m-%d %H:%M') }} 
+                                    ({{ backup.size }})</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary me-2" onclick="downloadBackup('{{ backup.filename }}')">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteBackup('{{ backup.filename }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <h6>Maintenance Mode</h6>
+                            <small>Temporarily disable access for maintenance</small>
+                        </div>
+                        <div class="setting-control">
+                            <button class="btn {{ 'danger-btn' if settings.maintenance_mode else 'btn-outline-warning' }}" 
+                                    id="toggleMaintenanceMode">
+                                {% if settings.maintenance_mode %}
+                                    <i class="fas fa-play"></i> Disable Maintenance
+                                {% else %}
+                                    <i class="fas fa-tools"></i> Enable Maintenance
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Information -->
+                <div class="settings-card">
+                    <h4 class="mb-4"><i class="fas fa-info-circle text-secondary"></i> System Information</h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Platform Version</h6>
+                                    <small>Current system version</small>
+                                </div>
+                                <div class="setting-control">
+                                    <span class="badge bg-primary">v{{ system_info.version }}</span>
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Database Status</h6>
+                                    <small>Connection and health</small>
+                                </div>
+                                <div class="setting-control">
+                                    <span class="status-indicator status-{{ 'online' if system_info.db_status == 'healthy' else 'offline' }}"></span>
+                                    {{ system_info.db_status.title() }}
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Last Backup</h6>
+                                    <small>Most recent backup date</small>
+                                </div>
+                                <div class="setting-control">
+                                    {{ system_info.last_backup or 'Never' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Total Users</h6>
+                                    <small>Registered students and counselors</small>
+                                </div>
+                                <div class="setting-control">
+                                    <span class="badge bg-info">{{ system_info.total_users }}</span>
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Server Uptime</h6>
+                                    <small>System availability</small>
+                                </div>
+                                <div class="setting-control">
+                                    <span class="status-indicator status-online"></span>
+                                    {{ system_info.uptime }}
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-label">
+                                    <h6>Storage Used</h6>
+                                    <small>Database and file storage</small>
+                                </div>
+                                <div class="setting-control">
+                                    <span class="badge bg-warning">{{ system_info.storage_used }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Store settings changes
+        let settingsChanges = {};
+
+        // Toggle setting function
+        function toggleSetting(element, settingName) {
+            element.classList.toggle('active');
+            const isActive = element.classList.contains('active');
+            settingsChanges[settingName] = isActive;
+            
+            // Show save button if changes exist
+            showSaveButton();
+        }
+
+        // Show save button when changes are made
+        function showSaveButton() {
+            const saveBtn = document.getElementById('saveAllSettings');
+            if (Object.keys(settingsChanges).length > 0) {
+                saveBtn.classList.add('btn-warning');
+                saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Unsaved Changes';
+            }
+        }
+
+        // Track input changes
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('change', function() {
+                settingsChanges[this.id] = this.value;
+                showSaveButton();
+            });
+        });
+
+        // Save all settings
+        document.getElementById('saveAllSettings').addEventListener('click', function() {
+            if (Object.keys(settingsChanges).length === 0) {
+                alert('No changes to save.');
+                return;
+            }
+
+            fetch('/admin/settings/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(settingsChanges)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Settings saved successfully!');
+                    settingsChanges = {};
+                    this.classList.remove('btn-warning');
+                    this.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
+                    location.reload();
+                } else {
+                    alert('Error saving settings: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error saving settings: ' + error);
+            });
+        });
+
+        // Logo upload preview
+        document.getElementById('logoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('logoPreview');
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Logo Preview">`;
+                    
+                    // Upload logo
+                    const formData = new FormData();
+                    formData.append('logo', file);
+                    
+                    fetch('/admin/settings/upload-logo', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            settingsChanges.platform_logo = data.logo_url;
+                            showSaveButton();
+                        } else {
+                            alert('Error uploading logo: ' + data.message);
+                        }
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Create backup
+        document.getElementById('createBackup').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            this.disabled = true;
+            
+            fetch('/admin/settings/create-backup', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Backup created successfully!');
+                    location.reload();
+                } else {
+                    alert('Error creating backup: ' + data.message);
+                }
+            })
+            .finally(() => {
+                this.innerHTML = '<i class="fas fa-download"></i> Create Backup';
+                this.disabled = false;
+            });
+        });
+
+        // Download backup
+        function downloadBackup(filename) {
+            window.open(`/admin/settings/download-backup/${filename}`, '_blank');
+        }
+
+        // Delete backup
+        function deleteBackup(filename) {
+            if (confirm(`Are you sure you want to delete backup "${filename}"?`)) {
+                fetch(`/admin/settings/delete-backup/${filename}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Backup deleted successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error deleting backup: ' + data.message);
+                    }
+                });
+            }
+        }
+
+        // Toggle maintenance mode
+        document.getElementById('toggleMaintenanceMode').addEventListener('click', function() {
+            const isMaintenanceActive = this.classList.contains('danger-btn');
+            const action = isMaintenanceActive ? 'disable' : 'enable';
+            
+            if (confirm(`Are you sure you want to ${action} maintenance mode?`)) {
+                fetch('/admin/settings/toggle-maintenance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ enable: !isMaintenanceActive })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Maintenance mode ${action}d successfully!`);
+                        location.reload();
+                    } else {
+                        alert('Error toggling maintenance mode: ' + data.message);
+                    }
+                });
+            }
+        });
+
+        // Warn about unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (Object.keys(settingsChanges).length > 0) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    </script>
+</body>
+</html>
